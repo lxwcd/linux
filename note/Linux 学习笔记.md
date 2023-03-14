@@ -823,6 +823,15 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 > [echo command in Linux with Examples](https://www.geeksforgeeks.org/echo-command-in-linux-with-examples/)
 > [How to use Linux echo command](https://www.ionos.com/digitalguide/server/configuration/linux-echo-command/)
 
+## echo -n 不输出结尾的换行符
+![](img/2023-03-14-19-43-47.png)
+
+
+## echo -e 允许转义
+![](img/2023-03-14-19-46-03.png)
+![](img/2023-03-14-19-46-54.png)
+![](img/2023-03-14-19-48-11.png)
+
 
 # PATH 环境变量
 > [Linux path environment variable](https://linuxconfig.org/linux-path-environment-variable)
@@ -2699,20 +2708,20 @@ lkj<br/>
 ![1](https://img-blog.csdnimg.cn/b0c240b65d6a45eca279c0feff4e5ee9.png)
 
 
-## 查看文件内容——纯文本文件
+# 查看文件内容——纯文本文件
 > [ 文件内容查阅](http://cn.linux.vbird.org/linux_basic/0220filemanager_3.php)
 > [5 Commands to View the Content of a File in Linux Command Line](5 Commands to View the Content of a File in Linux Command Line)
 
 ![1](https://img-blog.csdnimg.cn/a1477d7c083544bb973a9f3db9fff2f3.png)
 
-### cat
+## cat
 > [Cat Command in Linux: Essential and Advanced Examples](https://linuxhandbook.com/cat-command/)
 > [How to Use Linux Cat Command (With Examples)](https://phoenixnap.com/kb/linux-cat-command)
 
 
 ![1](https://img-blog.csdnimg.cn/748f96c4ebe848278dc3e4f401610675.png)
 
-#### 显示多个输入
+### 显示多个输入
 ![1](https://img-blog.csdnimg.cn/283dfad016574960a20b87b52aeff211.png)
 
 <br/>
@@ -2790,40 +2799,40 @@ reverse lines charaterwise
 ![3](https://img-blog.csdnimg.cn/93c5c1f124964b4facc52888c738c8fe.png)
 
 
-### tail
+## tail
 ![1](https://img-blog.csdnimg.cn/e41fbc0ce43449e1ab672625052d2f9c.png)
 
-#### tail -n NUM
+### tail -n NUM
 
 ![1](https://img-blog.csdnimg.cn/26c79f356d4b4a04813b81fc853cf6d6.png)
 ![2](https://img-blog.csdnimg.cn/57f59673a6d647b8ab57be97a94b17f2.png)
 
 
-#### tail -c NUM
+### tail -c NUM
 
 ![1](https://img-blog.csdnimg.cn/987e4855448a41e68505683c883e0405.png)
 ![2](https://img-blog.csdnimg.cn/ae795be7d099484fba77e3ebf81cb684.png)
 
 
-#### tail -f
+### tail -f
 
 ![1](https://img-blog.csdnimg.cn/3cad37030307458ba10f821dc8624c3f.png)
 
 
-### cut
+## cut
 > [Linux cut命令](https://www.runoob.com/linux/linux-comm-cut.html)
 > 
 
 
 ![1](https://img-blog.csdnimg.cn/c5a6478b73dd49c1882bb01fcae72f3f.png)
 
-#### cut -b 以字节为单位分割
+### cut -b 以字节为单位分割
 ![1](https://img-blog.csdnimg.cn/ef8eed5d4e3f402d8b2c668145afd2ac.png)
 ![2](https://img-blog.csdnimg.cn/7333e9068047407f87df11501af5d035.png)
 ![3](https://img-blog.csdnimg.cn/5b044ecbb08745338223220661131dfc.png)
 ![4](https://img-blog.csdnimg.cn/fa17436211334ff58e43fbe6a71bf668.png)
 
-#### cut -c 以字符为单位分割
+### cut -c 以字符为单位分割
 ![1](https://img-blog.csdnimg.cn/cec14564d1e443a5842599898501e107.png)
 ![2](https://img-blog.csdnimg.cn/b265be093bc447959baaf7e0c99fce7c.png)
 
@@ -3546,28 +3555,28 @@ reverse lines charaterwise
 
 ## sort -n 按照数字排序
 - `sort --numeric-sort`
-![1](https://img-blog.csdnimg.cn/704779689a694ce2892efd50976a576e.png)
 
+![](img/2023-03-14-20-55-05.png)
 <br/>
 
 
 ## sort -R 随机排序，打乱顺序
 - `sort --Random-sort`
+
 ![1](https://img-blog.csdnimg.cn/105062fb7af74734bcb16f3a344395d9.png)
 
 <br/>
 
 ## sort -k 按照指定的列排序
 - `sort --key=KEYDEF`
-![1](https://img-blog.csdnimg.cn/a7fb5a7e632b4318869277356a1fc958.png)
-![2](https://img-blog.csdnimg.cn/5036d347f17c4d72b2010d3771b055c0.png)
-![3](https://img-blog.csdnimg.cn/083f3b1ae76640ffa426ea13f2ceb70f.png)
+- 默认的分隔符为空格
 
+![](img/2023-03-14-21-08-21.png)
 <br/>
 
 ## sort -t 指定分隔符
-`sort --field-separator=SEP`
-用 sort -k 时默认的分隔符为空格，可以用 -t 修改分隔符。
+- `sort --field-separator=SEP`
+- 用 sort -k 时默认的分隔符为空格，可以用 -t 修改分隔符。
 
 ![1](https://img-blog.csdnimg.cn/38ce0688e3d44936a7a61123021facdb.png)
 
@@ -3576,6 +3585,7 @@ reverse lines charaterwise
 
 ## sort -u 去除相同的行
 - `sort --unique`
+
 ![1](https://img-blog.csdnimg.cn/6817c04f5d8848768a61207b8997fc7b.png)
 ![2](https://img-blog.csdnimg.cn/cbb602f78aa7449f890e8883a18b3118.png)
 
@@ -3718,6 +3728,10 @@ reverse lines charaterwise
 - `cat -T` 将制表符显示为 `^I` 符号
 - `cat -E` 将行末的结束符显示出来
 
+### <font color=red>不能显示空格</font>
+- 之前有显示出末尾空格，但重新测试不显示 `^M` 标记
+![](img/2023-03-14-19-20-58.png) 
+
 ## vim 中 list 模式显示制表符和行结束符号$
 ![1](https://img-blog.csdnimg.cn/4a66d80b7db847a295f69a4c46dd005e.png)
 ![2](https://img-blog.csdnimg.cn/ab4cc700bebd4648a896364af42241dd.png)
@@ -3741,6 +3755,7 @@ reverse lines charaterwise
 
 - `man grep` 或 `grep --help` 查看帮助
 ![1](https://img-blog.csdnimg.cn/c30d1d8375a6444d8eb2b33e9fa89324.png)
+
 - 按行匹配
 - 默认区分大小写
 
@@ -3866,6 +3881,19 @@ reverse lines charaterwise
 ## grep -e 匹配多个模式
 ![1](https://img-blog.csdnimg.cn/de6e347cd0a147f5a87983ad8fa03a73.png)
 ![2](https://img-blog.csdnimg.cn/cba9bdc693554d27b1b47f475c350261.png)
+
+
+## grep -E 结合扩展正则表达式
+
+![](img/2023-03-14-19-54-00.png)
+
+
+![](img/2023-03-14-20-04-06.png)
+
+## <font color=red>grep 取出首尾单词相同的行</font>
+
+![](img/2023-03-14-20-36-34.png)
+
 
 # dd
 > [https://www.lanqiao.cn/courses/1/learning/?id=62&compatibility=true](https://www.lanqiao.cn/courses/1/learning/?id=62&compatibility=true)
