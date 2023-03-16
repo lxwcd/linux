@@ -12,6 +12,8 @@
 在 [learnshell](https://www.learnshell.org/) 上学习，该网站讲的详细，可以在线练习，但内容少。
 将 [Bash 脚本教程](https://wangdoc.com/bash/intro) 教程看完一遍。
 
+> [Shell Scripting Tutorial](https://www.tutorialspoint.com/unix/shell_scripting.htm) 
+> 要查询一些用法在官网：[bash manual](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Introduction)
 
 
 # 查询当前 shell 类型和全部 shell 类型

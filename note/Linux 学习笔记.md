@@ -429,6 +429,7 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 
 - 列出命令的简单描述
 - 查询利用数据库，如果刚装的程序，可能查不到，需要 `mandb` 更新数据库
+- rocky 8.6 中装完系统后执行 `whatis hostname` 命令，显示 `hostname: nothing appopriate`，普通用户执行 `sudo mandb`后可以正常使用
 
 ![0](img/2023-03-06-17-53-57.png)
 ![1](https://img-blog.csdnimg.cn/ebb4b50a5878470bbab5079b57d9b257.png)
@@ -753,7 +754,6 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 ![1](https://img-blog.csdnimg.cn/1264f460f34247b2950d7840ee3c596a.png)
 ![2](https://img-blog.csdnimg.cn/b7b87a8f32534b1b9c544bab7d7b5a16.png)
 ![3](https://img-blog.csdnimg.cn/d59789f03b374d07a3f326220a2ee133.png)
-
 ![4](https://img-blog.csdnimg.cn/e445603ba8bd45f78997baa31a0cfc3c.png)
 
 ## + 指定具体格式
@@ -787,6 +787,8 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 ![1](https://img-blog.csdnimg.cn/15c1d1aaed4e4820abed78946b1cb403.png)
 <br/>
 
+### 显示过去某天的星期
+![](img/2023-03-15-14-12-20.png)
 
 ### 查看距离当前一定时间的具体日期
 - `date -d` 或 `date --date`
@@ -832,6 +834,13 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 ![](img/2023-03-14-19-46-54.png)
 ![](img/2023-03-14-19-48-11.png)
 
+## <font color=red>echo $(ls) 和 ls</font>
+> [Difference between 'ls' and 'echo $(ls)'](https://unix.stackexchange.com/questions/283586/difference-between-ls-and-echo-ls)
+> [Command Substitution](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Substitution)
+
+
+
+![](img/2023-03-16-19-32-57.png)
 
 # PATH 环境变量
 > [Linux path environment variable](https://linuxconfig.org/linux-path-environment-variable)
@@ -2014,7 +2023,7 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 
 
 - 查找可执行文件
-- 在环境变量 $PATH 的路径中搜索
+- 在环境变量 `$PATH` 的路径中搜索
 - `-a` 显示全部匹配结果
 
 ![1](https://img-blog.csdnimg.cn/898cf91feab74c0792e482d92ddd48bc.png)
@@ -2033,19 +2042,19 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 > [Linux locate命令](https://www.runoob.com/linux/linux-comm-locate.html)
 > [How to Use the locate Command in Linux](https://phoenixnap.com/kb/locate-command-in-linux)
 
+
+- 从数据库查找数据，速度快
+- 新建的文件等需要更新，用 `updatedb` 更新
+- 查找的是路径全名，即 `-w` 选项；只搜索文件名
+- 不是实时更新，如果一个文件被删了，但数据库没更新，可能该能查到
+
+
 ![1](https://img-blog.csdnimg.cn/373a69d4c41549e7b2c2050fc0500575.png)
 ![2](https://img-blog.csdnimg.cn/c170119724394449b3c6ee3f1fd91e04.png)
 ![3](https://img-blog.csdnimg.cn/4b0246e6c6014a8a8deaf3ec5a7ad111.png)![4](https://img-blog.csdnimg.cn/82f84fc8274c473fb47423a358a809b8.png)
 
+
 &nbsp;
-
-
-- 从数据库查找数据，速度快
-- 新建的文件等需要更新，用 `updatedb` 更新
-- 查找的是路径全名，即 `-w` 选项；只搜索文件名用
-
-
-
 ## find
 > [find](http://cn.linux.vbird.org/linux_basic/0220filemanager_5.php#find)
 > [Linux find 命令](https://www.runoob.com/linux/linux-comm-find.html)
@@ -2058,9 +2067,6 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 <br/>
 
 ![1](https://img-blog.csdnimg.cn/e95e08f31182446ab6b1bb05f6cbb927.png)
-
-
-### <font color=red>find 查找的原理</font>
 
 
 ### <font color=red>find 查找没有 x 权限的目录</font>
@@ -2082,10 +2088,12 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 <br/>
 
 ### find -name 按文件名在特定目录查找
+- 直接指定文件名为精确查找
+
 ![1](https://img-blog.csdnimg.cn/a3a9923d02b94c189107b9dd08ebf26a.png)
 
+![](img/2023-03-15-10-30-04.png)
 <br/>
-
 
 ### find -type 指明文件类型查找
 
@@ -2095,7 +2103,6 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ![3](https://img-blog.csdnimg.cn/e004236c423e4e81865da24c9395109c.png)
 
 <br/>
-
 
 ### find -perm 查找特定权限的文件
 #### find -perm mode 精准匹配
@@ -2110,10 +2117,7 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 
 #### find -perm /mode 任意一个权限位的权限匹配即可
 
-
-
-
-<br/>
+![](img/2023-03-15-10-41-37.png)
 
 ### find -exec 对查找的文件执行命令
 ![1](https://img-blog.csdnimg.cn/0c55c4f5dd86433cb2f5eb62073f60b7.png)
@@ -2136,7 +2140,9 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 
 <br/>
 
-- `.?*` 排除 `.` ?
+- 这里的点表示符号 `.`，用的是通配符而非正则表达式的符号
+- 通配符 `*` 匹配任意字符，可以没有，因此可以匹配 `.` 
+- `.?*` 排除 `.`，`?` 匹配单个字符，`.` 后至少要有一个字符才行，因此排除 `.`
 
 ### 根据文件所有者或所属组查询
 > -user
@@ -2156,6 +2162,8 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 > 鸟哥的私房菜解释时间含义：[find](http://cn.linux.vbird.org/linux_basic/0220filemanager_5.php#find)
 
 
+- 当时间为 0，表示从当前时间到过去 24h 内的时间段
+
 ![1](https://img-blog.csdnimg.cn/76a2ce93e3ec4bd880b686c9c862c96a.png)
 
 <br/>
@@ -2166,7 +2174,7 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 
 ![1](https://img-blog.csdnimg.cn/f915c2174cf24f6fb1a0bde8d43bd192.png)
 
-lkj<br/>
+<br/>
 
 ### find -size 按文件大小查找文件
 
@@ -2188,7 +2196,6 @@ lkj<br/>
 小于等于 **n-1** unit。
 ![4](https://img-blog.csdnimg.cn/4211b5eaf3bf420bab6f61076ab866b1.png)
 
-&nbsp;
 
 - find -size +n -size -m 查找一段范围内文件
 ![2](https://img-blog.csdnimg.cn/862a9118535243fbbf8d4740cfe3ab2f.png)
@@ -2210,12 +2217,6 @@ lkj<br/>
 ![2](https://img-blog.csdnimg.cn/2c081937ac6541fca663cbb765392306.png)
 
 
-
-
-
-
-
-# 绝对路径和相对路径
 > [绝对路径与相对路径](http://cn.linux.vbird.org/linux_basic/0210filepermission_3.php#dir_path)
 
 
@@ -3068,6 +3069,11 @@ reverse lines charaterwise
 ![1](https://img-blog.csdnimg.cn/148d30a59a184f988c4c322bdf8e41ae.png)
 ![2](https://img-blog.csdnimg.cn/ecbf3dacc9834bd3ab33d016db547d7d.png)
 
+
+## tr -d "[:digit:]"
+
+![](img/2023-03-15-09-22-08.png)
+
 &nbsp;
 
 # Here 文档 输入多行字符串
@@ -3126,7 +3132,7 @@ reverse lines charaterwise
 
 ![1](https://img-blog.csdnimg.cn/a8d4ce01a46148c98ab7f5b822b46268.png)
 
-文件压缩指令只能针对单个文件压缩，不能压缩目录。
+- 文件压缩指令只能针对单个文件压缩，不能压缩目录。
 
 ## compress 压缩
 ### 一些比较小或者空的文件不能压缩
@@ -3151,7 +3157,6 @@ reverse lines charaterwise
 
 ## gzip 压缩文件
 > [Linux gzip命令：压缩文件或目录](http://c.biancheng.net/view/783.html)
-
 
 
 - gzip  只能压缩文件，不能压缩目录
@@ -3222,19 +3227,22 @@ reverse lines charaterwise
 ![3](https://img-blog.csdnimg.cn/ae65eb366f1144e4b33afe311df9daf9.png)
 
 ### bzip2 -k 压缩文件并保留源文件
+- `--keep` keep input files during compression or decompression
+
 ![4](https://img-blog.csdnimg.cn/b81b051a54d14702b213feb1c5286de0.png)
 
 ### bzip2 -c 
 - 将压缩的文件输出到标准输出
 - 直接输出到终端会提示错误
 - 可以结合重定向将输出的压缩文件内容重定向到一个文件
+
 ![1](https://img-blog.csdnimg.cn/578a796155eb48ed9273a31bf2f7a431.png)
 ![1](https://img-blog.csdnimg.cn/21fb597fc5664a0c8f00bdefdd789167.png)
 
 
 
 ### bzip2 -数字 设置压缩比
-和 gzip 相同
+- 和 gzip 相同
 
 ![5](https://img-blog.csdnimg.cn/a4b2ba732e53478b998fb85e334c0dd2.png)
 
@@ -3325,7 +3333,8 @@ reverse lines charaterwise
 <br/>
 
 ### -0 打包但不压缩
-数字为 0 ~ 9，0 不压缩，1 压缩比最低，速度最快；9 压缩比最高，速度最慢。
+- 数字为 0 ~ 9，0 不压缩，1 压缩比最低，速度最快；9 压缩比最高，速度最慢
+
 ![1](https://img-blog.csdnimg.cn/eeb53ca5da374489bca96f8acb3faf2e.png)
 
 &nbsp;
@@ -3390,6 +3399,7 @@ reverse lines charaterwise
 
 ### -t 查看打包的文件名
 - List the contents of an archive
+
 ![1](https://img-blog.csdnimg.cn/e481b9e488a042c68b1dfd9fca143ff5.png)
 
 - 加上 `-v` 选项可查看文件的属性等信息
@@ -3474,9 +3484,13 @@ reverse lines charaterwise
 
 ### split -l 按照文件的行划分
 - `-l` 指定分割的一份文件有多少行
+- `--lines=NUMBER`
+
 ![1](https://img-blog.csdnimg.cn/2e2d3a8a95344c70b59ba95600843f0a.png)
 
 ### split -n 将文件分成几份
+- `--number=CHUNKS`
+
 ![1](https://img-blog.csdnimg.cn/7bf89feffadb48b98b359880410fbb37.png)
 
 ### split -a 修改子文件后缀长度
@@ -3890,9 +3904,54 @@ reverse lines charaterwise
 
 ![](img/2023-03-14-20-04-06.png)
 
+# grep 中正则表达式应用
 ## <font color=red>grep 取出首尾单词相同的行</font>
 
 ![](img/2023-03-14-20-36-34.png)
+
+
+## grep "[0-Z]" 匹配
+
+![](img/2023-03-15-09-13-39.png)
+
+
+## [:digit:] 和 [[:digit:]]
+
+![](img/2023-03-15-09-22-08.png)
+
+# sed 
+
+- 一行一行处理，不将整个文件全部加载再处理
+  
+
+## s/regexp/replacement/ 查找替换
+- 不改变源文件的内容，仅将修改输出显示
+- 类似 vim 中的查找替换
+- 不加标志则，默认只替换一行中的第一个符合的字符
+- 标志位类似 vim 中替换的标志位，但不是全都支持
+- 可用标志位
+	- g
+	将一行中全部符合条件的均替换，而不是只替换第一个符合之处
+	- i 和 I
+    大写和小写的 i 均是忽略大小写，和 vim 不同，不加则区分大小写
+
+
+![](img/2023-03-16-20-01-49.png)
+![](img/2023-03-16-20-03-39.png)
+![](img/2023-03-16-20-34-38.png)
+
+### 指明行范围
+- `$` 表示最后一行
+- `1,3` 表示第 1 行到第 3 行
+- `1,+2` 表示第 1 行到第 1 行再加 2 行的位置
+- `1,/pattern/` 起始为第 1 行，结束根据模式匹配到的行
+
+![](img/2023-03-16-20-37-53.png)
+![](img/2023-03-16-21-13-27.png)
+
+### 处理一行中其中一个匹配内容
+![](img/2023-03-16-20-45-45.png)
+
 
 
 # dd
