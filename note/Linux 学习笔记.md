@@ -141,7 +141,11 @@
 
 
 
-# 常用热键
+# 常用热键查看
+- `stty -a` 查看热键，`man stty` 查看帮助说明
+
+![](img/2023-03-17-09-13-44.png)
+![](img/2023-03-17-09-18-48.png)
 
 ## 热键来源
 - `man bash` 查看帮助文档介绍，bash 会用到 [readline 库](https://en.wikipedia.org/wiki/GNU_Readline)
