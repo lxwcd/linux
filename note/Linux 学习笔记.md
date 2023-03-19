@@ -291,6 +291,12 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 ## logname
 ![1](https://img-blog.csdnimg.cn/a870ec486e964186b0ab3d4caa1b6ba6.png)
 
+
+## last
+- 查看最近登陆的用户
+
+![](img/2023-03-17-10-56-18.png)
+
 ## who
 > [who命令、whoami命令和who am i命令的区别](https://blog.csdn.net/u014270566/article/details/124177994)
 > [w who whoami](http://pygo2.top/articles/52265/)
@@ -2099,6 +2105,19 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ![](img/2023-03-15-10-30-04.png)
 <br/>
 
+- 可以使用通配符
+![](img/2023-03-19-09-41-48.png)
+  
+
+### <font color=red>find -regex 利用正则表达式查找文件</font>
+> [8.5.2 ‘emacs’ regular expression syntax](https://www.gnu.org/software/findutils/manual/html_node/find_html/emacs-regular-expression-syntax.html)
+
+- 用 Emacs 正则表达式
+
+![](img/2023-03-19-10-43-36.png)
+![](img/2023-03-19-10-48-25.png)
+![](img/2023-03-19-11-22-58.png)
+
 ### find -type 指明文件类型查找
 
 ![1](https://img-blog.csdnimg.cn/adbd3a5b27b248dfaae8d4e692fd7786.png)
@@ -2120,19 +2139,78 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ![6](https://img-blog.csdnimg.cn/4dc97e79cbeb49b990475b1185a0ef13.png)
 
 #### find -perm /mode 任意一个权限位的权限匹配即可
+- `find -perm /222` 则只要 	`owner group other` 中一个有 `w` 权限即可
+- `find -perm /002` 则 `other` 必须要有 `w` 权限，其他权限位的 `0` 不是只可以没有权限
 
 ![](img/2023-03-15-10-41-37.png)
+![](img/2023-03-19-11-07-57.png)
+
+### find -depth
+- 和 `find -d` 相同
+- 先处理目录的内容，再处理目录
+
+### find -ls
+- 加上 `-ls` 的选项，相当于 `ls -dils` 
+
+![](img/2023-03-19-11-46-58.png)
+
+### find -fls
+- 和 `ls` 类似，但将输出的内容重定向到文件中而非屏幕显示
+
+![](img/2023-03-19-14-36-41.png)
+
+
+### find -print
+- 将文件名打印到标准输出，每个文件名后加一个换行符
+- 默认行为
+
+![](img/2023-03-19-14-42-47.png)
+
+### find -print0
+- 和 `print` 类似，但每个文件后不加换行符，用 `null` 字符代替
+
+![](img/2023-03-19-14-47-11.png)
+![](img/2023-03-19-14-46-07.png)
+
+### <font color=red>find -prune 不递归查找目录</font>
+- 不能和 `-delete` 一起使用，`-delete` 默认递归处理目录
+- 要实现该功能可以用 `-maxdepth` 指定深度
+
+![](img/2023-03-19-14-58-32.png)
+![](img/2023-03-19-14-59-39.png)
+
+
+### find -maxdepth -mindepth 指定目录深度
+- 当前目录深度为 1，指定深度为 1，则只搜索当前目录
+- 指定深度时该参数放在最前面
+
+![](img/2023-03-19-15-09-31.png)
+![1](https://img-blog.csdnimg.cn/f62f9b2d240648c3b7b19e893847b352.png)
+![1](https://img-blog.csdnimg.cn/f915c2174cf24f6fb1a0bde8d43bd192.png)
+
 
 ### find -exec 对查找的文件执行命令
 ![1](https://img-blog.csdnimg.cn/0c55c4f5dd86433cb2f5eb62073f60b7.png)
 ![2](https://img-blog.csdnimg.cn/4724bcda74c64a84bd6efe578ac158d7.png)
 ![3](https://img-blog.csdnimg.cn/00c301ba761e4cf484bc174748941dfe.png)
 ![4](https://img-blog.csdnimg.cn/e566fb8f212842709ae24f9cb4132e12.png)
+![5](img/2023-03-19-14-17-46.png)
 
 **问题**：这里为什么有错误提示？看结果是删除成功了？
 
 <br/>
 
+### find -ok command ;
+- 和 `-exec` 类似，但执行命令时会提示
+
+![](img/2023-03-19-14-32-35.png)
+
+### find -delete 删除文件
+- 用该选项删除文件
+- 默认开启 `-depth` 选项
+
+![](img/2023-03-19-14-33-30.png)
+![](img/2023-03-19-14-26-36.png)
 
 ### find -empty 查找全部空文件
 ![1](https://img-blog.csdnimg.cn/ca5b0856c97f449e85be576545d81f14.png)
@@ -2148,6 +2226,13 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 - 通配符 `*` 匹配任意字符，可以没有，因此可以匹配 `.` 
 - `.?*` 排除 `.`，`?` 匹配单个字符，`.` 后至少要有一个字符才行，因此排除 `.`
 
+### 查找多个文件类型
+
+![](img/2023-03-19-15-33-51.png)
+
+### 找到一个符合的文件就退出
+
+![](img/2023-03-19-15-36-10.png)
 ### 根据文件所有者或所属组查询
 > -user
 > -group
@@ -2166,38 +2251,34 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 > 鸟哥的私房菜解释时间含义：[find](http://cn.linux.vbird.org/linux_basic/0220filemanager_5.php#find)
 
 
+#### 以天为时间
+- mtime atime ctime
 - 当时间为 0，表示从当前时间到过去 24h 内的时间段
 
 ![1](https://img-blog.csdnimg.cn/76a2ce93e3ec4bd880b686c9c862c96a.png)
 
-<br/>
 
-### 指定查询目录深度
+#### 以分钟为时间
+- mmin amin cmin
 
-![1](https://img-blog.csdnimg.cn/f62f9b2d240648c3b7b19e893847b352.png)
-
-![1](https://img-blog.csdnimg.cn/f915c2174cf24f6fb1a0bde8d43bd192.png)
-
-<br/>
 
 ### find -size 按文件大小查找文件
-
 ![1](https://img-blog.csdnimg.cn/4e8dc12bba254f7597382464990928ac.png)
-
+![](img/2023-03-19-16-06-17.png)
 
 - 单位 c，k，M，G 大小写敏感，数值不能是小数
 ![1](https://img-blog.csdnimg.cn/04564f387e3441838035a44a5795a518.png)
 
 - find -size n
-查询并非刚好 n units 的文件，而是 (n-1, n] unit 范围。
+- 查询并非刚好 n units 的文件，而是 (n-1, n] unit 范围。
 ![2](https://img-blog.csdnimg.cn/35bbe6780771452d911554c0011dd891.png)
 
 - find -size +n
-**大于 n** unit，不包括 n unit。
+- **大于 n** unit，不包括 n unit。
 ![3](https://img-blog.csdnimg.cn/c67f8f8e577b427da0e3bf862e04e37d.png)
 
 - find -size -n
-小于等于 **n-1** unit。
+- 小于等于 **n-1** unit。
 ![4](https://img-blog.csdnimg.cn/4211b5eaf3bf420bab6f61076ab866b1.png)
 
 
@@ -2207,20 +2288,21 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 
 <br/>
 
-### find -print0
-![1](https://img-blog.csdnimg.cn/3dc94611cd6d407aad41ce1342f846cf.png)
-![1](https://img-blog.csdnimg.cn/db8cd54df1ad42699b47b9e6d7e95f1d.png)
-
 
 ### 操作符
 > [Linux find command](https://www.computerhope.com/unix/ufind.htm#syntax)
 > [What is meant by POSIX compliant?](https://teacherscollegesj.org/what-is-meant-by-posix-compliant/)
 
 
+
 ![1](https://img-blog.csdnimg.cn/d513e67ad06e4d4bb3afadef927131f9.png)
 ![2](https://img-blog.csdnimg.cn/2c081937ac6541fca663cbb765392306.png)
 
 
+- 注意 `( expr )` 使用时括号要转义，即 `\( expr \)`，括号内左右两边有空格
+
+
+# 绝对路径和相对路径
 > [绝对路径与相对路径](http://cn.linux.vbird.org/linux_basic/0210filepermission_3.php#dir_path)
 
 
@@ -2230,8 +2312,6 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 # Linux 目录
 ## Linux 目录配置
 > [Linux目录配置](http://cn.linux.vbird.org/linux_basic/0210filepermission_3.php)
-
-
 
 
 ## 切换目录 cd
@@ -2472,6 +2552,12 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ![1](https://img-blog.csdnimg.cn/d68034ef44e84a4ab5af0800d852484a.png)
 
 <br/>
+
+## ls -s 
+> [Why does ls -l output a different size from ls -s?](https://askubuntu.com/questions/269480/why-does-ls-l-output-a-different-size-from-ls-s)
+
+- `ls -s` 列出的不是文件的真是大小
+![](img/2023-03-19-11-59-59.png)
 
 ## ll 常用组合 
 ![1](https://img-blog.csdnimg.cn/161e9d543c264b43bfb419ddd6cf9aa3.png)
@@ -2759,7 +2845,10 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 
 
 #### cat -A 显示非打印字符
+- 注意 windows 格式和 Linux 格式的文件显示隐藏字符不同
+
 ![1](https://img-blog.csdnimg.cn/f74d98d00cd54b7b8d92395249433e47.png)
+![](img/2023-03-17-09-58-44.png)
 
 <br/>
 
@@ -3736,19 +3825,18 @@ reverse lines charaterwise
 ![1](https://img-blog.csdnimg.cn/e96a88ceb20f45a2829224f145bfb060.png)
 
 # 查看文本中非打印字符
-## cat -A 显示出末尾空格、制表符、结束符等非打印字符
+## cat -A 显示出制表符、结束符等非打印字符
 ![1](https://img-blog.csdnimg.cn/9087369b700547318d3f23431b3412ef.png)
 
 <br/>
 
-- `cat -v` 只显示出末尾看不见的空格，可以方便查看末尾是否有空格
-![2](https://img-blog.csdnimg.cn/8eec24be6103414b9cb7987b753317f6.png)
+- `cat -v` 
+Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
+![](img/2023-03-17-09-58-44.png)
+
 - `cat -T` 将制表符显示为 `^I` 符号
 - `cat -E` 将行末的结束符显示出来
 
-### <font color=red>不能显示空格</font>
-- 之前有显示出末尾空格，但重新测试不显示 `^M` 标记
-![](img/2023-03-14-19-20-58.png) 
 
 ## vim 中 list 模式显示制表符和行结束符号$
 ![1](https://img-blog.csdnimg.cn/4a66d80b7db847a295f69a4c46dd005e.png)
@@ -3922,6 +4010,7 @@ reverse lines charaterwise
 ## [:digit:] 和 [[:digit:]]
 
 ![](img/2023-03-15-09-22-08.png)
+![](img/2023-03-17-10-18-30.png)
 
 # sed 
 
@@ -3958,6 +4047,13 @@ reverse lines charaterwise
 
 
 
+- 没有 `/etc/init.d/network` 文件 ？
+# 重启网络
+
+- ubuntu 20.04
+![](img/2023-03-17-14-38-13.png)
+
+- ubuntu 22.04
 # dd
 > [https://www.lanqiao.cn/courses/1/learning/?id=62&compatibility=true](https://www.lanqiao.cn/courses/1/learning/?id=62&compatibility=true)
 

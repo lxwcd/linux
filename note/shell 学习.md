@@ -5,6 +5,7 @@
 > [linuxcommand](http://linuxcommand.org/lc3_learning_the_shell.php)
 > [牛客刷题练习](https://www.nowcoder.com/exam/oj?page=1&tab=SHELL%E7%AF%87&topicId=195)
 > bash 官方文档：[Bash Reference Manual](https://www.gnu.org/software/bash/manual/bash.html)
+> [Advanced Bash-Scripting Guide](https://tldp.org/LDP/abs/html/index.html)
 
 
 1. 零基础学习
@@ -72,6 +73,27 @@
 # shopt 命令
 > [4.3.2 The Shopt Builtin](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#The-Shopt-Builtin)
 
+
+# operator
+
+## ;
+- 用 `;` 分开的命令顺序执行
+- 返回状态值为最后一条命令的执行结果
+- 不用 `;` 分开时一条命令中只要有错误的结果，则返回错误
+
+![](img/2023-03-18-10-20-02.png)
+![](img/2023-03-18-10-22-15.png)
+
+
+## &
+- 命令以 `&` 结束则 shell 异步地在子进程中执行
+- 命令在后台执行
+- 返回状态值为 0（true）
+
+## &&
+- 前面的命令执行成功才会执行右边的命令
+## ||
+- 左边的命令执行错误才会执行右边的命令
 
 
 
@@ -208,6 +230,7 @@
 ## Filename Expansion
 > [3.5.8 Filename Expansion](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Filename-Expansion)
 > [3.5.8.1 Pattern Matching](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Pattern-Matching)
+> [Think You Understand Wildcards? Think Again.](https://medium.com/@leedowthwaite/why-most-people-only-think-they-understand-wildcards-63bb9c2024ab)
 
 
 ![1](https://img-blog.csdnimg.cn/3a4878be23004b4e950b6330da073c43.png)
@@ -221,6 +244,8 @@
 
 ![1](https://img-blog.csdnimg.cn/dbe7900b7afc4ca3a9c0330b6db50a70.png)
 
+- multi-character wildcard
+- 匹配 0 个或多个字符
 - `*` 默认不匹配隐藏隐藏文件
 ![1](https://img-blog.csdnimg.cn/6e15e970e08a4325a5b77c95f99c5010.png)
 ![2](https://img-blog.csdnimg.cn/71059cdda01843f2a7dae1b6da145fb9.png)
@@ -290,3 +315,190 @@
 # 特殊参数
 ![1](https://img-blog.csdnimg.cn/3af7e751006b48c7b75e44ba9712a17f.png)
 
+
+# 变量
+## 变量名
+- 区分大小写
+- 字母、数字和下划线，不以数字开头
+- 不与保留变量名相同
+
+# Looping
+- 语句后加上 `;` 来代替换行
+- 用 `;` 分割命令，使得多个命令写在同一行
+  
+## until
+```bash
+until [ condition ]
+do
+...
+done
+```
+或
+```bash
+until [ condition ]; do
+...
+done
+```
+
+- `until` 后面的条件不满足则执行循环，满足则退出循环
+- 最后的退出状态为最后一条指令的执行结果
+
+## while
+
+```bash
+while [ condition ]
+do
+...
+done
+```
+
+- 满足条件则执行循环
+
+# for
+
+## for ... do ... done
+```bash
+for arg in [list]
+do
+...
+done
+```
+```bash
+for var in con1 con2 con3 ...
+do
+...
+done
+```
+
+## for ((exp1; expr2; exper3))
+> [Syntax error: Bad for loop variable](https://stackoverflow.com/questions/30358065/syntax-error-bad-for-loop-variable)
+
+
+- 用这种格式，执行时可以正常执行，但 `sh -n` 检查时提示 `bad for loop variable`，改用 `bash -n` 无错误
+
+![](img/2023-03-18-11-28-35.png)
+
+## break
+
+## continue
+
+# Conditional Constructs
+## if
+```bash
+if [ condition ]; then
+...
+fi
+```
+```bash
+if [ condition ]; then
+...
+elif [condition ]; then
+...
+else
+...
+fi
+```
+
+## case
+
+```bash
+case "$var" in
+    "$con1")
+        ...
+    ;;
+    "$con2|$con3")
+        ...
+    ;;
+    *)
+        ...
+    ;;
+esac
+```
+
+## select
+
+```bash
+select name in words
+do
+...
+done
+```
+
+# Operators
+## ((expression)) Arithmetic Expression
+![](img/2023-03-18-14-37-34.png)
+
+## [[expression]]
+
+## , comma operator
+- 逗号连接多个算术操作，返回最后一个的值
+
+## : null command
+- `NOP`
+- It may be considered as a synonym for the shell builtin `true`
+- exit status is `true` (0)
+- 如果在 `while` 循环的条件中写 `:` ，则相当于条件为 `true`
+- <font color=red>provide a placeholder where a binary operation is expected</font>
+- `: >` 将文件清空，仅适用普通文件
+
+![](img/2023-03-18-16-28-01.png)
+![](img/2023-03-18-16-35-11.png)
+![](img/2023-03-18-16-47-32.png)
+
+```bash
+# 相当于 while true
+while :
+do
+...
+done
+```
+
+```bash
+if condition
+then :  # do nothing 
+else
+...
+fi
+```
+
+## $'...' 进制转换
+- 将八进制或十六进制的数值转换为 ASCII 或 UNICODE 字符
+
+![](img/2023-03-18-17-44-05.png)
+
+
+# Positional Parameters
+## ?
+- `$?` 查看上个命令的退出状态值
+
+## $
+- `$$` expands to the process ID of the shell
+- In a subshell, it expands to the process ID of the **invoking shell, not the subshell** 
+
+
+# Grouping Commands
+## ()
+- 圆括号中的命令会在 subshell 中执行
+
+![](img/2023-03-18-14-45-04.png)
+## {}
+- 当前进程中执行命令
+
+```bash
+VAR=var
+echo ${VAR}
+```
+
+# Command Substitution
+## $(command)
+- 子进程中执行命令
+- Replace the command substitution with the standard output of the command, with any trailing newlines deleted.
+- 或者 **`command`**写法
+
+
+# Process Substitution 
+> [Chapter 23. Process Substitution](https://tldp.org/LDP/abs/html/process-sub.html)
+
+- `<(list)` 或 `>(list)`
+
+![](img/2023-03-18-15-41-00.png)
