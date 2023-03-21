@@ -286,6 +286,12 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 # 查看 IP 地址
 ![1](https://img-blog.csdnimg.cn/9453b193052247aab98ee0d9d16c303e.png)
 
+## ip a
+
+![](img/2023-03-20-09-45-21.png)
+## hostname -I
+![](img/2023-03-20-09-47-28.png)
+![](img/2023-03-20-09-47-52.png)
 
 # 查看登录用户
 ## logname
@@ -2372,8 +2378,17 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ![](img/2023-03-13-17-02-10.png)
 
 
-## //TODO 查看目录的实际大小
+# 查看目录的实际大小
+> [`ls -lS` isn't showing true size of directory](https://unix.stackexchange.com/questions/365369/ls-ls-isnt-showing-true-size-of-directory)
 
+- `ll` 查看的目录大小并非目录的实际大小
+![](img/2023-03-13-18-05-05.png)
+
+## du
+> [How to Get the Size of a Directory in Linux](https://linuxize.com/post/how-get-size-of-file-directory-linux/) 
+
+
+![](img/2023-03-19-16-56-55.png)
 # 链接文件
 > [Linux ln 命令](https://www.runoob.com/linux/linux-comm-ln.html)
 > [硬链接和符号链接的区别](https://www.cnblogs.com/LubinLew/p/LinuxFileLink.html)
@@ -2504,7 +2519,6 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 - 和源文件相同 
 #### 管道文件
 
-//TODO ll 显示目录的 size
 #### <font color=red>目录</font>
 > [Why is the size of a directory either 0 or 4096?](https://unix.stackexchange.com/questions/503048/why-is-the-size-of-a-directory-either-0-or-4096)
 > [`ls -lS` isn't showing true size of directory](https://unix.stackexchange.com/questions/365369/ls-ls-isnt-showing-true-size-of-directory)
@@ -2990,7 +3004,6 @@ reverse lines charaterwise
 - 不同文件系统的 inode
 - 文件系统没有 inode 号，但还有存储空间，也不能新建文件
 - inode 部分看深入理解计算机系统页表
-- ll 目录的size 
 - cp mv inde 是否在同一个文件系统
 - 不同分区 inode: df -i (查看多少分区，当前文件在哪个分区)
 - 不同分区的 inode，不同分区有相同一个 inode 号
@@ -3103,18 +3116,24 @@ reverse lines charaterwise
 ![1](https://img-blog.csdnimg.cn/a868442191654e9a9325a0c3a8622902.png)
 
 
-//TODO 输入重定向
 ## 输入重定向
 ![1](https://img-blog.csdnimg.cn/61b2d44cea54478990e419567528f334.png)
 
 
 - 用文件内容作为输入代替键盘输入
 - 注意命令是否支持标准输入，不支持则不能用输入重定向
+- 直接输入命令后回车，支持标准输入的则会等待输入，如 `cat`，`bc` 
 
 
 # | 管道
 - 管道 `|` 的前面要支持标准输出，后面要支持标准输入
 - 不支持标准错误，如果要处理标准错误，需要将标准错误重定向到标准输出
+- 管道的左右两边都在子进程中执行
+
+![](img/2023-03-19-17-53-13.png)
+![](img/2023-03-19-17-54-03.png)
+
+
 
 
 # tr 字符转换或删除
@@ -3143,13 +3162,15 @@ reverse lines charaterwise
 
 ![1](https://img-blog.csdnimg.cn/cf6acc29594140e38c2db5e496de10f0.png)
 
-//TODO tr -c
 ## tr -c 反选替换
 - 下面例子中，要替换的字符比用来替换的字符多，全替换为 `y`
+- 注意排除字符时可能会包含最后的换行符，可用 `echo -n` 去掉换行符
+
 ![1](https://img-blog.csdnimg.cn/e46a3631bcdf457589362a3cdaa13dba.png)
 ![2](https://img-blog.csdnimg.cn/4237ef5c53864806aeb420b8cbd7f9be.png)
-
-- tr -c 123 x 换行符处理，
+![](img/2023-03-19-17-21-32.png)
+![](img/2023-03-19-17-22-52.png)
+![](img/2023-03-19-17-24-46.png)
 
 ## tr -t 将原字符的长度减少到和替换字符相同
 - `t` 代表 `truncate`
@@ -3182,13 +3203,16 @@ reverse lines charaterwise
 
 - 将字符串通过标准输入传递给命令
 ![1](https://img-blog.csdnimg.cn/5853815999ac47ddb1c11755dde407d3.png)
+![](img/2023-03-19-17-31-57.png)
 
 &nbsp;
 
-# 进程替换
+# 进程替换 <(list)  >(list)
 > [Process Substitution: An Uncommon but Advanced Way for Input/Output Redirection in Linux](https://linuxhandbook.com/bash-process-substitution/)
+> [Chapter 23. Process Substitution](https://tldp.org/LDP/abs/html/process-sub.html)
 
 
+![](img/2023-03-18-15-41-00.png)
 
 # tee 命令
 > [How to Use the Linux tee Command](https://phoenixnap.com/kb/linux-tee)
@@ -3848,12 +3872,6 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 - 能识别出行结尾位置
 
 
-
-
-# du 显示文件大小
-![1](https://img-blog.csdnimg.cn/589e05e657ed4010b299d4d94d6ec4ff.png)
-
-
 # grep 
 > [20 grep command examples in Linux](https://www.golinuxcloud.com/grep-command-in-linux/)
 > [grep(1) — Linux manual page](https://man7.org/linux/man-pages/man1/grep.1.html)
@@ -4058,8 +4076,13 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 > [https://www.lanqiao.cn/courses/1/learning/?id=62&compatibility=true](https://www.lanqiao.cn/courses/1/learning/?id=62&compatibility=true)
 
 
+## 生成任意大小的文件
+- 文件单位
+![](img/2023-03-19-16-21-58.png)
 
 
+![](img/2023-03-19-16-22-38.png)
+![](img/2023-03-19-16-21-08.png)
 
 # xeyes
 > [xeyes](https://www.lanqiao.cn/courses/1/learning/?id=59)
@@ -4070,4 +4093,117 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 > [11 Fun Linux Command-Line Programs You Should Try When Bored](https://www.makeuseof.com/fun-linux-command-line-programs/)
 
 ## cmatrix
+
+
+# 软件管理
+> [鸟哥的 Linux 私房菜](http://cn.linux.vbird.org/linux_basic/linux_basic.php)
+
+## 软件包管理
+- 为了更好安装、卸载软件等，不用每次都要通过源码编译安装软件
+- 将软件所有相关文件打包成一个特殊格式的文件
+- 打包的文件包含**预先侦测系统**和**相依赖的脚本**
+- 打包的文件会记录软件提供的所有文件信息等
+- 安装软件时会进行环境检查，查看当前环境是否满足
+- 安装软件时会进行属性依赖检查，即安装某个软件可能需要依赖其它一些软件，不安装依赖则无法安装该软件
+
+
+## 软件包的分类
+> [What are *-devel packages?](https://stackoverflow.com/questions/2358801/what-are-devel-packages)
+
+- 一般软件内容分为一般使用和开发使用（devel package）
+- 很多软件会以函数库的方式释放出部分功能以供其他软件调用
+
+![](img/2023-03-21-15-41-06.png)
+## 获取软件包的途径
+
+- 官方网站
+
+
+## RPM 
+- 最早由 Red Hat 开发的包管理器
+- Package Manager
+- 软件已经事先被编译过，因此软件安装时对主机环境有要求
+- 安装软件前检查硬盘容量、操作系统版本等环境
+- RPM 文件提供软件版本信息、相关依赖、软件用途、所含文件等信息
+- RPM 文件使用数据库记录软件安装时必须具备的依赖属性软件以及其他参数等，便于软件升级、移除、验证、查询等
+- 通常不同的 distribution 所释出的 RPM 文件不能用在其他的 distributions 上
+
+### RPM 文件名
+> [Package filename and label](https://en.wikipedia.org/wiki/RPM_Package_Manager#Package_filename_and_label)
+
+
+![](img/2023-03-21-11-45-30.png)
+
+- 版本号后面的 release 第一个数字为相同的版本 rebuilt 的次数，可能是修复一些小 bug 或重设一些编译参数等
+- release 中的 `el` 时 `Red Hat Enterprise Linux` 的缩写，`8.7.0` 是适配 red hat 以及 centos 8.7.0 以上的版本 
+- 硬件操作平台常用种类
+  - i386
+  - i686
+  - x86_64
+  - noarch
+  没有硬件平台的限制
+
+
+
+
+### RPM 数据库目录 /var/lib/rpm
+> [What is the purpose of the '/var/lib/rpm' directory?](https://access.redhat.com/solutions/439953)
+
+- `/var/lib/rpm` 目录中包含 RPM 数据库
+- RPM 数据库包含系统中安装的 RPM 包的信息
+- 当使用 rpm 命令时会用到 RPM 数据库
+- 当安装或移除 rpm 包时会修改数据库
+- 但软件安装后其释放的软件内的文件放在其他目录中，如软件的使用手册说明放在 `/usr/share/doc` 目录中
+
+
+![](img/2023-03-21-15-32-45.png)
+
+## SRPM
+- Source RPM，即 RPM 文件里含的未编译的源代码
+- 文件的扩展名为 `*.src.rpm`
+- SRPM 中包含了软件所需的相关依赖性说明以及 RPM 文件提供的数据
+- 提供了参数配置文件，如 configure 与 makefile
+- 要以 RPM 管理的方式编译成 RPM 文件再安装
+- SRPM 可以通过修改配置参数来编译生成适合自己的 RPM 文件
+
+
+## YUM
+> [yum](https://en.wikipedia.org/wiki/Yum_(software))
+
+
+- Yellow Dog Updater, Modified
+- The YUM is a free and open-source command-line package-management utility for computers running the Linux operating system using the **RPM Package Manager**.
+- 为了解决 RPM 属性相依的问题
+- 安装软件时可自动装上需要的依赖
+
+## dpkg
+- Debian 社区开发的包管理器
+- Debian Package
+
+
+
+### Verify 校验文件
+- `man rpm` 搜索 `Verify`
+- 校验功能用于检查文件是否修改过
+- 软件安装包中的文件修改后卸载后会备份
+  
+![](img/2023-03-20-14-29-12.png)
+![](img/2023-03-20-14-30-20.png)
+
+
+## rocky 配置私有 yum 仓库
+环境：rocky 8.6
+
+- 安装 httpd
+```bash
+sudo yum install -y httpd
+```
+- 开启 httpd 服务
+```bash
+systemctl restart httpd.service
+```
+- 关闭防火墙
+```bash
+sudo systemctl stop firewalld.service
+```
 
