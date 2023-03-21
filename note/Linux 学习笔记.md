@@ -4114,12 +4114,29 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 - 很多软件会以函数库的方式释放出部分功能以供其他软件调用
 
 ![](img/2023-03-21-15-41-06.png)
+- 如安装 httpd 时有如下几个包
+![](img/2023-03-21-16-30-44.png)
+![](img/2023-03-21-16-32-10.png)
+![](img/2023-03-21-16-32-40.png)
+
+
+## 软件源
+### AppStream
+> [RHEL 8 - RHEL自带AppStream应用模块管理](https://blog.csdn.net/weixin_43902588/article/details/117589073)
+> [Chapter 1. Using AppStream](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/installing_managing_and_removing_user-space_components/using-appstream_using-appstream)
+> [Chapter 9. 使用AppStream](https://xy2401.com/local-docs/redhat/8.zh-Hans/installing-managing-and-removing-user-space-components/OEBPS/using-appstream_using-appstream.html)
+
+
+### BaseOS
+
+
 ## 获取软件包的途径
 
 - 官方网站
 
 
 ## RPM 
+- 环境：rocky 8.6
 - 最早由 Red Hat 开发的包管理器
 - Package Manager
 - 软件已经事先被编译过，因此软件安装时对主机环境有要求
@@ -4128,6 +4145,7 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 - RPM 文件使用数据库记录软件安装时必须具备的依赖属性软件以及其他参数等，便于软件升级、移除、验证、查询等
 - 通常不同的 distribution 所释出的 RPM 文件不能用在其他的 distributions 上
 
+![](img/2023-03-21-17-46-43.png)
 ### RPM 文件名
 > [Package filename and label](https://en.wikipedia.org/wiki/RPM_Package_Manager#Package_filename_and_label)
 
@@ -4144,6 +4162,19 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
   没有硬件平台的限制
 
 
+### RPM 仓库
+> [The Origin of RPM Content](https://docs.pulpproject.org/en/2.19/plugins/pulp_rpm/tech-reference/rpm.html#)
+
+
+![](img/2023-03-21-18-04-01.png)
+![](img/2023-03-21-18-07-30.png)
+
+- 根据功能不同将软件放在不同的仓库中，如 `AppStream` 和 `BaseOS`
+- 仓库中，如 `AppStrem` 中有两个目录
+	- Packages
+	rpm 安装包
+	- repodata
+	存放元数据，用来描述 RPM 包的信息
 
 
 ### RPM 数据库目录 /var/lib/rpm
@@ -4153,10 +4184,43 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 - RPM 数据库包含系统中安装的 RPM 包的信息
 - 当使用 rpm 命令时会用到 RPM 数据库
 - 当安装或移除 rpm 包时会修改数据库
-- 但软件安装后其释放的软件内的文件放在其他目录中，如软件的使用手册说明放在 `/usr/share/doc` 目录中
+- 但软guanguan其释放的软件内的文件放在其他目录中，如软件的使用手册说明放在 `/usr/share/doc` 目录中
 
 
 ![](img/2023-03-21-15-32-45.png)
+
+
+### 安装软件包
+环境
+- rocky 8.6
+- 虚拟机
+
+#### 从光盘安装包
+- 从系统的光盘中获取 rpm 包
+![](img/2023-03-21-17-00-05.png)
+![](img/2023-03-21-17-01-17.png)
+
+- 将光盘挂载到一个空目录
+	- `lsblk` 查看光盘的文件
+	
+	- 光盘文件在 `/dev/cdrom` （`/dev/sr0` 软连接）
+	
+	- 新建一个目录 `/mnt/cdrom`，利用 `mount /dev/sr0 /mnt/cdrom` 挂载光盘 
+	![](img/2023-03-21-17-13-02.png)
+	![](img/2023-03-21-17-15-31.png)
+	
+	- 查看光盘的内容，包主要在两个仓库中：BaseOS 和 AppStream
+		- BaseOS 放操作系统核心安装包
+		- AppStream 仓库放用户常用的安装包
+
+- 利用 rpm 安装，需要指定安装包的完整路径和文件名
+![](img/2023-03-21-18-13-14.png)
+![](img/2023-03-21-18-14-36.png)
+
+- 如果安装的包需要依赖，则 rpm 不能装成功
+![](img/2023-03-21-18-16-01.png)
+  
+
 
 ## SRPM
 - Source RPM，即 RPM 文件里含的未编译的源代码
