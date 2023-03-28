@@ -4393,3 +4393,14 @@ systemctl restart httpd.service
 sudo systemctl stop firewalld.service
 ```
 
+
+
+# curl
+
+//TODO: 补充脚本
+## 判断一个网站能否访问
+- `curl www.baidu.com` 可以测试写的网站能否访问
+- 能访问则返回 0，不能访问返回非0
+
+![](img/2023-03-28-20-04-43.png)
+

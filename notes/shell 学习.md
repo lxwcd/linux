@@ -367,6 +367,28 @@ done
 
 - 满足条件则执行循环
 
+
+### while read
+- 从标准输入读写入变量中
+- 
+
+
+//TODO: 补充脚本
+### 脚本示例
+#### 判断一个网站能否访问
+- `curl www.baidu.com` 可以测试写的网站能否访问
+- 能访问则返回 0，不能访问返回非0
+
+![](img/2023-03-28-20-04-43.png)
+
+#### 监控分区利用率
+- 设置一个阈值，最大的分区利用率超过阈值则报警并发邮件
+- 报警时提示超过阈值的设备文件
+- `df` 命令查看分区利用率，`sed` 取出利用率数值，`sort` 排序
+- ubuntu 22.04 虚拟机中设备 `/dev/sda` 等格式，ubuntu 20.04 物理机不是该名字
+
+
+
 ## for
 
 ### for ... do ... done
@@ -451,7 +473,7 @@ done
 - It may be considered as a synonym for the shell builtin `true`
 - exit status is `true` (0)
 - 如果在 `while` 循环的条件中写 `:` ，则相当于条件为 `true`
-- <font color=red>provide a placeholder where a binary operation is expected</font>
+- <font color=red>provide a placeholder where a binary operation is expected</font>，命令开头写 `:` 当占位符，这样 shell 不会将它后面的字符当作命令
 - `: >` 将文件清空，仅适用普通文件
 
 ![](img/2023-03-18-16-28-01.png)
@@ -502,11 +524,18 @@ VAR=var
 echo ${VAR}
 ```
 
+
+//TODO: 补充 subshell
+# subshell
+
 # Command Substitution
+
+//TODO: 补充 $()
 ## $(command)
 - 子进程中执行命令
 - Replace the command substitution with the standard output of the command, with any trailing newlines deleted.
 - 或者 **`command`**写法
+- 圆括号能继承父进程的自定义变量，但如果是用 `bash` 新打开一个进程，也是原来进程的子进程，但不继承父进程的自定义变量
 
 
 # Process Substitution 
@@ -515,3 +544,20 @@ echo ${VAR}
 - `<(list)` 或 `>(list)`
 
 ![](img/2023-03-18-15-41-00.png)
+
+
+# word splitting
+> [Word Splitting](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Word-Splitting)
+
+
+# Bash Builtin Commands
+## let
+
+## read
+> [read](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-read)
+
+
+
+
+
+![](img/2023-03-28-19-58-29.png)
