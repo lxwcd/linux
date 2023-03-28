@@ -414,7 +414,10 @@ done
 ![](img/2023-03-18-11-28-35.png)
 
 ## break
+> [break](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-break)
 
+
+- break [N] 后面可以指定一个数字，最内层的为 1
 ## continue
 
 # Conditional Constructs
@@ -451,6 +454,10 @@ esac
 ```
 
 ## select
+> [select](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-select)
+
+
+- 方便生成菜单
 
 ```bash
 select name in words
@@ -463,7 +470,12 @@ done
 ## ((expression)) Arithmetic Expression
 ![](img/2023-03-18-14-37-34.png)
 
+//TODO [[]]
 ## [[expression]]
+> [[[expression]]](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_005b_005b)
+
+
+
 
 ## , comma operator
 - 逗号连接多个算术操作，返回最后一个的值
@@ -557,7 +569,15 @@ echo ${VAR}
 > [read](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-read)
 
 
-
-
-
 ![](img/2023-03-28-19-58-29.png)
+
+
+## shift
+> [shift](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-shift)
+
+- shift [n]，默认 `n` 为1，即移除最左边的第 `n` 个参数，如果为 1，则原来的第二个参数变为第一个
+- 如果参数数目很多或者不固定，在脚本中可以用 shift，取走一个参数后，用 shift 移走第一个参数，这样原来的第二个参数变成第一个，脚本中只用 `$1` 取参数
+
+
+# Shell Functions
+> [Shell Functions](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Functions)

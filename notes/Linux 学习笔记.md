@@ -221,7 +221,7 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 
 
 
-## 修改提示符 
+## 修改提示符 PS1
 > [Controlling-the-Prompt](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Controlling-the-Prompt)
 > [环境变量PS1介绍](https://hongjh.blog.csdn.net/article/details/121312038)
 > [Bash PS1 customization examples](https://linuxhint.com/bash-ps1-customization/)
@@ -244,6 +244,10 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 - ubuntu 22.04 虚拟机中修改 PS1 （`/etc/profile`），需要 source 后生效，重新打开终端还原，且 `echo $PS1` 后查看的还是原来的变量
 
 
+//TODO: 补充
+# PS2
+
+# PS3
 
 
 # 主机名
@@ -4397,10 +4401,11 @@ sudo systemctl stop firewalld.service
 
 # curl
 
-//TODO: 补充脚本
 ## 判断一个网站能否访问
 - `curl www.baidu.com` 可以测试写的网站能否访问
 - 能访问则返回 0，不能访问返回非0
 
 ![](img/2023-03-28-20-04-43.png)
 
+
+# scp
