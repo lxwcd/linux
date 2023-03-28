@@ -3679,6 +3679,7 @@ reverse lines charaterwise
 <br/>
 
 ## sort -r 将排序后的结果逆序显示
+- 默认排序是从小到大，逆序后从大到小
 
 ![1](https://img-blog.csdnimg.cn/c01ee96cd37f46a58e9d69a5d5dd6ae7.png)
 
@@ -3686,6 +3687,7 @@ reverse lines charaterwise
 
 ## sort -n 按照数字排序
 - `sort --numeric-sort`
+- 默认从小到大排序
 
 ![](img/2023-03-14-20-55-05.png)
 <br/>
@@ -4045,6 +4047,7 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 	将一行中全部符合条件的均替换，而不是只替换第一个符合之处
 	- i 和 I
     大写和小写的 i 均是忽略大小写，和 vim 不同，不加则区分大小写
+- 分隔符 `/` 可以换成其他符号，如 `#` 或 `@` 等，当搜索的内容有 `/` 符号时，可以换成其他分隔符
 
 
 ![](img/2023-03-16-20-01-49.png)

@@ -1,4 +1,6 @@
 ﻿# 学习资源
+
+## 学习网站
 > [学习 Shell 脚本编程的免费资源 | Linux 中国](https://zhuanlan.zhihu.com/p/155613380)
 > [Bash 脚本教程](https://wangdoc.com/bash/intro)
 > [learnshell](https://www.learnshell.org/)
@@ -6,8 +8,18 @@
 > [牛客刷题练习](https://www.nowcoder.com/exam/oj?page=1&tab=SHELL%E7%AF%87&topicId=195)
 > bash 官方文档：[Bash Reference Manual](https://www.gnu.org/software/bash/manual/bash.html)
 > [Advanced Bash-Scripting Guide](https://tldp.org/LDP/abs/html/index.html)
+> [学习 shell 有什么好书推荐？](https://www.zhihu.com/question/19745611/answer/129024703)
+> [The Unix School](https://www.theunixschool.com/p/shell-scripts.html)
 
+## 书籍
 
+## 博客
+
+## 脚本示例
+
+## 练习
+
+# 学习过程
 1. 零基础学习
 学习 shell 前应先学 Linux 基本知识。
 在 [learnshell](https://www.learnshell.org/) 上学习，该网站讲的详细，可以在线练习，但内容少。
@@ -47,7 +59,7 @@
 ![1](https://img-blog.csdnimg.cn/1bd1209998dd4dc69bedf68d7a42e55a.png)
 
 ## 双引号
-- 除了 `$` `\` 反引号（**`**） 其他字符均视为普通字符
+- 除了 `$` `\` 反向单引号（**`**） 其他字符均视为普通字符
 - 显示双引号还是需要转义
 
 ![1](https://img-blog.csdnimg.cn/49c412977f634760a642a8d9ab6b8359.png)
@@ -120,6 +132,7 @@
 ![3](https://img-blog.csdnimg.cn/1c3b613167c2401eb7b032ad71408930.png)
 
 
+- 里面的逗号前后不能有空格
 
 ## ~ tilde expansion 
 > [3.5.2 Tilde Expansion](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Tilde-Expansion)
@@ -128,7 +141,6 @@
 - `man bash` 搜索 `Tilde Expansion` 查看帮助说明
 ![1](https://img-blog.csdnimg.cn/94a44f9f3f154652be5653cca7b1a825.png)
 ![2](https://img-blog.csdnimg.cn/653f160259864e90affed81714f000a7.png)
-![3](https://img-blog.csdnimg.cn/6b115ac8e44b4a2fadcb14bcf8157018.png)
 
 ## ${ } shell parameter expansion
 
@@ -274,7 +286,6 @@
 
 
 - `[start-end]` 方式不同 bash 版本，扩展方式可能不同，可查看 [3.5.8.1 Pattern Matching](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Pattern-Matching) 的说明
-
 ![1](https://img-blog.csdnimg.cn/83de8ee8c0bc488db165f353308175bb.png)
 ![2](https://img-blog.csdnimg.cn/aab8bb7fae7943fa9a6e477b7b06737f.png)
 ![3](https://img-blog.csdnimg.cn/b07efaf0b82b4d74887a7219f86fa7a3.png)
@@ -325,6 +336,8 @@
 # Looping
 - 语句后加上 `;` 来代替换行
 - 用 `;` 分割命令，使得多个命令写在同一行
+- 条件中如果写 `:` 相当于 `true`
+![](img/2023-03-28-17-10-58.png)  
   
 ## until
 ```bash
@@ -354,9 +367,9 @@ done
 
 - 满足条件则执行循环
 
-# for
+## for
 
-## for ... do ... done
+### for ... do ... done
 ```bash
 for arg in [list]
 do
@@ -370,7 +383,7 @@ do
 done
 ```
 
-## for ((exp1; expr2; exper3))
+### for ((exp1; expr2; exper3))
 > [Syntax error: Bad for loop variable](https://stackoverflow.com/questions/30358065/syntax-error-bad-for-loop-variable)
 
 
