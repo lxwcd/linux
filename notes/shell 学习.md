@@ -659,6 +659,19 @@ done
 ```
 
 # Operators
+> [Shell Basic Operators](https://www.tutorialspoint.com/unix/unix-basic-operators.htm#)
+
+
+
+
+## Boolean Operators
+- `!` logical negation
+- `-o` logical **OR**
+- `-a` logical **AND**
+
+
+![](img/2023-03-29-19-08-55.png)
+
 ## ((expression)) Arithmetic Expression
 > [arithmetic expression](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-select)
 
@@ -681,13 +694,26 @@ done
 - Conditional operators such as `-f` must be unquoted to be recognized as primaries.
 
 
+
+
 ### == 和 !=
 - 右边的字符串被认为是 [Pattern Matching](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Pattern-Matching)
 ![](img/2023-03-29-17-08-52.png)
 
+- 使用通配符，不能用引号包围
+![](img/2023-03-29-17-42-47.png)
+![](img/2023-03-29-17-48-40.png)
 
 ### =~ 
 - 右侧的字符串会被认为是 POSIX extended regular expression pattern and matched accordingly.
+![](img/2023-03-29-17-52-44.png)
+
+### 判断文件后缀
+
+![](img/2023-03-29-18-00-37.png)
+
+### 判断合法 IPv4 地址
+
 
 
 
@@ -737,22 +763,80 @@ fi
 - In a subshell, it expands to the process ID of the **invoking shell, not the subshell** 
 
 
-# Grouping Commands
-## ()
+# Command Execution Environment
+> [Command Execution Environment](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Execution-Environment)
+
+
+
+# subshell
+> [Command Execution Environment](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Execution-Environment)
+> [8.6. Shell Subprocesses and Subshells](https://docstore.mik.ua/orelly/unix3/korn/ch08_06.htm)
+
+
+- A subshell is a copy of the shell process.
+
+
+
+# 多个命令组合为一个整体 Grouping Commands
+> [Grouping Commands](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Grouping)
+
+
+- Bash 提供两种方法将多个命令组合成一个 group，因此执行时作为一个 unit。
+- When commands are grouped, redirections may be applied to the entire command list.
+
+
+## (list)
+> [Command Execution Environment](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Execution-Environment)
+> [Do parentheses really put the command in a subshell?](https://unix.stackexchange.com/questions/138463/do-parentheses-really-put-the-command-in-a-subshell)
+
+
 - 圆括号中的命令会在 subshell 中执行
 
-![](img/2023-03-18-14-45-04.png)
+- 圆括号中的变量赋值不会影响父进程
+
+- Commands grouped with parentheses are invoked in a subshell environment that is a duplicate of the shell environment, except that traps caught by the shell are reset to the values that the shell inherited from its parent at invocation.
+
+- shell 调用 fork 函数来创建的子进程，因此子进程继承父进程的自定义的变量，别名，用 `set -o` 临时设置的参数等环境
+![](img/2023-03-29-20-32-39.png)
+![](img/2023-03-29-20-34-35.png)
+![](img/2023-03-29-20-37-00.png)
+
+- 圆括号创建了子进程后，子进程和父进程用独立的虚拟内存空间，因此子进程中的临时设置和自定义变量等不会影响父进程
+
+
+
+用途：
+- 多个命令组合一起执行
+![](img/2023-03-29-20-29-58.png)
+
+- 临时做一些设置不影响父进程
+![](img/2023-03-29-20-39-52.png)
+![](img/2023-03-29-20-49-39.png)
+![](img/2023-03-29-20-51-11.png)
+
 ## {}
+> [{ list; }](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_007b)
+
 - 当前进程中执行命令
+- 可以将多个命令组合成一个整体，但不开启新的进程
+- 注意花括号两边要有空格，list 后面要有分号
 
-```bash
-VAR=var
-echo ${VAR}
-```
+![](img/2023-03-29-21-04-02.png)
 
 
-//TODO: 补充 subshell
-# subshell
+//TODO: 补充 pipeline
+# | pipeline
+> [pipeline](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Pipelines)
+
+
+- 管道的左边必须要有标准输出，管道的右边要能姐搜标准输入（仅输入命令后回车，终端会等待输入）
+- 管道的两边都会开启子进程
+![](img/2023-03-29-21-10-08.png)
+- 管道的退出状态（exit status）是管道中最后一个命令执行的退出状态
+
+# subprocess
+- 直接执行 `bash` 会开启一个子进程，但该子进程不继承父进程的自定义变量，别名和 `set -o` 设置等
+
 
 # Command Substitution
 
