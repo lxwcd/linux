@@ -86,7 +86,12 @@
 > [4.3.2 The Shopt Builtin](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#The-Shopt-Builtin)
 
 
-# operator
+# Lists of Commands
+> [List of Commands](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Lists)
+
+
+- A `list` is a sequence of one or more pipelines separated by one of the operators `;`, `&`, `&&`, or `||`, and optionally ternimated by one of `;`, `&`, or a `newline`.
+
 
 ## ;
 - 用 `;` 分开的命令顺序执行
@@ -104,10 +109,17 @@
 
 ## &&
 - 前面的命令执行成功才会执行右边的命令
+- left associativity
+
+
 ## ||
 - 左边的命令执行错误才会执行右边的命令
+- left associativity
 
 
+## && 和 || 组合
+
+![](img/2023-03-29-09-32-06.png)
 
 
 # shell expansion
@@ -332,6 +344,74 @@
 - 区分大小写
 - 字母、数字和下划线，不以数字开头
 - 不与保留变量名相同
+
+
+
+# Bash Conditional Expressions
+> [Bash Conditional Expressions](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Bash-Conditional-Expressions)
+
+- When used with `[[`, the `<` and `>` operators sort lexicographically using the current locale. The `test` command uses ASCII ordering.
+
+
+
+## 文件判断
+
+- Unless otherwise specified, primaries that operate on files follow **symbolic links** and operate on the **target of the link**, rather than the link itself.
+
+
+### 选项
+![](img/2023-03-29-09-53-20.png)
+![](img/2023-03-29-09-55-10.png) 
+
+### -a|-e 判断文件是否存在
+- `-a` 和 `-e` 都是判断文件是否存在
+- 有的版本用 `-a` 可能有问题，最好用 `-e`
+- 这种判断文件不区分文件类型
+
+![](img/2023-03-29-10-25-21.png)
+
+
+### -f|-d|-b|-c|-p|-h|-L 根据文件类型判断
+- `-f` 判断普通文件（regular file），符号链接和硬链接文件也会判断
+- `-d` 判断目录
+- `-b` 判断块文件（block special file）
+- `-c` 判断字符文件（character special file）
+- `-p` 判断管道文件（named pipe）
+- `-h` 和 `-L` 都是判断符号链接
+
+![](img/2023-03-29-10-42-13.png)
+![](img/2023-03-29-10-46-26.png)
+![](img/2023-03-29-10-49-39.png)
+
+
+### -r|-w|-x 根据文件权限判断
+- 注意 root 判断时特殊性，文件没有 r 和 w，root 也有这两项权限
+- 只要文件中 u, g 或 o 有一个有 x，权限，则 root 有 x，否则 root 也没 x 权限
+- 符号链接文件判断的是源文件
+
+
+![](img/2023-03-29-10-58-22.png)
+![](img/2023-03-29-11-01-52.png)
+![](img/2023-03-29-12-06-24.png)
+
+
+
+
+
+
+### -u|-g|-k 根据文件特殊权限判断
+- `-u` 为设置 `SUID` 权限
+- `-g` 为设置 `SGID` 权限
+- `-k` 为设置 `SBIT` 权限
+- 如果是符号链接文件，直接判断的是源文件而非符号链接文件
+
+
+![](img/2023-03-29-12-03-09.png)
+
+
+### -N 判断文件是否修改过
+![](img/2023-03-29-12-12-51.png)
+
 
 # Looping
 - 语句后加上 `;` 来代替换行
