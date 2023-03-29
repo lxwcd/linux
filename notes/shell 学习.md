@@ -128,8 +128,10 @@
 
 
 - shell 先将命令分成 tokens
-- 然后进行扩展，按照一定顺序
+- 然后进行扩展，**按照一定顺序**，注意扩展的顺序
 ![1](https://img-blog.csdnimg.cn/dd0ee2039e5c41afbe79f69f3325f87e.png)
+![](img/2023-03-29-14-54-21.png)
+
 - 扩展完成后再执行命令
 
 
@@ -139,12 +141,28 @@
 > [大括号扩展](https://wangdoc.com/bash/expansion#大括号扩展)
 
 
+- 花括号扩展是第一个扩展的，在其他扩展之前，因此，花括号中不能放其他扩展格式
+![](img/2023-03-29-14-57-46.png)
+
+
+### {a,b,c}
+- 里面的逗号前后不能有空格
+![](img/2023-03-29-14-36-19.png)
+
+
+### {x..y[..incr]}
+- {x..y[..incr]} x，y 可以是整型或字母
+![](img/2023-03-29-14-41-54.png)
+- 
+![](img/2023-03-29-14-47-24.png)
+
+
+
 ![1](https://img-blog.csdnimg.cn/e4f85bf49b264dc0832a533828ea659b.png)
 ![2](https://img-blog.csdnimg.cn/2534c660a0844aef926dab4c03237ccf.png)
 ![3](https://img-blog.csdnimg.cn/1c3b613167c2401eb7b032ad71408930.png)
 
 
-- 里面的逗号前后不能有空格
 
 ## ~ tilde expansion 
 > [3.5.2 Tilde Expansion](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Tilde-Expansion)
@@ -371,13 +389,14 @@
 ![](img/2023-03-29-10-25-21.png)
 
 
-### -f|-d|-b|-c|-p|-h|-L 根据文件类型判断
+### -f|-d|-b|-c|-p|-h|-L|S 根据文件类型判断
 - `-f` 判断普通文件（regular file），符号链接和硬链接文件也会判断
 - `-d` 判断目录
 - `-b` 判断块文件（block special file）
 - `-c` 判断字符文件（character special file）
 - `-p` 判断管道文件（named pipe）
 - `-h` 和 `-L` 都是判断符号链接
+- `-S` 判断套接字文件（socket）
 
 ![](img/2023-03-29-10-42-13.png)
 ![](img/2023-03-29-10-46-26.png)
@@ -389,15 +408,9 @@
 - 只要文件中 u, g 或 o 有一个有 x，权限，则 root 有 x，否则 root 也没 x 权限
 - 符号链接文件判断的是源文件
 
-
 ![](img/2023-03-29-10-58-22.png)
 ![](img/2023-03-29-11-01-52.png)
 ![](img/2023-03-29-12-06-24.png)
-
-
-
-
-
 
 ### -u|-g|-k 根据文件特殊权限判断
 - `-u` 为设置 `SUID` 权限
@@ -405,12 +418,103 @@
 - `-k` 为设置 `SBIT` 权限
 - 如果是符号链接文件，直接判断的是源文件而非符号链接文件
 
-
 ![](img/2023-03-29-12-03-09.png)
 
 
 ### -N 判断文件是否修改过
 ![](img/2023-03-29-12-12-51.png)
+
+
+### -O|-G 文件存在且有有效的 UID|GID
+- `-O` 文件存在且有有效的 UID
+- `-G` 文件存在且有有效的 GID
+
+### file1 -ef file2 两个文件相同
+- equal file
+- 两个文件同属某个文件的**硬链接**或者一个为另一个的**硬链接**
+- 两个文件的 inode 号相同，且属于一个分区的一个文件系统
+
+### file1 -nt file2 比较两个文件的时间
+- newer than
+- 比较的是 mtime
+- file1 必须存在
+- file2 不存在，file1 存在，返回 true
+
+![](img/2023-03-29-14-23-07.png)
+
+
+### file1 -ot file2
+- older than
+- 比较 mtime
+- file1 不存在，file2 存在，返回 true
+
+![](img/2023-03-29-14-27-25.png)
+
+
+## 变量判断
+
+### -v varname  判断变量是否赋值
+- True if the shell variable varname is set (has been assigned a value)
+- 变量赋值为空也可以 
+![](img/2023-03-29-15-17-43.png)
+
+
+### -R varname 变量是 name reference
+- True if the shell variable is set and is a name reference
+
+## -o optname shell 选项判断
+> [The Set Builtin](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#The-Set-Builtin)
+
+- True if the shell option optname is enabled
+![](img/2023-03-29-15-23-20.png)
+
+
+## 字符串判断
+
+### -z 字符串长度为零
+- 字符串长度为 zero 则为 true
+- 字符串最好用双引号包围
+- 字符串中仅一个空格也不为空
+
+![](img/2023-03-29-15-29-34.png)
+
+
+### -n 字符串长度不为零
+- 字符串长度为 non-zero 则为真
+- 可以直接写字符串判断
+![](img/2023-03-29-15-33-45.png)
+
+
+### 字符串是否相等
+- 两种格式：string1 == string2 或 string1 = string2
+- 等号前后需要有空格，否则变成变量赋值
+- `=` should be used with the `test` command for POSIX conformance
+![](img/2023-03-29-15-36-54.png)
+
+### 字符串比较
+- string1 != string2
+- string1 < string2 
+- string1 > string2
+
+
+![](img/2023-03-29-15-48-46.png)
+
+## 整型数值比较
+> [Shell Basic Operators](https://www.tutorialspoint.com/unix/unix-basic-operators.htm)
+
+![](img/2023-03-29-15-54-31.png)
+
+- Arg1 and Arg2 mau be positive or negative intergers
+
+
+# Shell Arithmetic
+> [Shell Arithmetic](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Arithmetic)
+
+
+![](img/2023-03-29-16-27-32.png)
+
+
+
 
 
 # Looping
@@ -538,6 +642,14 @@ esac
 
 
 - 方便生成菜单
+- select name [in words ...]; do conmmand; done
+- words 会被扩展，产生一系列项，每项最前面是一个数字
+- 如果省略 `in words` 部分，则默认用 `$@`
+- select display the `PS3` prompt and reads a line from the standard input
+- 遇到 EOF 则终止并返回 1
+- The line read is saved in the variable `REPLY`
+- 可以用 `break` 终止
+
 
 ```bash
 select name in words
@@ -548,12 +660,34 @@ done
 
 # Operators
 ## ((expression)) Arithmetic Expression
+> [arithmetic expression](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-select)
+
+
 ![](img/2023-03-18-14-37-34.png)
 
-//TODO [[]]
-## [[expression]]
-> [[[expression]]](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_005b_005b)
 
+## [ expression ] Test Expression
+- 方括号的两边要有空格
+- 字符串比较时最好用双引号包围
+
+
+
+## [[ expression ]] Test Expression
+> [conditional expression](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_005b_005b)
+> [Are double square brackets [[ ]] preferable over single square brackets [ ] in Bash?](https://stackoverflow.com/questions/669452/are-double-square-brackets-preferable-over-single-square-brackets-in-b)
+
+
+- The words between the [[ and ]] do not undergo word splitting and filename expansion.
+- Conditional operators such as `-f` must be unquoted to be recognized as primaries.
+
+
+### == 和 !=
+- 右边的字符串被认为是 [Pattern Matching](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Pattern-Matching)
+![](img/2023-03-29-17-08-52.png)
+
+
+### =~ 
+- 右侧的字符串会被认为是 POSIX extended regular expression pattern and matched accordingly.
 
 
 
