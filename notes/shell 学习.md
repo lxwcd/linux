@@ -10,8 +10,10 @@
 > [Advanced Bash-Scripting Guide](https://tldp.org/LDP/abs/html/index.html)
 > [学习 shell 有什么好书推荐？](https://www.zhihu.com/question/19745611/answer/129024703)
 > [The Unix School](https://www.theunixschool.com/p/shell-scripts.html)
+> [BashGuide](http://mywiki.wooledge.org/BashGuide)
 
 ## 书籍
+> [Learing the Korn Shell](https://docstore.mik.ua/orelly/unix3/korn/)
 
 ## 博客
 
@@ -225,10 +227,21 @@
 
 ![1](https://img-blog.csdnimg.cn/45c27819f10b4d27a91ff8035234e3f1.png)
 
-## $() 和 `` 子命令扩展
+## $(command) 子命令扩展
+> [Difference between $() and () in Bash](https://stackoverflow.com/questions/39110485/difference-between-and-in-bash)
 > [3.5.4 Command Substitution](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Substitution)
 > [子命令扩展](https://wangdoc.com/bash/expansion#子命令扩展)
 
+
+- 注意区分 `$()` 和 `()`，前者将命令展开成字符串，后者将多个命令组合成一个 group 执行
+![](img/2023-03-30-11-25-18.png)
+
+- subshell 中执行命令，和 () 相似
+![](img/2023-03-30-11-33-12.png)
+
+- Replace the command substitution with the standard output of the command, with any trailing newlines deleted.
+
+- 或者 **`command`**写法，这种写法是旧写法
 
 - `man bash` 查看帮助
 ![1](https://img-blog.csdnimg.cn/86df82a1119543b0b6665fc53b09e3a0.png)
@@ -236,16 +249,18 @@
 ![3](https://img-blog.csdnimg.cn/aab2322e3a634f84bcb609a5b7444e97.png)
 
 
-## $(( )) 算数扩展
+## $(( expression )) 算数扩展
 > [3.5.5 Arithmetic Expansion](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Arithmetic-Expansion)
 > [6.5 Shell Arithmetic](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Arithmetic)
 > [Bash 的算术运算](https://wangdoc.com/bash/arithmetic)
 
 
+![](img/2023-03-30-11-49-03.png)
 
 - `man bash` 查看帮助
 ![1](https://img-blog.csdnimg.cn/a97d83103a474d81906e734fc6d35f22.png)
 ![2](https://img-blog.csdnimg.cn/be29f6eb29d24b82aca905de875f5776.png)
+
 
 - 只支持整数的算数运算
 ![1](https://img-blog.csdnimg.cn/91c31ba1f75e4e9e8a92daa2800be5f7.png)
@@ -672,11 +687,6 @@ done
 
 ![](img/2023-03-29-19-08-55.png)
 
-## ((expression)) Arithmetic Expression
-> [arithmetic expression](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-select)
-
-
-![](img/2023-03-18-14-37-34.png)
 
 
 ## [ expression ] Test Expression
@@ -767,6 +777,13 @@ fi
 > [Command Execution Environment](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Execution-Environment)
 
 
+# subprocess
+> [8.6. Shell Subprocesses and Subshells](https://docstore.mik.ua/orelly/unix3/korn/ch08_06.htm)
+
+
+- 直接执行 `bash` 会开启一个子进程，但该子进程不继承父进程的自定义变量，别名和 `set -o` 设置等
+- 执行一个 shell 脚本时，不同的调用脚本方式可以在当前进程执行（继承父进程的自定义变量，别名，set -o 等的临时设置）或者在一个 subprocess 中执行（不继承父进程的自定义变量等）
+
 
 # subshell
 > [Command Execution Environment](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Execution-Environment)
@@ -774,6 +791,7 @@ fi
 
 
 - A subshell is a copy of the shell process.
+- 区分 subshell 和 subprocess
 
 
 
@@ -824,29 +842,21 @@ fi
 ![](img/2023-03-29-21-04-02.png)
 
 
-//TODO: 补充 pipeline
 # | pipeline
 > [pipeline](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Pipelines)
 
 
-- 管道的左边必须要有标准输出，管道的右边要能姐搜标准输入（仅输入命令后回车，终端会等待输入）
+- 管道的左边必须要有标准输出，管道的右边要能支持标准输入（仅输入命令后回车，终端会等待输入）
 - 管道的两边都会开启子进程
 ![](img/2023-03-29-21-10-08.png)
 - 管道的退出状态（exit status）是管道中最后一个命令执行的退出状态
+- If the lastpipe option is enabled using the **shopt** builtin (see (The Shopt Builtin)[https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#The-Shopt-Builtin]), the last element of a pipeline may be run by the shell process when job control is not active.
 
-# subprocess
-- 直接执行 `bash` 会开启一个子进程，但该子进程不继承父进程的自定义变量，别名和 `set -o` 设置等
+
+![](img/2023-03-30-10-36-01.png)
 
 
 # Command Substitution
-
-//TODO: 补充 $()
-## $(command)
-- 子进程中执行命令
-- Replace the command substitution with the standard output of the command, with any trailing newlines deleted.
-- 或者 **`command`**写法
-- 圆括号能继承父进程的自定义变量，但如果是用 `bash` 新打开一个进程，也是原来进程的子进程，但不继承父进程的自定义变量
-
 
 # Process Substitution 
 > [Chapter 23. Process Substitution](https://tldp.org/LDP/abs/html/process-sub.html)
