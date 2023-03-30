@@ -1,25 +1,28 @@
 ﻿# 学习资源
 
 ## 学习网站
+> [The UNIX School](https://www.theunixschool.com/)
 > [学习 Shell 脚本编程的免费资源 | Linux 中国](https://zhuanlan.zhihu.com/p/155613380)
 > [Bash 脚本教程](https://wangdoc.com/bash/intro)
 > [learnshell](https://www.learnshell.org/)
 > [linuxcommand](http://linuxcommand.org/lc3_learning_the_shell.php)
-> [牛客刷题练习](https://www.nowcoder.com/exam/oj?page=1&tab=SHELL%E7%AF%87&topicId=195)
 > bash 官方文档：[Bash Reference Manual](https://www.gnu.org/software/bash/manual/bash.html)
 > [Advanced Bash-Scripting Guide](https://tldp.org/LDP/abs/html/index.html)
 > [学习 shell 有什么好书推荐？](https://www.zhihu.com/question/19745611/answer/129024703)
 > [The Unix School](https://www.theunixschool.com/p/shell-scripts.html)
 > [BashGuide](http://mywiki.wooledge.org/BashGuide)
 
+
 ## 书籍
 > [Learing the Korn Shell](https://docstore.mik.ua/orelly/unix3/korn/)
+
 
 ## 博客
 
 ## 脚本示例
 
 ## 练习
+> [牛客刷题练习](https://www.nowcoder.com/exam/oj?page=1&tab=SHELL%E7%AF%87&topicId=195)
 
 # 学习过程
 1. 零基础学习
@@ -39,6 +42,14 @@
 
 # 设置 shell 选项 shopt 
 [shopt 命令](https://wangdoc.com/bash/expansion#shopt-%E5%91%BD%E4%BB%A4)
+
+# set 命令
+> [4.3.1 The Set Builtin](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#The-Set-Builtin)
+
+
+# shopt 命令
+> [4.3.2 The Shopt Builtin](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#The-Shopt-Builtin)
+
 
 # 引号和转义
 > [引号和转义](https://wangdoc.com/bash/quotation)
@@ -78,14 +89,6 @@
 - `man bash` 中列出的 ANSI-C 一些转义
 ![1](https://img-blog.csdnimg.cn/a73b0b338a51435dbe37c524eda8b78e.png)
 ![2](https://img-blog.csdnimg.cn/4876725e4752404f84d5c35477445918.png)
-
-
-# set 命令
-> [4.3.1 The Set Builtin](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#The-Set-Builtin)
-
-
-# shopt 命令
-> [4.3.2 The Shopt Builtin](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#The-Shopt-Builtin)
 
 
 # Lists of Commands
@@ -612,11 +615,6 @@ done
 
 ![](img/2023-03-18-11-28-35.png)
 
-## break
-> [break](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-break)
-
-
-- break [N] 后面可以指定一个数字，最内层的为 1
 ## continue
 
 # Conditional Constructs
@@ -730,34 +728,6 @@ done
 ## , comma operator
 - 逗号连接多个算术操作，返回最后一个的值
 
-## : null command
-- `NOP`
-- It may be considered as a synonym for the shell builtin `true`
-- exit status is `true` (0)
-- 如果在 `while` 循环的条件中写 `:` ，则相当于条件为 `true`
-- <font color=red>provide a placeholder where a binary operation is expected</font>，命令开头写 `:` 当占位符，这样 shell 不会将它后面的字符当作命令
-- `: >` 将文件清空，仅适用普通文件
-
-![](img/2023-03-18-16-28-01.png)
-![](img/2023-03-18-16-35-11.png)
-![](img/2023-03-18-16-47-32.png)
-
-```bash
-# 相当于 while true
-while :
-do
-...
-done
-```
-
-```bash
-if condition
-then :  # do nothing 
-else
-...
-fi
-```
-
 ## $'...' 进制转换
 - 将八进制或十六进制的数值转换为 ASCII 或 UNICODE 字符
 
@@ -870,7 +840,110 @@ fi
 > [Word Splitting](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Word-Splitting)
 
 
-# Bash Builtin Commands
+# shell 内置命令
+> [Shell Builtin Commands](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Builtin-Commands)
+
+
+## Bourne Shell Builtins
+> [Bourne Shell Builtins](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Builtin-Commands)
+
+
+### : null command
+> [a colon](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Builtin-Commands)
+
+
+- `: [arguments]`
+- `NOP`
+- It may be considered as a synonym for the shell builtin `true`
+- exit status is `true` (0)
+- 如果在 `while` 循环的条件中写 `:` ，则相当于条件为 `true`
+- <font color=red>provide a placeholder where a binary operation is expected</font>，命令开头写 `:` 当占位符，这样 shell 不会将它后面的字符当作命令
+- `: >` 将文件清空，仅适用普通文件
+
+![](img/2023-03-18-16-28-01.png)
+![](img/2023-03-18-16-35-11.png)
+![](img/2023-03-18-16-47-32.png)
+
+```bash
+# 相当于 while true
+while :
+do
+...
+done
+```
+
+```bash
+if condition
+then :  # do nothing 
+else
+...
+fi
+```
+
+### . A Period
+> [a period](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_002e)
+
+
+- `. filename [arguments]`
+
+- 和命令 `source` 效果相同
+
+- Read and execute commands from the filename arguments in the **current shell context**.
+![](img/2023-03-30-14-26-16.png)
+
+- 用 `.` 执行脚本，脚本可以没有 `x` 权限
+![](img/2023-03-30-14-32-17.png)
+
+- 如果执行时带参数，则脚本中用位置变量来获取参数的值
+
+- return status 时最后一条执行的命令的 exit status
+
+- 如果没命令执行，则 exit status 为 0
+
+- 如果文件名不存在或者文件不可读，则 return status 是非零
+
+
+### break
+> [break](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-break)
+
+
+- break [n] 
+
+- Exit from a `for, while, until, or select` loop
+
+- 后面可以指定一个数字，最小为 1，表名当层的循环
+
+- 不指定则退出最当层循环，即 n 为 1
+  
+- 如果 n 为 2，则退出当层，和该层外面一层的循环
+
+
+### cd
+> [cd](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-cd)
+
+
+- Change the current working directory.
+
+- If the directory is not supplied, the value of the `HOME` shell variable is used.
+
+- If the shell variable `[CDPATH](https://www.theunixschool.com/2012/04/what-is-cdpath.html)` exists, it is used as a search path: each directory name in `CDPATH` is searched for directory, with alternative directory names in `CDPATH` separated by a colon (`:`). **If directory begins with a slash, `CDPATH` is not used.** 
+
+
+![](img/2023-03-30-15-27-25.png)
+
+#### -P 进入源目录而非符号链接目录
+
+![](img/2023-03-30-15-25-56.png)
+
+#### -e 退出状态
+
+![](img/2023-03-30-15-27-25.png)
+
+#### - 切换到上次的工作目录
+- 切换到 `OLDPWD` 环境变量的值所代表的目录
+
+
+## Bash Builtin Commands
 ## let
 
 ## read
@@ -885,6 +958,19 @@ fi
 
 - shift [n]，默认 `n` 为1，即移除最左边的第 `n` 个参数，如果为 1，则原来的第二个参数变为第一个
 - 如果参数数目很多或者不固定，在脚本中可以用 shift，取走一个参数后，用 shift 移走第一个参数，这样原来的第二个参数变成第一个，脚本中只用 `$1` 取参数
+
+
+# 环境变量
+
+## CDPATH
+> [What is CDPATH](https://www.theunixschool.com/2012/04/what-is-cdpath.html)
+> [Hack 1. Use CDPATH to define the base directory for cd command](https://linux.101hacks.com/cd-command/cdpath/)
+
+
+## PWD
+
+## OLDPWD
+
 
 
 # Shell Functions
