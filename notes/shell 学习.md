@@ -918,6 +918,31 @@ fi
 - 如果 n 为 2，则退出当层，和该层外面一层的循环
 
 
+### continue
+> [continue](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-continue)
+
+
+- `continue [n]`
+- Resume the next iteration of an enclosing `for, while, or select` loop.
+- 同 `break` 相同，当层循环的 n 为 1，默认的 n 为 1 
+
+
+### exit
+
+
+### eval
+> [eval](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-eval)
+
+
+### exec
+
+
+### export
+
+
+
+
+
 ### cd
 > [cd](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-cd)
 

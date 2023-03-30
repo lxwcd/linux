@@ -4415,3 +4415,9 @@ sudo systemctl stop firewalld.service
 
 
 # scp
+
+//TODO: sleep 问题
+# sleep
+
+![](img/2023-03-30-17-52-06.png)
+
