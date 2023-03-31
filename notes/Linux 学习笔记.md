@@ -4043,9 +4043,87 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 ![](img/2023-03-17-10-18-30.png)
 
 # sed 
+> [sed, a stream editor](https://www.gnu.org/software/sed/manual/sed.html#Invoking-sed)
 
+
+
+
+- `sed` is a stream editor. A stream editor is used to perform basic text transformations on an input stream(a file or input from a pipeline).
+- `sed` can filter text in a pipeline.
 - 一行一行处理，不将整个文件全部加载再处理
-  
+
+
+## 工作原理
+> [How sed Works](https://www.gnu.org/software/sed/manual/sed.html#index-Pattern-space_002c-definition)
+
+
+- `sed` maintains two data buffers: the active pattern space, and the auxiliary hold space. Both are initially empty.
+- `sed` 从 input stream 读取一行内容，去掉 trailing newline 后将其放到 pattern space 中。 
+- 然后执行命令，每个命令可以关联一个地址，即在选择的地址返回内执行命令。
+- 当该行的命令执行完成后，除非使用了 `-n` 选项，该模式空间的内容会打印到 output stream，加上被移除的 trailing newline。
+- 接着开始重复的处理下面一行内容。
+
+
+
+
+
+## 命令格式
+- `sed [OPTION]... {script-only-if-no-other-script} [input-file]...`
+
+
+![](img/2023-03-31-19-54-15.png)
+
+
+### 选项 OPTION
+> [Command-line Options](https://www.gnu.org/software/sed/manual/sed.html#Command_002dLine-Options)
+
+
+#### -n 不自动输出模式空间的内容
+- quite, --silent 
+- 不自动的输出模式空间的内容
+
+![](img/2023-03-31-20-25-52.png)
+
+
+#### -e 处理多个命令
+- `--expression=script` 
+- Add the commands in script to the set of commands to be run while processing the input.
+
+
+![](img/2023-03-31-20-38-12.png)
+![](img/2023-03-31-20-43-10.png)
+
+#### -i[SUFFIX] 修改文件
+> [sed -i](https://www.gnu.org/software/sed/manual/sed.html#Command_002dLine-Options)
+
+
+- `--in-place[=SUFFIX]`
+- `sed` 将创建一个临时文件并发送输出到该文件而非标准输出。
+- 当文件全部处理完，临时文件被重命名为输出文件的名字，即覆盖原始文件。
+- 可以加一个后缀（SUFFIX），这样起到备份的作用，将原始文件的名字修改为带有后缀或前缀的名字。
+- 添加前缀或后缀时，可以用 `*` 代表源文件的名字，这样可以在 `*` 前后添加字符。
+- 后缀中不加 `*`，则默认在源文件的名后添加后缀。
+
+
+![](img/2023-03-31-21-18-43.png)
+## 处理多个命令
+> [Multiple commands syntax](https://www.gnu.org/software/sed/manual/sed.html#Multiple-commands-syntax)
+
+
+### `sed` 命令用 newlines 分隔
+
+![](img/2023-03-31-20-47-55.png)
+
+### 用 `;` 分隔一些命令
+
+![](img/2023-03-31-20-49-33.png)
+
+### 用 `-e` 选项
+
+
+
+## 处理标准输入的内容
+
 
 ## s/regexp/replacement/ 查找替换
 - 不改变源文件的内容，仅将修改输出显示
@@ -4054,7 +4132,7 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 - 标志位类似 vim 中替换的标志位，但不是全都支持
 - 可用标志位
 	- g
-	将一行中全部符合条件的均替换，而不是只替换第一个符合之处
+	将**一行**中全部符合条件的均替换，而不是只替换第一个符合之处
 	- i 和 I
     大写和小写的 i 均是忽略大小写，和 vim 不同，不加则区分大小写
 - 分隔符 `/` 可以换成其他符号，如 `#` 或 `@` 等，当搜索的内容有 `/` 符号时，可以换成其他分隔符
@@ -4078,13 +4156,16 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 
 
 
-- 没有 `/etc/init.d/network` 文件 ？
 # 重启网络
 
 - ubuntu 20.04
 ![](img/2023-03-17-14-38-13.png)
 
 - ubuntu 22.04
+没有 `/etc/init.d/network` 文件 ？
+
+
+
 # dd
 > [https://www.lanqiao.cn/courses/1/learning/?id=62&compatibility=true](https://www.lanqiao.cn/courses/1/learning/?id=62&compatibility=true)
 
@@ -4421,3 +4502,18 @@ sudo systemctl stop firewalld.service
 
 ![](img/2023-03-30-17-52-06.png)
 
+
+# 进程
+
+## 进程状态
+### 三态
+
+### 五态
+
+## 观察进程
+
+### ps
+
+### pstree
+
+### 
