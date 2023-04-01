@@ -4791,6 +4791,7 @@ sudo systemctl stop firewalld.service
 # df 
 - 只能看正在挂载的文件系统
 
+# blkid 查看文件的 UUID
 
 # 磁盘分区
 操作环境：虚拟机
@@ -4871,6 +4872,12 @@ sudo systemctl stop firewalld.service
 ### ext4 
 - 支持扩容和缩减
 
+### xfs
+
+### swap
+
+
+
 ## 虚拟文件系统 VFS
 - 屏蔽不同文件系统的差异
 
@@ -4891,6 +4898,8 @@ sudo systemctl stop firewalld.service
 
 - mkfs.ext -b 创建文件系统时指定文件大小
 - 一旦文件系统创建完成，不能修改块的大小
+
+
 
 ### Reserved blocks
 - 保留块，预留给 root 使用，普通用户无法使用，应急
@@ -4917,7 +4926,151 @@ sudo systemctl stop firewalld.service
 
 ## mount 临时挂载
 
+### -o ro 只读
+
+### -a
+
+### unmount 接触挂载
+
 ## 永久挂载
+### 写配置文件 `/etc/fstab`
+	- 设备名或UUID
+	UUID 在用 mount 挂载后会生成，可以用 blkid 查看，该方式更好
+	- 挂载点
+	- 文件系统类型
+	- 选项
+	如 `ro` 只读
+
+### 让配置文件生效
+- mount -a 对配置文件中新增的行可以生效，但修改配置文件或删除不能生效
+- mount -o remount 挂载点名 可以让配置文件生效
+
+
+# 逻辑卷轴管理器 LVM
+## 什么时 LVM
+
+
+## 为什么需要逻辑卷
+
+## 逻辑卷使用和物理卷区别
+
+## 能否将全部分区都用逻辑卷
+
+
+## 逻辑卷的性能
+
+
+## 物理卷
+### 查看物理卷的信息
+#### pvs
+
+
+#### pvdisplay 
+- 更详细
+
+
+## PE
+
+## VG 卷组
+- volumn group
+
+
+### 查看卷组信息
+#### vgs 
+
+#### vgdisplay
+
+
+## LV 逻辑卷
+- logical volumn
+
+### lvcreate 创建逻辑卷
+- 创建完的逻辑卷是软连接
+![](img/2023-04-01-20-18-26.png)
+
+
+
+### 查看逻辑卷的信息
+#### lvs
+
+### lvdisplay
+
+![](img/2023-04-01-20-20-51.png)
+
+
+
+## 创建逻辑卷的过程
+### 创建分区
+
+### 修改分区的类型为 LVM
+	- MBR 类型
+	- GPT 类型
+
+### 安装 lvm2 软件包
+	- rocky : yum -y install lvm2
+	- ubuntu: apt -y install lvm2
+
+### pvcreate 创建物理卷
+- 如 `pvcreate /dev/sdb{1..3}
+- 
+
+
+### vgcreate 创建卷组
+- 如 `vgcreate vg_demo /dev/sdb{1..3}`
+- 可以指定 PE 大小，加上 `-s` 选项，不指定则使用默认值
+
+
+### lvcreate 创建逻辑卷
+- `lvcreate  `
+
+#### -n 指定逻辑卷名字
+
+#### -L 指定逻辑卷的大小
+- 可以直接指定 size，如 `6G`
+- 如果指定的大小不是 PE 的整数倍怎么处理？
+- 指定的大小不能超过卷组的大小
+
+#### -l 指定逻辑卷的大小
+- 指定 PE 的个数
+
+#### 指明逻辑卷的卷组
+- 一个逻辑卷能否能否从多个卷组组合？
+- 能否不指明卷组
+
+
+### 为逻辑卷创建文件系统
+- 如 `mkfs.xfs /dev/vg_demo/lv1`
+
+![](img/2023-04-01-20-27-21.png)
+
+
+### 挂载
+- 用 `blkid` 查看 UUID 
+- 修改 `/etc/fstab` 配置文件，注意挂载点必须存在
+![](img/2023-04-01-20-48-47.png)
+- 让配置文件生效 
+	- `mount -a` 
+
+
+
+## lvextend 扩展逻辑卷
+- 在卷组的多余空间中扩容
+- 格式：`lvextend {} LV_NAME`
+
+
+### 扩展条件
+- 已经有文件系统，已经有数据，能否扩容
+- 先看卷组是否还有空间
+![](img/2023-04-01-21-00-02.png)
+
+
+### -L 指定大小
+- 如 `lvextend -L +4G` 原来的基础上增加 `4G`，必须卷组有 `4G` 的空间
+![](img/2023-04-01-21-06-39.png)
+
+### -l 指定 PE 个数
+
+### -r 自动重置文件系统大小
 
 
 # 进程
