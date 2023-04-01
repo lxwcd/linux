@@ -4828,10 +4828,18 @@ sudo systemctl stop firewalld.service
 ### GPT 分区
 
 ## 新增磁盘
+> [ Virtual Hard Disk is added, but not showing using lsblk -d command](https://www.linuxquestions.org/questions/linux-newbie-8/virtual-hard-disk-is-added-but-not-showing-using-lsblk-d-command-4175645367/)
+> [How to detect new hard disk attached without rebooting?](https://unix.stackexchange.com/questions/404405/how-to-detect-new-hard-disk-attached-without-rebooting)
+> [How to Scan Newly added Disks in Linux Easily](https://www.learnitguide.net/2016/02/how-to-scan-newly-added-disks-in-linux.html)
+> [How to Scan\Detect new LUN’s & SCSI disks in Linux](https://www.2daygeek.com/scan-detect-luns-scsi-disks-on-redhat-centos-oracle-linux/)
+
 - 是否需要关机状态新增硬盘
 - 新增硬盘后让系统识别到新硬盘
 	- 重启系统
-	- 
+	- 重新扫描硬盘
+	![](img/2023-04-01-21-31-47.png)
+
+
 
 ## fdisk 创建 MBR 分区
 - 需要 root 权限
@@ -5067,6 +5075,8 @@ sudo systemctl stop firewalld.service
 ### -L 指定大小
 - 如 `lvextend -L +4G` 原来的基础上增加 `4G`，必须卷组有 `4G` 的空间
 ![](img/2023-04-01-21-06-39.png)
+
+
 
 ### -l 指定 PE 个数
 
