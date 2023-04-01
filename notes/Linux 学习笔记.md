@@ -4044,7 +4044,7 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 
 # sed 
 > [sed, a stream editor](https://www.gnu.org/software/sed/manual/sed.html#Invoking-sed)
-
+> [50 sed Command Examples](https://linuxhint.com/50_sed_command_examples/)
 
 
 
@@ -4067,14 +4067,155 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 
 
 
+## sed 使用的正则表达式语法
+> [Regular Expressions: selecting text](https://www.gnu.org/software/sed/manual/sed.html#sed-regular-expressions)
+
+
+- greedy 模式匹配
+
+
+### 基本正则表达式
+> [5.3 Overview of basic regular expression syntax](https://www.gnu.org/software/sed/manual/sed.html#BRE-syntax)
+
+
+#### `.` 
+- Matched any character, including newline.
+
+#### `\+`
+
+#### `\?`
+
+#### `\{i\}`
+
+#### `\{i,j\}`
+
+#### `\{i,\}`
+
+#### `\(regexp\)`
+
+#### regexp1\|regexp2
+- or
+  
+#### regexp1regexp2
+- and
+
+#### \digit
+- 对 `()` 中的内容 back reference，如 `\1` 引用第一个 group 的内容
+
+#### `\n`
+- newline
+
+#### `\char`
+- 对特殊字符转义，匹配字符本身，如 `$ * . [ \ ^`
+- `\\` 匹配 `\`
+- `\t` 不能匹配制表符，只匹配 `t`
+![](img/2023-04-01-09-34-04.png)
+- `\$` 匹配一个 `$` 符号
+- ``\\$` 匹配以 `\` 结尾的字符串
+
+#### `[a-zA-Z0-9]` 匹配字母和数字
+- 数字和字母
+
+
+
+### 扩展正则表达式
+> [5.4 Overview of extended regular expression syntax](https://www.gnu.org/software/sed/manual/sed.html#ERE-syntax)
+
+
+#### 特殊字符匹配本身需要转义
+- ?
+- +
+- {}
+- ()
+- |
+
+### `[]` Bracket Expressions
+> [5.5 Character Classes and Bracket Expressions](https://www.gnu.org/software/sed/manual/sed.html#Character-Classes-and-Bracket-Expressions)
+
+
+- 基本和扩展正则表达式都可以用
+- 方括号中以 `^` 开头则排除后面的字符
+- `^` 在方括号中只有不是在最前面时才能表达本来含义
+- `-` 在方括号中只有在最后或最前面时才不是表示范围
+- `]` 如果不是在最前面，则表示结束 bracket expression
+
+#### [abc]
+- 匹配方括号中的其中一个单个字符
+
+#### `[a-d]` Range Expression
+
+### Named Classes
+> [5.5 Character Classes and Bracket Expressions](https://www.gnu.org/software/sed/manual/sed.html#Character-Classes-and-Bracket-Expressions)
+
+
+- 必须要在方括号中使用，如 `[[:digit:]]`
+
+#### [:digit:]
+
+#### [:alnum:]
+
+#### [:alpha:]
+
+#### [:blank:]
+- space and tab
+
+#### [:cntrl:]
+- ASCII 码八进制范围为 `000` 到 `037`，以及 `177`
+
+#### [:graph:]
+- `[:alnum:]` and `[:punct:]`
+#### [:print:]
+- `[:alnum:]`, `[:punct:]`, and space
+#### [:space:]
+- Space characters: in the `C locale`, this is tab, newline, vertical tab, form feed, carriage return, and space.
+#### [:lower:]
+#### [:upper:]
+#### [:xdigit:]
+
+### Regular Expression Extensions
+> [Regular Expression Extensions](https://www.gnu.org/software/sed/manual/sed.html#regexp-extensions)
+
+- 基本正则表达式和扩展正则表达式都可以使用
+
+#### \w
+
+#### \W
+
+#### \b 匹配单词边界
+- 边界是 word 和 non-word 的边界
+
+#### \< 单词的开头
+
+#### \> 单词的结束
+
+#### \B 
+- 和 `\b` 相反
+
+#### \s
+- space and tabs
+
+#### \S
+
+#### \`
+
+#### \'
+
+
+### 转义字符
+> [5.8 Escape Sequences - specifying special characters](https://www.gnu.org/software/sed/manual/sed.html#Escapes)
+
+
 ## 命令格式
 - `sed [OPTION]... {script-only-if-no-other-script} [input-file]...`
 
 
 ![](img/2023-03-31-19-54-15.png)
 
+- 选项：可选
+- scrip：必须有，如果没有命令，则用空 `''`
+- 文件：可选，没有则用标准输入
 
-### 选项 OPTION
+### 选项 OPTION 格式第一部分
 > [Command-line Options](https://www.gnu.org/software/sed/manual/sed.html#Command_002dLine-Options)
 
 
@@ -4106,6 +4247,142 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 
 
 ![](img/2023-03-31-21-18-43.png)
+
+
+#### -b 二进制模式打开文件
+- `--binary`
+
+
+#### -r|-E 扩展正则表达式
+> [extended regular expression](https://www.gnu.org/software/sed/manual/sed.html#ERE-syntax)
+> [Regular Expressions: selecting text](https://www.gnu.org/software/sed/manual/sed.html#sed-regular-expressions)
+
+
+- `--regexp-extended`
+- `egrep` 使用的正则表达式
+- 扩展正则表达式对一些符号需要转义：`? + () {} |`
+
+####  -s 将多个文件视为分开的独立文件
+
+### scrip 格式第二部分
+> [sed Script](https://www.gnu.org/software/sed/manual/sed.html#sed-scripts)
+
+- `sed` 程序可以包含多个 `sed` 命令，即 `sed script`
+- 格式为 `[addr]X[options]`
+- `X` 是单个字母的 `sed` 命令
+- `[addr]` 表示地址，可选的，指定地址则后面的命令 `X` 只处理匹配的**行**
+- 地址可以是行号，正则表达式，或者行范围
+- 不特意指明地址，则表示全部范围
+- 最后的 `options` 是可选的额外命令
+  
+#### `[addr]` 地址表示方法
+> [4 Addresses:selecting lines](https://www.gnu.org/software/sed/manual/sed.html#sed-addresses)
+
+
+##### 指定特定一行
+- 直接输入行号
+- `$` 表示最后一行
+
+##### 指定连续的行的范围
+- 两个行号用 `,` 分隔，如 `3,5` 表示第 3 行到第 5 行
+![](img/2023-04-01-11-12-18.png)
+- `4,` 表示第 4 行到最后一行
+- `4,1` 则只能匹配第 4 行
+- `2,+3` 表示起始为第 2 行，结束行为第 2 行后面的第 3 行
+![](img/2023-04-01-11-20-54.png)
+
+
+##### 指定不连续的加步长的行范围
+- `first~step`
+- `0~2` 表示从第 2 行开始，取 2，4，6 行等偶数行
+- `1~2` 表示从第 1 行开始，取 1，3，5 行等奇数行
+![](img/2023-04-01-11-09-12.png)
+- `2,~3` 表示从第 2 行开始，结束行为 3 倍数的行  
+![](img/2023-04-01-11-26-35.png)
+
+
+##### 行号 + 正则表达式 指定地址范围
+- 如 `0,/regexp/` 起始行为第 0 行，结束行为正则表达式匹配的行
+- 注意 `0,/regexp/` 和 `1,/regexp/` 的区别
+- 起始行也可以是正则表达式，`/regexp/,/regexp/`
+  
+![](img/2023-04-01-11-19-37.png)
+
+
+### sed 命令
+> [sed commands summary](https://www.gnu.org/software/sed/manual/sed.html#sed-scripts)
+
+
+#### p 打印模式空间的内容
+- 默认区分大小写
+- `IP` 忽略大小写
+![](img/2023-04-01-12-16-00.png)
+
+
+#### P 打印模式空间的内容直到第一个换行符
+- Print the pattern space, up to the first <newline>.
+
+#### a\ 在行后添加内容
+- 用 `a\` 后面写要添加的内容
+![](img/2023-04-01-11-49-32.png)  
+- 可以用 `\n` 添加多行
+![](img/2023-04-01-11-50-48.png)
+
+#### d 删除内容
+- 直到范围后删除匹配的行
+![](img/2023-04-01-11-51-43.png)
+
+#### c\ 替换行
+- change lines with text
+- 在 `\c` 后写入替换的文本，可以用 `\n` 换行
+![](img/2023-04-01-11-53-30.png)
+
+#### e command 执行命令替换输出内容
+- Executes command and sends its output to the output stream. The command can run across multiple lines, all but the last ending with a back-slash.
+![](img/2023-04-01-11-57-55.png)
+
+
+#### i\ text 在行前插入内容
+![](img/2023-04-01-11-59-50.png)
+
+#### r filename 读取文件内容到匹配的行后
+![](img/2023-04-01-12-20-14.png)
+
+#### w filename 保存模式空间的内容到指定文件
+![](img/2023-04-01-12-23-58.png)
+
+#### = 为输出的内容打印行号
+- 行号后带换行符，即行号单独占一行，在实际行的上面
+- 空行也有行号
+![](img/2023-04-01-12-26-33.png)
+
+#### { cmd ; cmd ... } 组合多个命令
+![](img/2023-04-01-12-59-15.png)
+
+
+#### q[exit-code] 退出
+- 下面的例子不执行后面的 `5d`，但输出不是 `2 4 5 6` 而是 `2`
+![](img/2023-04-01-13-03-25.png)
+
+#### s/regexp/replacement/[flags] 查找替换
+> [The s Command](https://www.gnu.org/software/sed/manual/sed.html#The-_0022s_0022-Command)
+
+
+- 和 vim 中使用语法类似
+
+##### flags
+- g
+![](img/2023-04-01-13-12-21.png)
+
+- p
+打印替换后模式空间的结果
+
+- i|I 忽略大小写
+默认区分大小写
+
+- m|M 多行匹配
+
+
 ## 处理多个命令
 > [Multiple commands syntax](https://www.gnu.org/software/sed/manual/sed.html#Multiple-commands-syntax)
 
@@ -4119,6 +4396,7 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 ![](img/2023-03-31-20-49-33.png)
 
 ### 用 `-e` 选项
+
 
 
 
