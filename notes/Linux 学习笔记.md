@@ -4841,7 +4841,7 @@ sudo systemctl stop firewalld.service
 
 
 
-## fdisk 创建 MBR 分区
+
 - 需要 root 权限
 
 ### fdisk -l device 查看设备分区
@@ -4853,6 +4853,7 @@ sudo systemctl stop firewalld.service
 #### 查看内核是否识别新的分区
 - 用 `lsblk` 命令查看是否有新分区信息
 - `cat /proc/partitions` 查看内核是否识别新的分区
+- 上面两种方式区别？
 
 #### partprobe 分区后同步分区表
 - 内核中的分区表信息和硬盘分区表同步
@@ -5031,6 +5032,7 @@ sudo systemctl stop firewalld.service
 ### lvcreate 创建逻辑卷
 - `lvcreate  `
 
+![](img/2023-04-02-09-43-42.png)
 #### -n 指定逻辑卷名字
 
 #### -L 指定逻辑卷的大小
@@ -5053,18 +5055,23 @@ sudo systemctl stop firewalld.service
 
 
 ### 挂载
-- 用 `blkid` 查看 UUID 
-- 修改 `/etc/fstab` 配置文件，注意挂载点必须存在
+- 创建一个空目录如 `/log` 作为挂载点，如果该目录已存在，则换一个名字
+- 用 `lsblk -f` 或者 `blkid` 查看逻辑卷的 UUID
+- 修改 `/etc/fstab` 配置文件，注意挂载点必须存在，且最好是空目录，否则原来目录的内容会被覆盖
 ![](img/2023-04-01-20-48-47.png)
 - 让配置文件生效 
-	- `mount -a` 
+	- `mount -a`，该命令对配置文件中新增或删除的项有效
+	- 如果修改配置项后需要生效，用 `mount -o remount mountpoint` 
+- 用 `lsblk` 可以查看逻辑卷有了挂载点的信息
+![](img/2023-04-02-10-05-27.png)
 
 
 
 ## lvextend 扩展逻辑卷
 - 在卷组的多余空间中扩容
-- 格式：`lvextend {} LV_NAME`
-
+- 先查看卷组是否还有空间进行扩展，用 `vgs` 查看 `VFree` 选项的值即为剩余的空间
+- 用 `lvextend` 命令扩展，`-L` 选项指定大小，如 `lvextend -L +4G` 在原来的基础上增加 `4G`，必须卷组有 `4G` 的空间
+![](img/2023-04-02-10-22-10.png)
 
 ### 扩展条件
 - 已经有文件系统，已经有数据，能否扩容
@@ -5095,3 +5102,81 @@ sudo systemctl stop firewalld.service
 ### ps
 
 ### pstree
+
+
+******************
+# 网络配置
+- ip
+- netmask
+- getway
+
+# 添加一块新网卡
+- 环境：虚拟机（VMware） Rocky 8.6
+- VMware ---> 虚拟机 ---> 设置
+![](img/2023-04-02-13-38-54.png)
+
+- `ip a` 可以看到新网卡名，但没 ip 等信息
+
+- `nmcli connection` 查看生效的网卡，绿色为正常状态
+![](img/2023-04-02-13-42-40.png)
+
+- 配置网卡信息
+	- 进入 `/etc/sysconfig/network-scripts/` 目录，可看到有 `ifcfg-` 开头的文件名 
+	![](img/2023-04-02-13-54-45.png)
+
+
+
+## 网络连接模式
+
+### 桥接
+
+### 仅主机
+- 配置文件无网关
+- 可以设置 DCPH 自动分配 IP
+
+### NAT
+
+## 识别新网卡
+- 先用 `nmcli connection` 查看是否有新网卡
+
+# 查看是 BIOS 还是
+# 修改网卡名
+- 为什么修改网卡名
+- CentOS 7 以后用硬件生成的网卡名，不会和其他重复，插入新网卡也不会重复
+- 但网卡名不方便管理，不能标准化，不好大规模管理
+
+
+# 添加域名解析服务器地址
+- 修改 `/etc/sysconfig/network-scripts/ifcfg-eth0` 配置文件，其中 `eth0` 为网卡名
+	- 添加 `DNS1=10.0.0.2`，`DNS2=服务器地址` 
+
+- `cat /etc/resolv.conf` 查看
+![](img/2023-04-02-13-18-33.png)
+![](img/2023-04-02-13-26-38.png)
+
+- 判断域名解析是否生效
+	- host
+	- nslookup
+	![](img/2023-04-02-13-25-22.png)
+
+
+## Rocky8.6
+- 修改配置文件 `/etc/default/grub` 中在 `GRUB_CMDLINE_LINUX` 行的内容中追加 `net.ifnames=0`
+
+- DEVICE 
+网卡名
+- NAME
+配置文件名 `nmcli connection` 第一列显示的名称
+
+
+- nmcli connection 让配置文件生效
+- 
+- ## Ubuntu22.04
+
+# 网卡配置
+## Red Hat 系列
+
+
+
+## Ubuntu
+
