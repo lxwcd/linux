@@ -5110,6 +5110,11 @@ sudo systemctl stop firewalld.service
 - netmask
 - getway
 
+# 查看启动方式
+
+- VMware ---> 虚拟机 ---> 设置 ---> 选项 ---> 高级
+![](img/2023-04-02-15-27-03.png)
+
 # 添加一块新网卡
 - 环境：虚拟机（VMware） Rocky 8.6
 - VMware ---> 虚拟机 ---> 设置
@@ -5123,9 +5128,26 @@ sudo systemctl stop firewalld.service
 - 配置网卡信息
 	- 进入 `/etc/sysconfig/network-scripts/` 目录，可看到有 `ifcfg-` 开头的文件名 
 	![](img/2023-04-02-13-54-45.png)
+	- 在该目录下新建网卡配置文件，如 `ifcfg-eth1`，网卡名为 `eth1`
+	![](img/2023-04-02-14-25-16.png)
 
+- 
 
+# 修改网卡名
+- 修改 `/etc/default/grub` 配置文件，在 `GRUB_CMDLINE_LINUX` 中的内容最后追加 `net.ifnames=0`
+- 修改网卡配置文件，修改 `/etc/sysconfig/network-scripts/` 目录中对应的配置文件的名字
+- 修改网卡配置文件中 `DEVICE` 和 `NAME` 都修改，`DEVICE` 为网卡名 
+- 如原来的网卡名为 `ens160`，则配置文件名为 `ifcfg-ens160`，将其改为 `ifcfg-eth0`
 
+- 重读网卡配置文件
+	- UEFI 模式引导的系统重读配置
+	
+	- BIOS 模式引导的系统重读配置 
+    ![](img/2023-04-02-15-25-37.png)
+
+- 重启使配置文件生效
+
+`nmcli connection reload` 和 `nmcli connection up NAME`
 ## 网络连接模式
 
 ### 桥接
@@ -5149,6 +5171,10 @@ sudo systemctl stop firewalld.service
 # 添加域名解析服务器地址
 - 修改 `/etc/sysconfig/network-scripts/ifcfg-eth0` 配置文件，其中 `eth0` 为网卡名
 	- 添加 `DNS1=10.0.0.2`，`DNS2=服务器地址` 
+
+- 让配置生效
+	- `nmcli connection reload`
+	- `nmcli connection up eth1`，其中 `eth1` 不是网卡名，而是配置文件中写的 `NAME`
 
 - `cat /etc/resolv.conf` 查看
 ![](img/2023-04-02-13-18-33.png)

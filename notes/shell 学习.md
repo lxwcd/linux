@@ -734,6 +734,7 @@ done
 ![](img/2023-03-18-17-44-05.png)
 
 
+//TODO: 位置变量
 # Positional Parameters
 ## ?
 - `$?` 查看上个命令的退出状态值
