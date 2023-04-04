@@ -19,6 +19,11 @@
 > [Linux Tutorial](https://rc.byu.edu/documentation/unix-tutorial/)
 
 
+
+## 博客
+> [The Linux kernel](https://www.win.tue.nl/~aeb/linux/lk/lk.html#toc10)
+
+
 ## 提问网站
 
 > [FORCHANGE AI EDU](https://chat.forchange.cn/)
@@ -226,7 +231,7 @@ PermitEmptyPasswords yes
 
 ## tty
 > [Difference between /dev/tty and /dev/pts (tty vs pts) in Linux](https://www.golinuxcloud.com/difference-between-pty-vs-tty-vs-pts-linux/)
-
+> [The TTY demystified](http://www.linusakesson.net/programming/tty/)
 
 - terminal = tty = text input/output environment
 
@@ -258,11 +263,11 @@ PermitEmptyPasswords yes
 
 
 
-
+//TODO: session 待补充
 # session 会话管理
 > [Linux session(会话)](https://www.cnblogs.com/sparkdev/p/12146305.html)
+> [10. Processes](https://www.win.tue.nl/~aeb/linux/lk/lk-10.html)
 
-> [Tmux 使用教程](https://www.ruanyifeng.com/blog/2019/10/tmux.html)
 
 
 # Tmux 终端复用
@@ -276,10 +281,14 @@ PermitEmptyPasswords yes
 # 命令格式
 > [What's the difference between a flag, an option, and an argument? [closed]](https://unix.stackexchange.com/questions/285575/whats-the-difference-between-a-flag-an-option-and-an-argument)
 
+
 # Tab 补全命令
 
 ## 列出全部变量
 - 输入 `$` 后按两次 `Tab` 键
+
+## 列出全部用户
+- 输入 `~` 后按两次 `Tab` 键
 
 
 
@@ -304,14 +313,31 @@ PermitEmptyPasswords yes
 > [ctrl+c 和 ctrl+z 的区别](https://blog.csdn.net/qq_54947566/article/details/124345900?spm=1001.2014.3001.5502)
 > [Linux Ctrl+c与ctrl+z的区别](https://www.cnblogs.com/yzjT-mac/p/6207843.html)
 > [Linux后台进程管理以及ctrl+z（挂起）、ctrl+c（中断）、ctrl+\（退出）和ctrl+d（EOF）的区别](https://blog.csdn.net/qq_36838191/article/details/82710101)
+> [What is the difference in using Ctrl+D and Ctrl+C to terminate cat command?](https://unix.stackexchange.com/questions/379347/what-is-the-difference-in-using-ctrld-and-ctrlc-to-terminate-cat-command)
 
 
 ### Ctrl + z 进程放到后台挂起
 ![1](https://img-blog.csdnimg.cn/b92877d442d0478ca70bdddc6aaa33ff.png)
 
 
-### Ctrl + c 终止终端输入
+//TODO: 待补充 Ctrl C
+### Ctrl + c 发送 SIGINT 信号
+> [POSIX signals](https://dsa.cs.tsinghua.edu.cn/oj/static/unix_signal.html)
+> [How to Use SIGINT and Other Termination Signals in Linux](https://linuxhandbook.com/termination-signals/)
+
+
 - 终端输入命令时，如果不想输入了可以按这两个键，该输入不会执行，不会记录到历史记录
+- 如果输入 `sleep 100`，可以用该快捷键终止
+
+
+//TODO: 待补充 Ctrl D
+### Ctrl + d 发送 EOF 
+> [Why does Ctrl-D (EOF) exit the shell?](https://unix.stackexchange.com/questions/110240/why-does-ctrl-d-eof-exit-the-shell)
+
+
+- 终端直接按该快捷键则退出终端
+
+
 
 ## Ctrl + s 屏幕不显示和执行输入命令
 - 按 `Ctrl + s` 后，输入的命令不显示在屏幕上，按 `Enter` 也不执行命令
@@ -320,14 +346,47 @@ PermitEmptyPasswords yes
 ## Ctrl + q 解锁 Ctrl + s 
 
 
+//TODO: login shell 待补充
+# login shell 和 non-login shell
+> [bash 的环境配置文件](http://cn.linux.vbird.org/linux_basic/0320bash_4.php#settings_bashrc)
+> [What is the difference between Login and Non-Login Shell?](https://tecadmin.net/difference-between-login-and-non-login-shell/)
+
+
+- 用 `echo $0` 查看 shell 类型，有 `-` 前缀为 login shell
+![](img/2023-04-04-21-07-16.png)
+
+- login shell 和 non-login shell 创建时执行的一些环境设置脚本不同
+
+
+
+## login-shell
+- 用户最开始登录系统创建的是 login shell
+- `su -` 即 `su -l` 创建的也是 login shell
+![](img/2023-04-04-20-54-19.png)
+
+- ssh 登录的用户创建 login shell
+
+
+
+
 
 # shell 配置相关文件说明
+> [bash 的环境配置文件](http://cn.linux.vbird.org/linux_basic/0320bash_4.php#settings_bashrc)
+
+
 ![1](https://img-blog.csdnimg.cn/44be8cb3c28247dd9072f49feaa98ef5.png)
+
+
+- 不同 bash 其配置文件的执行顺序可能不同，但登录用户都是先执行 `/etc/profile` 脚本，可以看该脚本中的代码查看其执行顺序
+- 基本顺序是先执行 `/etc/` 下的文件，再执行用户家目录中的文件，有的 bash 版本会在家目录中的文件执行完后又调用 `/etc/` 目录中的某个文件
+
 
 
 # 命令放后台执行
 ## &
 > [Linux 命令中的 & 符号](https://blog.csdn.net/weixin_45505313/article/details/103749523)
+
+
 
 
 # shell 设置文本输出颜色

@@ -770,6 +770,9 @@ done
 
 //TODO: 位置变量
 # Positional Parameters
+> [Positional Parameters](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Positional-Parameters)
+
+
 ## ?
 - `$?` 查看上个命令的退出状态值
 
