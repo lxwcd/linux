@@ -16,7 +16,7 @@
 > [Linux 入门教程](http://www.imooc.com/wiki/linuxlesson)
 > [Linux 常用命令全拼](https://www.runoob.com/w3cnote/linux-command-full-fight.html)
 > [howtogeek](https://www.howtogeek.com/category/linux/)
-> [Linux man pages](https://linux.die.net/man/)
+> [Linux Tutorial](https://rc.byu.edu/documentation/unix-tutorial/)
 
 
 ## 提问网站
@@ -58,6 +58,87 @@
 > [有那些免费的虚拟机软件？](https://zhuanlan.zhihu.com/p/422262182)
 
 
+
+***************************
+# 操作系统
+> 计算机的心智操作系统值哲学原理 1.3
+
+- 操作系统是一个软件系统
+- 替用户及其应用管理计算机上的软硬件资源
+- 保证对计算机资源的公平竞争和使用
+- 防止对计算机资源的非法侵占和使用
+- 保证操作系统自身正常运转
+
+
+# Linux 介绍
+
+> [Operating System - Linux](https://www.tutorialspoint.com/operating_system/os_linux.htm)
+> [What is Linux](https://www.redhat.com/en/topics/linux/what-is-linux)
+> [Architecture of Linux](https://www.javatpoint.com/architecture-of-linux)
+
+
+
+- 一种开源的操作系统软件
+- 管理系统的硬件和资源
+- 介于硬件和应用程序之间
+- 提供一个平台能让用户方便的运行应用程序
+
+
+## Linux 基本组成
+> [Operating System - Linux](https://www.tutorialspoint.com/operating_system/os_linux.htm)
+
+
+- Kernel
+- System Library
+- System Utility
+###  Kernel
+- The core part of linux
+- It onsists of variable modules
+- It interacts directly with the ulderlying hardware 
+- It provides an abstraction to hide low level hardware details to **system or application programs**
+
+### System Library
+- Special functions or programs 
+- Application programs or system utilities access the Kernel's ofeatures through system libraries
+- These libraries implement most of the functionalities of the operating system and do not requires kernel module's code access rights
+
+
+## 特点
+- Portable
+- Open Source
+- Multi-User
+- Multiprogramming
+- Hierachical File System
+- Shell
+- Security
+
+
+### System Utility
+- Do specialized, individual level tasks
+
+
+*********************************
+
+> [Introduction: The Linux Operating System](https://rc.byu.edu/documentation/unix-tutorial/unix1.php) 
+
+
+Three parts of the Linux operating system:
+1. The kernel
+- It is the lowest layer of the Linux operating system
+- It interfaces directly with the computer hardware
+- It provides an interface to programs whereby they may access files, the network, and devices
+
+2. The shell
+- The shell acts as an interface between the user and the kernel
+- It is a command line interpreter (CLI) 
+- It interprets the commands the user types in and executes them
+
+3. The programs
+- Each of programs does one thing and does it well
+
+
+
+
 # Linux 分支介绍
 > [Linux的分支及使用选择](https://zhuanlan.zhihu.com/p/381753464)
 
@@ -91,19 +172,38 @@
 - ubuntu 默认安装 openssh-client
 - ubuntu 安装 openssh-server：`sudo apt-get install openssh-server` 
 
-### ubuntu root 不能通过 xshell 远程
-- 修改配置文件
-![1](https://img-blog.csdnimg.cn/529423ec76724a71b68609dfe8dda207.png)
+### root 不能通过 xshell 远程
+- 修改配置文件 /etc/ssh/sshd_config
+编辑 `/etc/ssh/sshd_config` 做如下修改：
+```bash
+# 添加下面的行
+PermitRootLogin yes
+
+# 注释原来的行
+#PermitRootLogin prohibit-password
+```
+
 - 重启 ssh 服务
+> [How do I restart sshd daemon on Linux or Unix?](https://www.cyberciti.biz/faq/how-do-i-restart-sshd-daemon-on-linux-or-unix/)
+
+- Ubuntu 22.04 和 Ubuntu 20.04
 ```bash
 /etc/init.d/ssh restart
 ```
 
-### 删除用户密码后 xshell 中不输入密码不能连接
+### 删除用户密码后 xshell 中不输入
+密码不能连接
 - ssh 做了限制，默认无密码时不能用密码的方法连接，可以修改配置
-![1](https://img-blog.csdnimg.cn/1e75a90345854620baecc2e0291d9894.png)
+```bash
+# /etc/ssh/sshd_config
+# 注释下面行
+#PermitEmptyPasswords no
 
-- 换其他方式连接，如密钥或其他方式
+# 新增下面行
+PermitEmptyPasswords yes
+```
+
+- 换其他方式连接，如密钥或其他方式，还未试过
 ![2](https://img-blog.csdnimg.cn/cd84de7e58804de98bc460f55723afbe.png)
 
 
@@ -120,11 +220,53 @@
 > [Linux的各种终端类型及概念](https://blog.csdn.net/xyz/article/details/118066465)
 
 
+
+## console
+
+
+## tty
+> [Difference between /dev/tty and /dev/pts (tty vs pts) in Linux](https://www.golinuxcloud.com/difference-between-pty-vs-tty-vs-pts-linux/)
+
+
+- terminal = tty = text input/output environment
+
+- Ubuntu 22.04 server 可通过 `Ctrl A|t ` `F1-F6` 分别切换到六个 tty 终端，可通过 `tty` 命令显示当前  tty，不按照顺序切换，如先用 `Ctrl A|t F6` 再用 `Ctrl A|t F5` 切换，前面的仍是 `tty6`，后面的是 `tty5`
+![](img/2023-04-04-17-21-22.png)
+
+用 `w` 可以查看当前登录的用户
+![](img/2023-04-04-17-30-02.png)
+
+- Ubuntu 20.04 桌面版默认打开图形，用 `tty` 命令查看是 `/dev/pts/num` 而非 `/dev/tty/num`
+![](img/2023-04-04-17-45-35.png)
+
+切换到其他终端，如 `tty3`，可以通过 `startx` 命令切换到图形界面，但该方式打开的图形窗口只能有一个，即其他终端不能再用 `startx` 运行 `X server`，但原来的第一个终端的图形界面还存在。可通过 `killall xinit` 退出图形界面回到终端
+
+- 图形界面登录可通过 `init 3` 切换到 CLI 模式，此时用 `tty` 命令查看为 `tty` 设备而非 `pts`
+
+- 在图形界面可通过 `init 5` 再回到图形界面，查看其他终端还保持原来的界面不变
+
+
+## pty
+
+## pts
+- 图形界面和远程登录时终端显示的设备为 `pts` 而非 `tty`
+
+
+## startx
+> [what does startx command do](https://askubuntu.com/questions/518454/what-does-startx-command-do)
+> [startx Command](https://www.ibm.com/docs/en/aix/7.2?topic=s-startx-command)
+
+
+
+
 # session 会话管理
 > [Linux session(会话)](https://www.cnblogs.com/sparkdev/p/12146305.html)
+
 > [Tmux 使用教程](https://www.ruanyifeng.com/blog/2019/10/tmux.html)
 
+
 # Tmux 终端复用
+> [Tmux使用手册](http://louiszhai.github.io/2017/09/30/tmux/)
 > [Tmux 使用教程](https://www.ruanyifeng.com/blog/2019/10/tmux.html)
 
 
@@ -1305,6 +1447,7 @@ Ubuntu 22.04.1 测试两者区别，adduser 会交互式让输入密码，默认
 
 ### -u 修改用户 UID
 `-u` 选项修改 UID，和添加用户时使用规则相同，注意范围，以及修改的 UID 不能和已存在的相同，如果添加相同的 UID，需要加上 `-o` 选项。![1](https://img-blog.csdnimg.cn/e425dca499f542eb9be0e39a7262120a.png)
+
 
 ### -l 修改用户登录名
 - 家目录的名称不变

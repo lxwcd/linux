@@ -1,8 +1,7 @@
 ﻿# 学习资源
+> [学习 Shell 脚本编程的免费资源 | Linux 中国](https://zhuanlan.zhihu.com/p/155613380)
 
 ## 学习网站
-> [The UNIX School](https://www.theunixschool.com/)
-> [学习 Shell 脚本编程的免费资源 | Linux 中国](https://zhuanlan.zhihu.com/p/155613380)
 > [Bash 脚本教程](https://wangdoc.com/bash/intro)
 > [learnshell](https://www.learnshell.org/)
 > [linuxcommand](http://linuxcommand.org/lc3_learning_the_shell.php)
@@ -20,6 +19,7 @@
 ## 博客
 
 ## 脚本示例
+> [The UNIX School: Shell Scripts](https://www.theunixschool.com/p/shell-scripts.html)
 
 ## 练习
 > [牛客刷题练习](https://www.nowcoder.com/exam/oj?page=1&tab=SHELL%E7%AF%87&topicId=195)
@@ -382,6 +382,40 @@
 - 不与保留变量名相同
 
 
+
+## declare 指定变量类型
+
+- `help declare`
+
+### -i
+
+### -a
+
+### -A
+### -x
+
+
+## 变量赋值
+### 双引号
+
+- `$` 有特殊含义
+![](img/2023-04-03-19-27-42.png)
+
+### 单引号
+
+
+### read 从标准输入赋值给变量
+
+
+
+
+
+## export 设置为环境变量
+
+## set 显示全部变量
+
+
+## unset 取消变量
 
 # Bash Conditional Expressions
 > [Bash Conditional Expressions](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Bash-Conditional-Expressions)
