@@ -177,10 +177,13 @@
 ![1](https://img-blog.csdnimg.cn/94a44f9f3f154652be5653cca7b1a825.png)
 ![2](https://img-blog.csdnimg.cn/653f160259864e90affed81714f000a7.png)
 
+
+//NOTE: 参数扩展
 ## ${ } shell parameter expansion
 
 > [3.5.3 Shell Parameter Expansion](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Parameter-Expansion)
 > [变量扩展](https://wangdoc.com/bash/expansion#变量扩展)
+> [2.6.2 Parameter Expansion](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_02)
 
 
 ![1](https://img-blog.csdnimg.cn/9059ce606d964e12a0d53372b587b312.png)
@@ -196,9 +199,20 @@
 
 ### ${parameter:-word} 为输出参数添加默认值
 - 为变量 `parameter` 添加一个默认值，如果该变量不存在，则输出 `word`
+- `parameter` set 但为空，也输出 `word`
+- `parameter` unset，输出 `word`
 
 ![1](https://img-blog.csdnimg.cn/e8d63e93f1bf4367a2b66e69739ffbde.png)
 ![2](https://img-blog.csdnimg.cn/c0597f0d93ab40eea6d26f854704e6b9.png)
+
+
+### ${parameter-word} 为输出参数添加默认值
+- `parameter` 不为空，输出 `parameter`
+- `parameter` set 但为空，输出 `parameter`
+- `parameter` unset，输出 `word`
+
+![](img/2023-04-05-21-28-45.png)
+
 
 ### ${parameter:=word} 为变量赋默认值
 - 变量 `parameter` 不存在，则将默认值 `word` 复制给该变量

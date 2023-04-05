@@ -350,25 +350,48 @@ PermitEmptyPasswords yes
 # login shell 和 non-login shell
 > [bash 的环境配置文件](http://cn.linux.vbird.org/linux_basic/0320bash_4.php#settings_bashrc)
 > [What is the difference between Login and Non-Login Shell?](https://tecadmin.net/difference-between-login-and-non-login-shell/)
+> [Interactive, Non-interactive, Login, Non-login Shells in Linux](https://www.baeldung.com/linux/interactive-non-interactive-login-non-login-shells)
+
 
 
 - 用 `echo $0` 查看 shell 类型，有 `-` 前缀为 login shell
 ![](img/2023-04-04-21-07-16.png)
+
+- ubunut 20.04 `Ctrl A|t F1` 和 `Ctrl A|t F2` 都能进入图形界面
 
 - login shell 和 non-login shell 创建时执行的一些环境设置脚本不同
 
 
 
 ## login-shell
-- 用户最开始登录系统创建的是 login shell
-- `su -` 即 `su -l` 创建的也是 login shell
+1. ubuntu 22.04 带图形界面版本测试
+
+- 登录系统默认进入的是 `tty2`，是 login shell
+
+- 用户最开始登录系统创建的是 login shell（tty2），但如果是图形界面，在登录后启动图形化接口，这时进入 pts 伪终端，无需再次登录，查看可以发现该登录为 non-login shell（Ubuntu 22.02）, 但用 w 命令看不到 pts 登录
+![](img/2023-04-05-20-14-22.png)
+
+- 图形界面登录后再用 xshell 远程连接，登录 shell 为 login shell，登录设备是 pts 伪终端
+![](img/2023-04-05-20-18-14.png)
+![](img/2023-04-05-20-20-49.png) 
+
+- `Ctrl A|t F1` 切换终端，此时变成 `tty3`，但仍是图形界面登录，图形界面登录的仍是 pts
+![](img/2023-04-05-20-30-35.png)
+
+- 在一个图形界面用 `init 3` 进入 CLI 命令行界面后，此时用 `tty` 查看其设备，`F1` ~ `F6` 分别对应的变为 `tty1` ~ `tty6`？
+
+
+- `su -` 即 `su -l` 创建的也是 login shell，但 `tty` 查看仍是一个终端设备
 ![](img/2023-04-04-20-54-19.png)
+![](img/2023-04-05-21-00-44.png)
+
 
 - ssh 登录的用户创建 login shell
 
 
-
-
+## non-login shell
+- `w` 命令看不到 non-login shell 登录的用户
+  
 
 # shell 配置相关文件说明
 > [bash 的环境配置文件](http://cn.linux.vbird.org/linux_basic/0320bash_4.php#settings_bashrc)
