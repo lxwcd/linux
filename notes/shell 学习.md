@@ -10,6 +10,7 @@
 > [学习 shell 有什么好书推荐？](https://www.zhihu.com/question/19745611/answer/129024703)
 > [The Unix School](https://www.theunixschool.com/p/shell-scripts.html)
 > [BashGuide](http://mywiki.wooledge.org/BashGuide)
+> [Shell & Utilities: Detailed Toc](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/contents.html)
 
 
 ## 书籍
