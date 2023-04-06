@@ -199,7 +199,7 @@
 
 
 ### ${parameter:-word} 为输出参数添加默认值
-- 为变量 `parameter` 添加一个默认值，如果该变量不存在，则输出 `word`
+- `parameter` set and not null, 输出 `parameter`
 - `parameter` set 但为空，也输出 `word`
 - `parameter` unset，输出 `word`
 
@@ -211,8 +211,22 @@
 - `parameter` 不为空，输出 `parameter`
 - `parameter` set 但为空，输出 `parameter`
 - `parameter` unset，输出 `word`
-
 ![](img/2023-04-05-21-28-45.png)
+
+******************
+#### ${parameter-} 和 ${parameter} 区别
+> [Is "${PS1-}" valid syntax and how does it differ from plain "$PS1"?](https://unix.stackexchange.com/questions/352110/is-ps1-valid-syntax-and-how-does-it-differ-from-plain-ps1)
+
+
+![](img/2023-04-06-20-29-18.png)
+
+ubuntu 22.04 中的 `/etc/profile` 配置文件中使用 `${PS1-}` 的用法，看着和 `${PS1}` 的效果相同，因为默认的值 `word` 为空，如果 `PS1` 未设置，都为空。
+
+但如果 `set -u` 选项设置了，即 `parameter` 未设置则输出错误而非空：
+![](img/2023-04-06-20-51-14.png)
+
+这种情况下两种写法的结果不同：
+![](img/2023-04-06-20-54-59.png)
 
 
 ### ${parameter:=word} 为变量赋默认值

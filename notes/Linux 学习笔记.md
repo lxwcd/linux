@@ -404,6 +404,17 @@ PermitEmptyPasswords yes
 - 基本顺序是先执行 `/etc/` 下的文件，再执行用户家目录中的文件，有的 bash 版本会在家目录中的文件执行完后又调用 `/etc/` 目录中的某个文件
 
 
+## /etc/profile
+- 谁调用该文件执行
+- login shell 会读该文件，在哪里定义？
+### ubuntu 22.02 带图形界面
+![](img/2023-04-06-21-12-09.png)
+
+- 在当前 shell 中执行 `/etc/profile.d` 目录下的全部 `.sh` 脚本
+### ubuntu 22.04
+
+
+
 
 # 命令放后台执行
 ## &
