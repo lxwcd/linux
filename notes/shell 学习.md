@@ -123,6 +123,8 @@
 ### set options
 > [4.3.1 The Set Builtin](https://www.gnu.org/software/bash/manual/bash.html#The-Set-Builtin)
 
+> set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [argument …]
+> set [+abefhkmnptuvxBCEHPT] [+o option-name] [--] [-] [argument …]
 
 - old options
 - `set --help | less` 查看帮助说明
@@ -291,13 +293,41 @@
 > The -x and -v options are turned off
 
 
-
 ### shopt options
-> new options
-> 包含 `set` 中的旧选项
+> [4.3.2 The Shopt Builtin](https://www.gnu.org/software/bash/manual/bash.html#The-Shopt-Builtin)
+
+> shopt [-pqsu] [-o] [optname …]
+
+![](img/2023-04-07-20-27-53.png)
 
 
+- new options
+- 包含 `set` 中的旧选项
 
+#### shopt -o 显示 set 的选项
+- 和 `set -o` 显示效果相同，兼容 `set` 选项 
+![](img/2023-04-07-20-31-23.png)
+
+
+#### shopt -p 显示全部选项及其状态
+- `shopt -p | less`，`-u` 表示 `unset`，`-s` 表示 `set`
+![](img/2023-04-07-20-43-40.png)
+
+- 也可用 `shopt | less` 查看，结果显示不同，用 `on` 和 `off` 表示其状态
+
+#### shopt -q 查看某个选项是否存在
+- 不输出结果，可通过 return status 查看选项是否开启
+![](img/2023-04-07-20-52-09.png)
+
+- 如果查询的选项有多个，则只要有一个选项未设置，返回 non-zero
+![](img/2023-04-07-20-54-45.png)
+
+
+#### shopt -s 开启一个或多个选项
+> Enable (set) each optname
+
+#### shopt -u 禁用一个或多个选项
+> Disable (unset) each optname
 
 
 # 查询当前 shell 类型和全部 shell 类型
