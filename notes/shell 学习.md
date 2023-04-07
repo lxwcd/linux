@@ -11,6 +11,7 @@
 > [The Unix School](https://www.theunixschool.com/p/shell-scripts.html)
 > [BashGuide](http://mywiki.wooledge.org/BashGuide)
 > [Shell & Utilities: Detailed Toc](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/contents.html)
+> [sh - shell, the standard command language interpreter](https://pubs.opengroup.org/onlinepubs/9699919799/)
 
 
 ## 书籍
@@ -329,22 +330,12 @@
 #### shopt -u 禁用一个或多个选项
 > Disable (unset) each optname
 
-
+//TODO: 补充 shell 种类
 # 查询当前 shell 类型和全部 shell 类型
 > [Shell 的种类 ](https://wangdoc.com/bash/intro#shell-%E7%9A%84%E7%A7%8D%E7%B1%BB)
 
 
 ![1](https://img-blog.csdnimg.cn/85e2bba9df4a45ad857d1a486f1e8e8b.png)
-
-# 设置 shell 选项 shopt 
-[shopt 命令](https://wangdoc.com/bash/expansion#shopt-%E5%91%BD%E4%BB%A4)
-
-# set 命令
-> [4.3.1 The Set Builtin](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#The-Set-Builtin)
-
-
-# shopt 命令
-> [4.3.2 The Shopt Builtin](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#The-Shopt-Builtin)
 
 
 # 引号和转义
