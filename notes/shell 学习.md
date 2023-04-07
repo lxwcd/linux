@@ -35,6 +35,271 @@
 > 要查询一些用法在官网：[bash manual](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Introduction)
 
 
+
+# BASH 命令格式
+> [bash(1) — Linux manual page](https://man7.org/linux/man-pages/man1/bash.1.html#OPTIONS)
+
+- 环境：ubuntu 22.04
+- `man bash` 查看
+- `bash [options] [command_string | file]`
+
+![](img/2023-04-07-12-33-25.png)
+
+## OPTIONS
+> [Bash Script Class: Shell Options](https://www.youtube.com/watch?v=26t2LMtrDOc&t=349s&ab_channel=NIH_HPC)
+> [Chapter 33.Options](https://tldp.org/LDP/abs/html/options.html)
+> [6.1 Invoking Bash](https://www.gnu.org/software/bash/manual/html_node/Invoking-Bash.html)
+
+
+![](img/2023-04-07-12-35-19.png)
+
+> All of the single-character shell options documented in the description of the `set` builtin command, including `-o`, can be used as options when shell is invlked.
+
+
+
+### shell 内置但不能用 set 设置的一些选项
+- `echo $-` 可以查看这些选项中哪些设置了
+![](img/2023-04-07-15-39-19.png)
+
+#### -c
+- 不是太明白用处
+
+
+#### -i interactive shell
+- 如果设置，则 shell is `interactive`
+- `echo $-` 可查看该选项是否设置
+![](img/2023-04-07-15-15-48.png)
+
+
+#### -l login shell
+> Make `bash` act as if it had been invoked as a login shell.
+
+- 可以让当前的 shell 变成 login shell，这样加载的 bash startup files 不同，相当于执行 `exec bash --login`
+
+
+#### r restricted shell
+> Make the shell a restricted shell
+
+#### -s stdin
+
+> If the `-s` option is present, or if no arguments remain after option processing, then the commands are read from the standard input.
+> This option allows the positional parameters to be set when invoking an interactive shell or when reading input through a pipe.
+
+- `echo $-` 可以查看该选项是否设置
+![](img/2023-04-07-15-39-19.png)
+
+
+#### -v verbose
+> Print each command to `stdout` before executing it
+
+- `set` 可以设置该选项，因此可以通过 `set` 命令查看是否设置该参数
+- 设置该参数后会将输入的命令作为输出到 `stdout`，但不会扩展命令
+![](img/2023-04-07-16-01-27.png)  
+![](img/2023-04-07-16-04-12.png)
+![](img/2023-04-07-16-05-27.png)
+
+#### -x xtrace
+> Similar to `-v`, but expands commands
+
+- 可以通过 `set` 命令设置
+![](img/2023-04-07-16-09-03.png)
+![](img/2023-04-07-16-14-57.png)
+
+#### -D Double-quoted string
+> A list of all double-quoted strings preceded by `$` is printed on the standard output.
+> These strings that are subject to language translation when the current locale is not `C` or `POSIX`.
+> This implies the `-n` option; no commands will be executed.
+
+- 不能在 `set` 命令中设置
+- 包含 `-n` 选项的作用，扩展 `$`后面双引号的内容，不执行该命令，做语法检查
+
+
+#### --
+> A `--` signals the end of options and disables further option processing.
+> Any arguments after the `--` are treated as filenames and arguments.
+> An argument of `-` is equivalent to `--`.
+
+
+### set options
+> [4.3.1 The Set Builtin](https://www.gnu.org/software/bash/manual/bash.html#The-Set-Builtin)
+
+
+- old options
+- `set --help | less` 查看帮助说明
+- `-` 设置选项
+- `+` 取消设置选项
+- 在 `shell` 中用 `set` 命令设置的选项只是临时生效，除非写道配置文件中
+
+#### set -|+ o 查看全部的选项
+- `set -o` 和 `set +o` 都可以查看全部选项的设置状态，只是结果显示格式不同
+![](img/2023-04-07-17-09-14.png)
+
+#### 设置或禁用某个选项
+- 有的选项有两种格式，如 `-v` 与 `-o verbose` 格式
+- 写 `set -|+v` 或 `set -|+o verbose` 都一样
+- 可通过 `set -o | grep "verbose"` 查看 `-v` 选项是否设置
+  
+#### -a | -o allexport
+> [4.3.1 The Set Builtin](https://www.gnu.org/software/bash/manual/bash.html#The-Set-Builtin)
+> [set(1p) — Linux manual page](https://man7.org/linux/man-pages/man1/set.1p.html)
+
+> Each variable or function that is created or modified is given the export attribute and marked for export to the environment of subsequent commands.
+
+
+- 创建的变量自动变为环境变量，相当于加上 `export` 属性
+- `man bash` 查看的帮助中没有提到 `functin`，`gnu.org` 文档中提到 `funtion` 也适用，未测试
+
+![](img/2023-04-07-17-31-10.png)
+
+
+#### -b | -o notify
+> Cause the status of terminated background jobs to be reported immediately, rather than before printing the next primary prompt.
+
+- ubuntu 22.04 默认未设置
+
+#### -e | -o errexit
+- Exit immediately if a command exits with a non-zero status
+
+![](img/2023-04-07-17-44-55.png)
+
+
+#### -f | -o noglob
+> Disable filename expansion(globbing)
+
+![](img/2023-04-07-17-47-44.png)
+
+
+#### -h | -o hashall
+> Locate and remember (hash) commands as they are looked up for execution.
+
+- `echo $-` 可看到该选项是默认设置
+![](img/2023-04-07-17-55-00.png)
+
+- 或者用 `set -o | grep "hashall` 查看
+![](img/2023-04-07-17-55-58.png)
+
+- 开启该功能，则执行过的外部命令会存在 `hash` 缓存中，下次再执行时直接从 `hash` 缓存中找命令的路径
+![](img/2023-04-07-18-03-20.png)
+
+
+#### -C | -o noclobber
+> uppercase C
+> If set, disallow existing regular files to be overwritten by redirection of output
+
+- 默认没有设置该选项，即重定向可以覆盖原有文件内容
+![](img/2023-04-07-19-15-49.png)
+
+#### -m | -O monitor
+> Job control is enabled
+
+
+- 默认开启该设置
+
+
+#### -n | -o noglob
+> Read commands but do not execute them
+> An interactive shell may ignore this option
+
+- 读取命令但不执行，可以用来检查 shell 脚本语法错误
+- interactive shell 设置该选项失败，默认未设置
+![](img/2023-04-07-19-23-51.png)
+
+
+#### -t | -o onecmd
+> Exit after reading and executing one command
+
+#### -u | -o nounset
+> Treat unset variable as an error when substituting
+
+- 默认未开启，如果 `echo $var` 而 `var` 未设置，则输出空，退出状态为 0
+- 设置后为设置的变量认为错误，退出状态 non-zero
+
+![](img/2023-04-07-19-30-49.png)
+
+
+#### -v | -o verbose
+> Print each command to `stdout` before executing it
+
+- `set` 可以设置该选项，因此可以通过 `set` 命令查看是否设置该参数
+- 设置该参数后会将输入的命令作为输出到 `stdout`，但不会扩展命令
+![](img/2023-04-07-16-01-27.png)  
+![](img/2023-04-07-16-04-12.png)
+![](img/2023-04-07-16-05-27.png)
+
+#### -x | -o xtrace
+> Similar to `-v`, but expands commands
+
+- 可以通过 `set` 命令设置
+![](img/2023-04-07-16-09-03.png)
+![](img/2023-04-07-16-14-57.png)
+
+
+#### -B | -o braceexpand
+> The shell will perform brace expansion
+
+- 默认开启该设置，`echo $-` 可看到 `B` 选项
+![](img/2023-04-07-19-35-26.png)
+
+
+#### -H | -o hisexpand
+> Enable ! style history substitution.
+
+- 默认设置，即 `echo $-` 看到的 `H`
+- 通过 `history` 命令找到历史命令的编号，可以通过 `!num` 执行历史命令
+
+![](img/2023-04-07-19-53-45.png)
+
+#### -P | -o physical
+> If set, do not resolve symbolic links when executing commands such as `cd` which change the current directory
+
+![](img/2023-04-07-19-59-33.png)
+
+
+#### -o emacs
+> [8 Command Line Editing](https://www.gnu.org/software/bash/manual/bash.html#Command-Line-Editing)
+
+> Use an emacs-style line editing interface
+> This also affects the editing interface used for `read -e`
+
+- 默认选项
+- emacs 风格的的快捷键，如回到行首等和 vi 快捷键不同
+- 例在写命令时用 `ctrl b` 想左移动一个字符，相当于 vi 在普通模式下的 `h` 
+
+#### -o vi
+> Use a vi-style line editing interface
+
+- 设置后默认为 insert 模式，按下 `Esc` 或者 `ctrl [` 可切换到 normal 模式
+
+#### -p | -o Privileged
+
+
+#### -o ignoreeof
+> The shell whill not exit upon reading EOF
+
+#### -o -o interactive-comments
+> allow comments to appear in interactive commands
+
+
+#### --
+> Assign any remaining arguments to the positional parameters
+> If there are no remaining arguments, the positional parameters are unset
+> The -x and -v options are turned off
+
+
+#### -
+> Assign any remaining arguments to the positional parameters
+> The -x and -v options are turned off
+
+
+
+### shopt options
+> new options
+> 包含 `set` 中的旧选项
+
+
+
+
+
 # 查询当前 shell 类型和全部 shell 类型
 > [Shell 的种类 ](https://wangdoc.com/bash/intro#shell-%E7%9A%84%E7%A7%8D%E7%B1%BB)
 
@@ -172,7 +437,7 @@
 
 ## ~ tilde expansion 
 > [3.5.2 Tilde Expansion](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Tilde-Expansion)
-
+Error loading webview: Error: Could not register service worker: InvalidStateError: Failed to register a ServiceWorker: The document is in an invalid state.
 
 - `man bash` 搜索 `Tilde Expansion` 查看帮助说明
 ![1](https://img-blog.csdnimg.cn/94a44f9f3f154652be5653cca7b1a825.png)

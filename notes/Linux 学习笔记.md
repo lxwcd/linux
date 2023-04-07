@@ -346,16 +346,86 @@ PermitEmptyPasswords yes
 ## Ctrl + q 解锁 Ctrl + s 
 
 
+# Interactive Shells
+> [6.3 Interactive Shells](https://www.gnu.org/software/bash/manual/html_node/Interactive-Shells.html)
+
+> An interactive shell generally reads from and writes to a user's terminal.
+
+
+
+
 //TODO: login shell 待补充
 # login shell 和 non-login shell
 > [bash 的环境配置文件](http://cn.linux.vbird.org/linux_basic/0320bash_4.php#settings_bashrc)
 > [What is the difference between Login and Non-Login Shell?](https://tecadmin.net/difference-between-login-and-non-login-shell/)
 > [Interactive, Non-interactive, Login, Non-login Shells in Linux](https://www.baeldung.com/linux/interactive-non-interactive-login-non-login-shells)
+> [6.1 Invoking Bash](https://www.gnu.org/software/bash/manual/html_node/Invoking-Bash.html)
 
 
+**********************
+## 查看当前 shell 是 login shell 还是 non-login shell 
+> A login shell is one whose first character of argument zero is `-`, or one inviked whith `--login` optin.
 
 - 用 `echo $0` 查看 shell 类型，有 `-` 前缀为 login shell
 ![](img/2023-04-04-21-07-16.png)
+- `su -`，即 `su -l` 或 `su --login` 切换用户登录的为 login shell
+
+
+**********************
+## Interactive login shell 或使用 `--login` 选项
+> [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
+> &nbsp;
+> When Bash is invoked as an **interactive login shell**, or as a **non-interactive shell with the `--login` option**, it **first** reads and executes commands from the file `/etc/profile`.
+> &nbsp;
+> If that file exists, it looks for `~/.bash_profile`, `~/.bash_login`, and `~/.profile`, **in that oeder**, and reads and executes commands from the first one that **exists and is readable**.
+> &nbsp;
+> The `--noprofile` option may be used when the shell is started to inhibit this behavior.
+> &nbsp;
+> When an **interactive login shell exits, or a non-interactive login shell** executes the `exit` builtin command, **Bash reads and executes commands** from the file `~/.bash_logout`, if it exists.
+
+&nbsp;
+
+- 执行 `/etc/profile` 文件时，该文件中可能调用其他文件，如 ubunut 22.04 和 ubuntu 20.04 中调用 `/etc/profile.d` 目录下的全部文件。
+![](img/2023-04-06-21-12-09.png)
+
+- ubuntu 22.04 和 ubuntu 20.04 用户家目录中没有 `~/.bash_profile` 和 `~/.bash_login`文件，但有 `~/.profile` 文件，因此执行的是 `~/.profile` 文件
+
+- 只有 `~/.bash_profile` 和 `~/.bash_login` 均不存在才会读 `~/.profile`，且按照该顺序查找文件
+
+
+
+*************************
+## Interactive non-login shell 登录
+> [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
+> &nbsp;
+> When an **interactive shell** that is **not a login shell** started, Bash reads and executes commands from `~/.bashrc`, if that file exist.
+> &nbsp;
+> This may be inhibited by using the `--norc` option.
+> &nbsp;
+> The `--rcfile file` option will force Bash to read and execute commands from `file` instead of `~/.bashrc`.
+
+&nbsp;
+- ubuntu 22.04 和 ubuntu 20.04 用户家目录中没有 `~/.bash_profile` 文件，但 rocky8.6 有，该文件内容主要用于调用 `~/.bashrc`，防止上面提到的 `--rcfile file` 选项存在时不执行 `~/.bashrc`。
+```bash
+# rocky8.6
+# .bash_profile
+  
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+        . ~/.bashrc
+fi
+
+
+# User specific environment and startup programs
+```
+- ubutun 22.04 中执行的是 `~/.profile` 文件
+
+## non-interactive shell 登录
+> [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
+> &nbsp;
+
+
+
 
 - ubunut 20.04 `Ctrl A|t F1` 和 `Ctrl A|t F2` 都能进入图形界面
 
@@ -395,6 +465,8 @@ PermitEmptyPasswords yes
 
 # shell 配置相关文件说明
 > [bash 的环境配置文件](http://cn.linux.vbird.org/linux_basic/0320bash_4.php#settings_bashrc)
+> [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
+> [bash-doc 4.3-6ubuntu1/usr/share/doc/bash/examples/startup-files](https://www.apt-browse.org/browse/ubuntu/trusty/main/all/bash-doc/4.3-6ubuntu1/file/usr/share/doc/bash/examples/startup-files)
 
 
 ![1](https://img-blog.csdnimg.cn/44be8cb3c28247dd9072f49feaa98ef5.png)
@@ -405,16 +477,63 @@ PermitEmptyPasswords yes
 
 
 ## /etc/profile
-- 谁调用该文件执行
+- 该文件在哪被调用的？
 - login shell 会读该文件，在哪里定义？
+
+- 
+
+
 ### ubuntu 22.02 带图形界面
 ![](img/2023-04-06-21-12-09.png)
 
 - 在当前 shell 中执行 `/etc/profile.d` 目录下的全部 `.sh` 脚本
-### ubuntu 22.04
 
 
 
+## ~/.profile
+### ubuntu 22.02 带图形界面
+```bash
+  1 # ~/.profile: executed by the command interpreter for login shells.      
+  2 # This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
+  3 # exists.
+  4 # see /usr/share/doc/bash/examples/startup-files for examples.
+  5 # the files are located in the bash-doc package.
+  6 
+  7 # the default umask is set in /etc/profile; for setting the umask
+  8 # for ssh logins, install and configure the libpam-umask package.
+  9 #umask 022
+ 10 
+ 11 # if running bash
+ 12 if [ -n "$BASH_VERSION" ]; then
+ 13     # include .bashrc if it exists
+ 14     if [ -f "$HOME/.bashrc" ]; then
+ 15     . "$HOME/.bashrc"
+ 16     fi
+ 17 fi
+ 18 
+ 19 # set PATH so it includes user's private bin if it exists
+ 20 if [ -d "$HOME/bin" ] ; then
+ 21     PATH="$HOME/bin:$PATH"
+ 22 fi
+ 23 
+ 24 # set PATH so it includes user's private bin if it exists
+ 25 if [ -d "$HOME/.local/bin" ] ; then
+ 26     PATH="$HOME/.local/bin:$PATH"
+ 27 fi
+```
+
+- login shell 才会读
+
+- 只有 `~/.bash_profile` 和 `~/.bash_login` 均不存在才会读
+![](img/2023-04-07-11-11-25.png)
+
+- 注释中提到的 `/usr/share/doc/bash/examples/startup-files` 找不到 `examples` 目录，可从 [bash-doc 4.3-6ubuntu1/usr/share/doc/bash/examples/startup-files](https://www.apt-browse.org/browse/ubuntu/trusty/main/all/bash-doc/4.3-6ubuntu1/file/usr/share/doc/bash/examples/startup-files) 查看
+
+- 该文件会执行家目录中的 `~/.bashrc` 文件
+
+- 如果用户家目录中有 `bin` 或 `.local/bin` 文件夹，则会将这两个路径加入到 PATH 环境变量中，ubuntu 22.04 中默认无这两个目录，用户可以自己创建，如将可执行文件放到 `~/bin` 目录下，则可执行文件执行时不需要写全路径，可以直接执行了
+
+- 
 
 # 命令放后台执行
 ## &
@@ -2740,7 +2859,7 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 
 
 
-
+//LABEL ls
 # 查看文件目录内容 ls
 > [Linux ls Options](https://ipcisco.com/lesson/linux-ls-command/)
 > [文件与目录的检视： ls](http://cn.linux.vbird.org/linux_basic/0220filemanager_2.php#ls)
@@ -2773,11 +2892,18 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ![](img/2023-03-13-18-05-05.png)
 
 ## ls -a 查看全部文件，包含隐藏文件 
+
 ![1](https://img-blog.csdnimg.cn/48d8064f80ab43bca74fe35e0ca9ef90.png)
 
 ## ls -A 查看全部文件，不包括 . 和 .. 
-`.` 为当前目录，`..` 为上级目录。
+
+- `.` 为当前目录，`..` 为上级目录。
 ![1](https://img-blog.csdnimg.cn/c45cf82acba2404b86ea8fa5167f2af7.png)
+
+
+## ls 仅列出隐藏文件
+
+![](img/2023-04-07-11-08-37.png)
 
 ## ls -d 仅列出目录，而不列出目录的内容
 
