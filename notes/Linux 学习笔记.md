@@ -346,121 +346,7 @@ PermitEmptyPasswords yes
 ## Ctrl + q 解锁 Ctrl + s 
 
 
-# Interactive Shells
-> [6.3 Interactive Shells](https://www.gnu.org/software/bash/manual/html_node/Interactive-Shells.html)
 
-> An interactive shell generally reads from and writes to a user's terminal.
-
-
-
-
-//TODO: login shell 待补充
-# login shell 和 non-login shell
-> [bash 的环境配置文件](http://cn.linux.vbird.org/linux_basic/0320bash_4.php#settings_bashrc)
-> [What is the difference between Login and Non-Login Shell?](https://tecadmin.net/difference-between-login-and-non-login-shell/)
-> [Interactive, Non-interactive, Login, Non-login Shells in Linux](https://www.baeldung.com/linux/interactive-non-interactive-login-non-login-shells)
-> [6.1 Invoking Bash](https://www.gnu.org/software/bash/manual/html_node/Invoking-Bash.html)
-
-
-**********************
-## 查看当前 shell 是 login shell 还是 non-login shell 
-> A login shell is one whose first character of argument zero is `-`, or one inviked whith `--login` optin.
-
-- 用 `echo $0` 查看 shell 类型，有 `-` 前缀为 login shell
-![](img/2023-04-04-21-07-16.png)
-- `su -`，即 `su -l` 或 `su --login` 切换用户登录的为 login shell
-
-
-**********************
-## Interactive login shell 或使用 `--login` 选项
-> [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
-> &nbsp;
-> When Bash is invoked as an **interactive login shell**, or as a **non-interactive shell with the `--login` option**, it **first** reads and executes commands from the file `/etc/profile`.
-> &nbsp;
-> If that file exists, it looks for `~/.bash_profile`, `~/.bash_login`, and `~/.profile`, **in that oeder**, and reads and executes commands from the first one that **exists and is readable**.
-> &nbsp;
-> The `--noprofile` option may be used when the shell is started to inhibit this behavior.
-> &nbsp;
-> When an **interactive login shell exits, or a non-interactive login shell** executes the `exit` builtin command, **Bash reads and executes commands** from the file `~/.bash_logout`, if it exists.
-
-&nbsp;
-
-- 执行 `/etc/profile` 文件时，该文件中可能调用其他文件，如 ubunut 22.04 和 ubuntu 20.04 中调用 `/etc/profile.d` 目录下的全部文件。
-![](img/2023-04-06-21-12-09.png)
-
-- ubuntu 22.04 和 ubuntu 20.04 用户家目录中没有 `~/.bash_profile` 和 `~/.bash_login`文件，但有 `~/.profile` 文件，因此执行的是 `~/.profile` 文件
-
-- 只有 `~/.bash_profile` 和 `~/.bash_login` 均不存在才会读 `~/.profile`，且按照该顺序查找文件
-
-
-
-*************************
-## Interactive non-login shell 登录
-> [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
-> &nbsp;
-> When an **interactive shell** that is **not a login shell** started, Bash reads and executes commands from `~/.bashrc`, if that file exist.
-> &nbsp;
-> This may be inhibited by using the `--norc` option.
-> &nbsp;
-> The `--rcfile file` option will force Bash to read and execute commands from `file` instead of `~/.bashrc`.
-
-&nbsp;
-- ubuntu 22.04 和 ubuntu 20.04 用户家目录中没有 `~/.bash_profile` 文件，但 rocky8.6 有，该文件内容主要用于调用 `~/.bashrc`，防止上面提到的 `--rcfile file` 选项存在时不执行 `~/.bashrc`。
-```bash
-# rocky8.6
-# .bash_profile
-  
-# Get the aliases and functions
-if [ -f ~/.bashrc ]; then
-        . ~/.bashrc
-fi
-
-
-# User specific environment and startup programs
-```
-- ubutun 22.04 中执行的是 `~/.profile` 文件
-
-## non-interactive shell 登录
-> [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
-> &nbsp;
-
-
-
-
-- ubunut 20.04 `Ctrl A|t F1` 和 `Ctrl A|t F2` 都能进入图形界面
-
-- login shell 和 non-login shell 创建时执行的一些环境设置脚本不同
-
-
-
-## login-shell
-1. ubuntu 22.04 带图形界面版本测试
-
-- 登录系统默认进入的是 `tty2`，是 login shell
-
-- 用户最开始登录系统创建的是 login shell（tty2），但如果是图形界面，在登录后启动图形化接口，这时进入 pts 伪终端，无需再次登录，查看可以发现该登录为 non-login shell（Ubuntu 22.02）, 但用 w 命令看不到 pts 登录
-![](img/2023-04-05-20-14-22.png)
-
-- 图形界面登录后再用 xshell 远程连接，登录 shell 为 login shell，登录设备是 pts 伪终端
-![](img/2023-04-05-20-18-14.png)
-![](img/2023-04-05-20-20-49.png) 
-
-- `Ctrl A|t F1` 切换终端，此时变成 `tty3`，但仍是图形界面登录，图形界面登录的仍是 pts
-![](img/2023-04-05-20-30-35.png)
-
-- 在一个图形界面用 `init 3` 进入 CLI 命令行界面后，此时用 `tty` 查看其设备，`F1` ~ `F6` 分别对应的变为 `tty1` ~ `tty6`？
-
-
-- `su -` 即 `su -l` 创建的也是 login shell，但 `tty` 查看仍是一个终端设备
-![](img/2023-04-04-20-54-19.png)
-![](img/2023-04-05-21-00-44.png)
-
-
-- ssh 登录的用户创建 login shell
-
-
-## non-login shell
-- `w` 命令看不到 non-login shell 登录的用户
   
 
 # shell 配置相关文件说明
@@ -2436,6 +2322,8 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 
 
 &nbsp;
+
+//LABEL: find
 ## find
 > [find](http://cn.linux.vbird.org/linux_basic/0220filemanager_5.php#find)
 > [Linux find 命令](https://www.runoob.com/linux/linux-comm-find.html)

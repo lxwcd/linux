@@ -1,17 +1,23 @@
 ﻿# 学习资源
 > [学习 Shell 脚本编程的免费资源 | Linux 中国](https://zhuanlan.zhihu.com/p/155613380)
 
+
+## 官方文档
+> man 手册官方文档：[bash(1) — Linux manual page](https://man7.org/linux/man-pages/man1/bash.1.html#OPTIONS)
+> gnu 官方文档：[Bash Reference Manual](https://www.gnu.org/software/bash/manual/bash.html)
+
+
 ## 学习网站
 > [Bash 脚本教程](https://wangdoc.com/bash/intro)
 > [learnshell](https://www.learnshell.org/)
 > [linuxcommand](http://linuxcommand.org/lc3_learning_the_shell.php)
-> bash 官方文档：[Bash Reference Manual](https://www.gnu.org/software/bash/manual/bash.html)
 > [Advanced Bash-Scripting Guide](https://tldp.org/LDP/abs/html/index.html)
 > [学习 shell 有什么好书推荐？](https://www.zhihu.com/question/19745611/answer/129024703)
 > [The Unix School](https://www.theunixschool.com/p/shell-scripts.html)
 > [BashGuide](http://mywiki.wooledge.org/BashGuide)
 > [Shell & Utilities: Detailed Toc](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/contents.html)
 > [sh - shell, the standard command language interpreter](https://pubs.opengroup.org/onlinepubs/9699919799/)
+> [Linux Bash Shell Scripting Tutorial Wiki](https://bash.cyberciti.biz/guide/Main_Page)
 
 
 ## 书籍
@@ -73,25 +79,25 @@
 
 
 #### -l login shell
-> Make `bash` act as if it had been invoked as a login shell.
+> make `bash` act as if it had been invoked as a login shell.
 
 - 可以让当前的 shell 变成 login shell，这样加载的 bash startup files 不同，相当于执行 `exec bash --login`
 
 
 #### r restricted shell
-> Make the shell a restricted shell
+> make the shell a restricted shell
 
 #### -s stdin
 
-> If the `-s` option is present, or if no arguments remain after option processing, then the commands are read from the standard input.
-> This option allows the positional parameters to be set when invoking an interactive shell or when reading input through a pipe.
+> if the `-s` option is present, or if no arguments remain after option processing, then the commands are read from the standard input.
+> this option allows the positional parameters to be set when invoking an interactive shell or when reading input through a pipe.
 
 - `echo $-` 可以查看该选项是否设置
 ![](img/2023-04-07-15-39-19.png)
 
 
 #### -v verbose
-> Print each command to `stdout` before executing it
+> print each command to `stdout` before executing it
 
 - `set` 可以设置该选项，因此可以通过 `set` 命令查看是否设置该参数
 - 设置该参数后会将输入的命令作为输出到 `stdout`，但不会扩展命令
@@ -100,32 +106,32 @@
 ![](img/2023-04-07-16-05-27.png)
 
 #### -x xtrace
-> Similar to `-v`, but expands commands
+> similar to `-v`, but expands commands
 
 - 可以通过 `set` 命令设置
 ![](img/2023-04-07-16-09-03.png)
 ![](img/2023-04-07-16-14-57.png)
 
-#### -D Double-quoted string
-> A list of all double-quoted strings preceded by `$` is printed on the standard output.
-> These strings that are subject to language translation when the current locale is not `C` or `POSIX`.
-> This implies the `-n` option; no commands will be executed.
+#### -d double-quoted string
+> a list of all double-quoted strings preceded by `$` is printed on the standard output.
+> these strings that are subject to language translation when the current locale is not `c` or `posix`.
+> this implies the `-n` option; no commands will be executed.
 
 - 不能在 `set` 命令中设置
 - 包含 `-n` 选项的作用，扩展 `$`后面双引号的内容，不执行该命令，做语法检查
 
 
 #### --
-> A `--` signals the end of options and disables further option processing.
-> Any arguments after the `--` are treated as filenames and arguments.
-> An argument of `-` is equivalent to `--`.
+> a `--` signals the end of options and disables further option processing.
+> any arguments after the `--` are treated as filenames and arguments.
+> an argument of `-` is equivalent to `--`.
 
 
 ### set options
-> [4.3.1 The Set Builtin](https://www.gnu.org/software/bash/manual/bash.html#The-Set-Builtin)
+> [4.3.1 the set builtin](https://www.gnu.org/software/bash/manual/bash.html#the-set-builtin)
 
-> set [-abefhkmnptuvxBCEHPT] [-o option-name] [--] [-] [argument …]
-> set [+abefhkmnptuvxBCEHPT] [+o option-name] [--] [-] [argument …]
+> set [-abefhkmnptuvxbcehpt] [-o option-name] [--] [-] [argument …]
+> set [+abefhkmnptuvxbcehpt] [+o option-name] [--] [-] [argument …]
 
 - old options
 - `set --help | less` 查看帮助说明
@@ -143,10 +149,10 @@
 - 可通过 `set -o | grep "verbose"` 查看 `-v` 选项是否设置
   
 #### -a | -o allexport
-> [4.3.1 The Set Builtin](https://www.gnu.org/software/bash/manual/bash.html#The-Set-Builtin)
-> [set(1p) — Linux manual page](https://man7.org/linux/man-pages/man1/set.1p.html)
+> [4.3.1 the set builtin](https://www.gnu.org/software/bash/manual/bash.html#the-set-builtin)
+> [set(1p) — linux manual page](https://man7.org/linux/man-pages/man1/set.1p.html)
 
-> Each variable or function that is created or modified is given the export attribute and marked for export to the environment of subsequent commands.
+> each variable or function that is created or modified is given the export attribute and marked for export to the environment of subsequent commands.
 
 
 - 创建的变量自动变为环境变量，相当于加上 `export` 属性
@@ -156,24 +162,24 @@
 
 
 #### -b | -o notify
-> Cause the status of terminated background jobs to be reported immediately, rather than before printing the next primary prompt.
+> cause the status of terminated background jobs to be reported immediately, rather than before printing the next primary prompt.
 
 - ubuntu 22.04 默认未设置
 
 #### -e | -o errexit
-- Exit immediately if a command exits with a non-zero status
+- exit immediately if a command exits with a non-zero status
 
 ![](img/2023-04-07-17-44-55.png)
 
 
 #### -f | -o noglob
-> Disable filename expansion(globbing)
+> disable filename expansion(globbing)
 
 ![](img/2023-04-07-17-47-44.png)
 
 
 #### -h | -o hashall
-> Locate and remember (hash) commands as they are looked up for execution.
+> locate and remember (hash) commands as they are looked up for execution.
 
 - `echo $-` 可看到该选项是默认设置
 ![](img/2023-04-07-17-55-00.png)
@@ -185,23 +191,23 @@
 ![](img/2023-04-07-18-03-20.png)
 
 
-#### -C | -o noclobber
-> uppercase C
-> If set, disallow existing regular files to be overwritten by redirection of output
+#### -c | -o noclobber
+> uppercase c
+> if set, disallow existing regular files to be overwritten by redirection of output
 
 - 默认没有设置该选项，即重定向可以覆盖原有文件内容
 ![](img/2023-04-07-19-15-49.png)
 
-#### -m | -O monitor
-> Job control is enabled
+#### -m | -o monitor
+> job control is enabled
 
 
 - 默认开启该设置
 
 
 #### -n | -o noglob
-> Read commands but do not execute them
-> An interactive shell may ignore this option
+> read commands but do not execute them
+> an interactive shell may ignore this option
 
 - 读取命令但不执行，可以用来检查 shell 脚本语法错误
 - interactive shell 设置该选项失败，默认未设置
@@ -209,10 +215,10 @@
 
 
 #### -t | -o onecmd
-> Exit after reading and executing one command
+> exit after reading and executing one command
 
 #### -u | -o nounset
-> Treat unset variable as an error when substituting
+> treat unset variable as an error when substituting
 
 - 默认未开启，如果 `echo $var` 而 `var` 未设置，则输出空，退出状态为 0
 - 设置后为设置的变量认为错误，退出状态 non-zero
@@ -221,7 +227,7 @@
 
 
 #### -v | -o verbose
-> Print each command to `stdout` before executing it
+> print each command to `stdout` before executing it
 
 - `set` 可以设置该选项，因此可以通过 `set` 命令查看是否设置该参数
 - 设置该参数后会将输入的命令作为输出到 `stdout`，但不会扩展命令
@@ -230,72 +236,72 @@
 ![](img/2023-04-07-16-05-27.png)
 
 #### -x | -o xtrace
-> Similar to `-v`, but expands commands
+> similar to `-v`, but expands commands
 
 - 可以通过 `set` 命令设置
 ![](img/2023-04-07-16-09-03.png)
 ![](img/2023-04-07-16-14-57.png)
 
 
-#### -B | -o braceexpand
-> The shell will perform brace expansion
+#### -b | -o braceexpand
+> the shell will perform brace expansion
 
-- 默认开启该设置，`echo $-` 可看到 `B` 选项
+- 默认开启该设置，`echo $-` 可看到 `b` 选项
 ![](img/2023-04-07-19-35-26.png)
 
 
-#### -H | -o hisexpand
-> Enable ! style history substitution.
+#### -h | -o hisexpand
+> enable ! style history substitution.
 
-- 默认设置，即 `echo $-` 看到的 `H`
+- 默认设置，即 `echo $-` 看到的 `h`
 - 通过 `history` 命令找到历史命令的编号，可以通过 `!num` 执行历史命令
 
 ![](img/2023-04-07-19-53-45.png)
 
-#### -P | -o physical
-> If set, do not resolve symbolic links when executing commands such as `cd` which change the current directory
+#### -p | -o physical
+> if set, do not resolve symbolic links when executing commands such as `cd` which change the current directory
 
 ![](img/2023-04-07-19-59-33.png)
 
 
 #### -o emacs
-> [8 Command Line Editing](https://www.gnu.org/software/bash/manual/bash.html#Command-Line-Editing)
+> [8 command line editing](https://www.gnu.org/software/bash/manual/bash.html#command-line-editing)
 
-> Use an emacs-style line editing interface
-> This also affects the editing interface used for `read -e`
+> use an emacs-style line editing interface
+> this also affects the editing interface used for `read -e`
 
 - 默认选项
 - emacs 风格的的快捷键，如回到行首等和 vi 快捷键不同
 - 例在写命令时用 `ctrl b` 想左移动一个字符，相当于 vi 在普通模式下的 `h` 
 
 #### -o vi
-> Use a vi-style line editing interface
+> use a vi-style line editing interface
 
-- 设置后默认为 insert 模式，按下 `Esc` 或者 `ctrl [` 可切换到 normal 模式
+- 设置后默认为 insert 模式，按下 `esc` 或者 `ctrl [` 可切换到 normal 模式
 
-#### -p | -o Privileged
+#### -p | -o privileged
 
 
 #### -o ignoreeof
-> The shell whill not exit upon reading EOF
+> the shell whill not exit upon reading eof
 
 #### -o -o interactive-comments
 > allow comments to appear in interactive commands
 
 
 #### --
-> Assign any remaining arguments to the positional parameters
-> If there are no remaining arguments, the positional parameters are unset
-> The -x and -v options are turned off
+> assign any remaining arguments to the positional parameters
+> if there are no remaining arguments, the positional parameters are unset
+> the -x and -v options are turned off
 
 
 #### -
-> Assign any remaining arguments to the positional parameters
-> The -x and -v options are turned off
+> assign any remaining arguments to the positional parameters
+> the -x and -v options are turned off
 
 
 ### shopt options
-> [4.3.2 The Shopt Builtin](https://www.gnu.org/software/bash/manual/bash.html#The-Shopt-Builtin)
+> [4.3.2 the shopt builtin](https://www.gnu.org/software/bash/manual/bash.html#the-shopt-builtin)
 
 > shopt [-pqsu] [-o] [optname …]
 
@@ -325,17 +331,301 @@
 
 
 #### shopt -s 开启一个或多个选项
-> Enable (set) each optname
+> enable (set) each optname
 
 #### shopt -u 禁用一个或多个选项
-> Disable (unset) each optname
+> disable (unset) each optname
 
-//TODO: 补充 shell 种类
-# 查询当前 shell 类型和全部 shell 类型
-> [Shell 的种类 ](https://wangdoc.com/bash/intro#shell-%E7%9A%84%E7%A7%8D%E7%B1%BB)
+# 查看全部支持的有效 login shell
+- `cat /etc/shells` 查看
+![](img/2023-04-08-09-29-58.png)
 
 
-![1](https://img-blog.csdnimg.cn/85e2bba9df4a45ad857d1a486f1e8e8b.png)
+# 查看当前用户的默认 shell
+- 当前用户的默认 shell 不一定是当前正在使用的 shell
+- `echo $shell`
+- `getent passwd $user`
+- `grep "^$user" /etc/passwd`
+
+![](img/2023-04-08-10-47-46.png)
+
+# 查看当前使用的 shell
+> [how do i find out what shell i am using on linux/unix?](https://www.cyberciti.biz/tips/how-do-i-find-out-what-shell-im-using.html)
+
+
+- `echo $0` 可查看当前使用的 shell 类型，不一定是当前默认的 shell
+- `ps` 命令也可查看，一般在倒数第二个（pid 第二大），最下方的为 `ps` 命令的 pid
+- `ps -p $$` 可查看，`-p` 指定查看的 pid，`$$` 显示当前进程的 pid，即当前 shell 的 pid
+  
+![](img/2023-04-08-10-58-45.png)
+
+
+# 修改当前默认 shell
+
+![](img/2023-04-08-11-12-24.png)
+## usermod -s 
+- 需要 root 权限
+
+## chsh -s
+- change login shell
+- 不需要 root 权限
+- `chsh` 有 `s` 权限，普通用户执行时以 root 身份执行该命令
+
+
+# interactive, non-interactive, login, and non-login shells
+> [bash 的环境配置文件](http://cn.linux.vbird.org/linux_basic/0320bash_4.php#settings_bashrc)
+> [what is the difference between login and non-login shell?](https://tecadmin.net/difference-between-login-and-non-login-shell/)
+> [interactive, non-interactive, login, non-login shells in linux](https://www.baeldung.com/linux/interactive-non-interactive-login-non-login-shells)
+> [6.1 invoking bash](https://www.gnu.org/software/bash/manual/html_node/invoking-bash.html)
+
+
+**********************
+## 查看当前 shell 是 login shell 还是 non-login shell 
+> a login shell is one whose first character of argument zero is `-`, or one inviked whith `--login` optin.
+
+- 用 `echo $0` 查看 shell 类型，有 `-` 前缀为 login shell
+![](img/2023-04-04-21-07-16.png)
+
+- 或者用 `shopt login_shell` 查看，状态为 `on` 则为 login shell
+![](img/2023-04-08-11-36-43.png)
+
+
+
+## 查看当前 shell 是 interactive shell 还是 non-interactive shell
+> [6.3.2 is this shell interactive](https://www.gnu.org/software/bash/manual/html_node/is-this-shell-interactive_003f.html)
+
+
+- `echo $-` 查看，有 `i` flag 则为 `interactive shell`，`i` 为 shell 内置的 `-i` 选项
+![](img/2023-04-07-15-15-48.png)
+
+
+### 脚本中判断
+- startup scrips 默认`ps1` 只在 `interactive shell` 中有，在 `non-interactive shell` 中未设置，如 `/etc/bash.bashrc`
+![](img/2023-04-08-11-53-01.png)
+
+- 通过 `$-` 查看是否有 `i` 判断
+![](img/2023-04-08-11-57-36.png)
+
+
+## login-shell
+1. ubuntu 22.04 带图形界面版本测试
+
+- 登录系统默认进入的是 `tty2`，是 login shell
+
+- 用户最开始登录系统创建的是 login shell（tty2），但如果是图形界面，在登录后启动图形化接口，这时进入 pts 伪终端，无需再次登录，查看可以发现该登录为 non-login shell（ubuntu 22.02）, 但用 w 命令看不到 pts 登录
+![](img/2023-04-05-20-14-22.png)
+
+- 图形界面登录后再用 xshell 远程连接，登录 shell 为 login shell，登录设备是 pts 伪终端
+![](img/2023-04-05-20-18-14.png)
+![](img/2023-04-05-20-20-49.png) 
+
+- `ctrl a|t f1` 切换终端，此时变成 `tty3`，但仍是图形界面登录，图形界面登录的仍是 pts
+![](img/2023-04-05-20-30-35.png)
+
+- 在一个图形界面用 `init 3` 进入 cli 命令行界面后，此时用 `tty` 查看其设备，`f1` ~ `f6` 分别对应的变为 `tty1` ~ `tty6`？
+
+
+- `su -` 即 `su -l` 创建的也是 login shell，但 `tty` 查看仍是一个终端设备
+![](img/2023-04-04-20-54-19.png)
+![](img/2023-04-05-21-00-44.png)
+
+
+- ssh 登录的用户创建 login shell
+
+
+## non-login shell
+- `w` 命令看不到 non-login shell 登录的用户
+  
+
+## interactive shell behavior
+> [6.3.3 interactive shell behavior](https://www.gnu.org/software/bash/manual/html_node/interactive-shell-behavior.html)
+
+
+# bash 环境配置文件（bash startup files）
+> [bash 的环境配置文件](http://cn.linux.vbird.org/linux_basic/0320bash_4.php#settings_bashrc)
+> [6.2 bash startup files](https://www.gnu.org/software/bash/manual/html_node/bash-startup-files.html)
+> [bash-doc 4.3-6ubuntu1/usr/share/doc/bash/examples/startup-files](https://www.apt-browse.org/browse/ubuntu/trusty/main/all/bash-doc/4.3-6ubuntu1/file/usr/share/doc/bash/examples/startup-files)
+
+
+![1](https://img-blog.csdnimg.cn/44be8cb3c28247dd9072f49feaa98ef5.png)
+
+
+- 不同 bash 版本其具体一些配置文件的执行可能不同，可以看该脚本中的代码查看其执行顺序
+
+- **环境：ubuntu 22.04 和 ubuntu 20.04**
+- 图形界面登录时，开始登录的 tty 设备为 `interactive login shell`，然后通过图形界面登录为 `interactive non-login`
+- `interactive login shell` 登录
+
+
+## interactive login shell 或使用 `--login` 选项
+> [6.2 bash startup files](https://www.gnu.org/software/bash/manual/html_node/bash-startup-files.html)
+> &nbsp;
+> when bash is invoked as an **interactive login shell**, or as a **non-interactive shell with the `--login` option**, it **first** reads and executes commands from the file `/etc/profile`.
+> &nbsp;
+> if that file exists, it looks for `~/.bash_profile`, `~/.bash_login`, and `~/.profile`, **in that oeder**, and reads and executes commands from the first one that **exists and is readable**.
+> &nbsp;
+> the `--noprofile` option may be used when the shell is started to inhibit this behavior.
+> &nbsp;
+> when an **interactive login shell exits, or a non-interactive login shell** executes the `exit` builtin command, **bash reads and executes commands** from the file `~/.bash_logout`, if it exists.
+> &nbsp;
+> The --noprofile option may be used when the shell is started to inhibit this behavior.
+
+&nbsp;
+
+- 非图形界面通过 tty 登录，为 `interactive login shell`
+- 图形界面登录显示通过 tty 登录，再通过图形化接口登录，登录为 `interactive non-login shell`
+- ssh 远程登录为 `interacitve login shell`
+- 指定 `-l` 选项登录，如 `su - username` 或 `su -l username`, 或 `su --login username` 切换用户登录为 `interactive login shell`
+
+1. 首先执行 `/etc/profile` 文件
+- 执行 `/etc/profile` 文件时，该文件中可能调用其他文件，如 ubunut 22.04 和 ubuntu 20.04 中调用 `/etc/profile.d` 目录下的全部文件。
+![](img/2023-04-06-21-12-09.png)
+
+2. 按照顺序依次查找 `~/.bash_profile, ~/.bash_login 和 ~/.profile` 并执行第一个找到的且可读的文件
+- 只有 `~/.bash_profile` 和 `~/.bash_login` 均不存在才会读 `~/.profile`，且按照该顺序查找文件
+
+- ubuntu 22.04 和 ubuntu 20.04 用户家目录中没有 `~/.bash_profile` 和 `~/.bash_login`文件，但有 `~/.profile` 文件，因此执行的是 `~/.profile` 文件
+
+- ubuntu 22.04 `~/.profile` 文件中会调用 `~/.bashrc` 执行
+![](img/2023-04-08-14-52-01.png)
+
+- rocky8.6 家目录中有 `~/.bash_profile`
+```bash
+# rocky8.6
+# .bash_profile
+  
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+        . ~/.bashrc
+fi
+
+# User specific environment and startup programs
+```
+
+- **在找到的配置文件中可能调用其他的配置文件，不同的 bash 版本可能调用的文件有差异，具体要看对应的脚本**
+
+
+## Interactive non-login shell 登录
+> [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
+> &nbsp;
+> When an **interactive shell** that is **not a login shell** started, Bash reads and executes commands from `~/.bashrc`, if that file exist.
+> &nbsp;
+> This may be inhibited by using the `--norc` option.
+> &nbsp;
+> The `--rcfile file` option will force Bash to read and execute commands from `file` instead of `~/.bashrc`.
+
+&nbsp;
+
+- ubuntu 22.04 和 ubuntu 20.04 图形界面登录之前已经有 tty 设备登录，图形界面重新登录的为 pts 设备，为 `interactive non-login shell`，不会重新读 `/etc/profile` 文件，直接执行 `~/.bashrc` 文件
+
+- 登录一个 shell 后，执行 `bash` 或 `sh` 时新开启一个 shell 子进程为 `interactive non-login shell`
+
+- 通过 `su username` 切换用户，即未用 `-l` 选项，则登录的 shell 也为 `interactive non-login shell`
+
+1. 执行 `~/.bashrc` 文件
+- 该文件是 `interactive login shell` 直接执行的文件，`interactive non-login shell` 通过 `~/.profile` 文件调用该文件执行
+
+- 第 `5~8` 行是保证只有 `interactive shell` 执行，即 `echo $-` 的结果中有 `i` 标志
+![](img/2023-04-08-15-18-26.png)
+
+
+## non-interactive shell 登录
+> [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
+> &nbsp;
+> When Bash is started non-interactively, to run a shell script, for example, it looks for the variable BASH_ENV in the environment, expands its value if it appears there, and uses the expanded value as the name of a file to read and execute. Bash behaves as if the following command were executed: 
+```bash
+if [ -n "$BASH_ENV" ]; then . "$BASH_ENV"; fi
+```
+> &nbsp;
+> If a non-interactive shell is invoked with the --login option, Bash attempts to read and execute commands from the login shell startup files.
+
+
+- 执行 shell 脚本时，`PATH` 环境变量不会查找文件
+
+- 这种情况不清楚？ 在什么场景？
+
+
+## Invoked with name sh
+> [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
+
+## Invoked in POSIX mode
+> [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
+
+
+## Invoked by remote shell daemon
+> [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
+
+
+## Invoked by remote shell daemon
+> [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
+
+
+
+
+## /etc/profile
+- 该文件在哪被调用的？
+- login shell 会读该文件，在哪里定义？
+
+
+### ubuntu 22.02 带图形界面
+![](img/2023-04-06-21-12-09.png)
+
+- 在当前 shell 中执行 `/etc/profile.d` 目录下的全部 `.sh` 脚本
+
+
+
+## ~/.profile
+### ubuntu 22.02 带图形界面
+```bash
+  1 # ~/.profile: executed by the command interpreter for login shells.      
+  2 # This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
+  3 # exists.
+  4 # see /usr/share/doc/bash/examples/startup-files for examples.
+  5 # the files are located in the bash-doc package.
+  6 
+  7 # the default umask is set in /etc/profile; for setting the umask
+  8 # for ssh logins, install and configure the libpam-umask package.
+  9 #umask 022
+ 10 
+ 11 # if running bash
+ 12 if [ -n "$BASH_VERSION" ]; then
+ 13     # include .bashrc if it exists
+ 14     if [ -f "$HOME/.bashrc" ]; then
+ 15     . "$HOME/.bashrc"
+ 16     fi
+ 17 fi
+ 18 
+ 19 # set PATH so it includes user's private bin if it exists
+ 20 if [ -d "$HOME/bin" ] ; then
+ 21     PATH="$HOME/bin:$PATH"
+ 22 fi
+ 23 
+ 24 # set PATH so it includes user's private bin if it exists
+ 25 if [ -d "$HOME/.local/bin" ] ; then
+ 26     PATH="$HOME/.local/bin:$PATH"
+ 27 fi
+```
+
+- login shell 才会读
+
+- 只有 `~/.bash_profile` 和 `~/.bash_login` 均不存在才会读
+![](img/2023-04-07-11-11-25.png)
+
+- 注释中提到的 `/usr/share/doc/bash/examples/startup-files` 找不到 `examples` 目录，可从 [bash-doc 4.3-6ubuntu1/usr/share/doc/bash/examples/startup-files](https://www.apt-browse.org/browse/ubuntu/trusty/main/all/bash-doc/4.3-6ubuntu1/file/usr/share/doc/bash/examples/startup-files) 查看
+
+- 该文件会执行家目录中的 `~/.bashrc` 文件
+
+- 如果用户家目录中有 `bin` 或 `.local/bin` 文件夹，则会将这两个路径加入到 PATH 环境变量中，ubuntu 22.04 中默认无这两个目录，用户可以自己创建，如将可执行文件放到 `~/bin` 目录下，则可执行文件执行时不需要写全路径，可以直接执行了
+
+- 
+
+
+
+
+- ubunut 20.04 `Ctrl A|t F1` 和 `Ctrl A|t F2` 都能进入图形界面
+
+- login shell 和 non-login shell 创建时执行的一些环境设置脚本不同
+
 
 
 # 引号和转义
