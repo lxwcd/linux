@@ -984,7 +984,7 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 - `man bash` 搜索 `HISTFILESIZE` 查看说明
 - 修改当前用户可在 `~/.bashrc` 中修改参数
 
-### HISTCONTROL 历史记录在保存的格式
+### HISTCONTROL 历史记录在保存的方式
 > [HISTCONTROL Command in Linux with Examples](https://www.geeksforgeeks.org/histcontrol-command-in-linux-with-examples/)
 
 - `man bash` 搜索 `HISTCONTROL` 查看说明
@@ -4720,6 +4720,17 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 ## RUID
 
 ## SUID
+
+
+# chroot
+> [chroot](https://wiki.archlinux.org/title/chroot)
+> [How to Use the chroot Command on Linux](https://www.howtogeek.com/441534/how-to-use-the-chroot-command-on-linux/)
+> [chroot command in Linux with examples](https://www.geeksforgeeks.org/chroot-command-in-linux-with-examples/)
+
+
+
+
+
 **************************
 
 

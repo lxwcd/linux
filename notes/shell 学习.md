@@ -412,6 +412,8 @@
 
 - 登录系统默认进入的是 `tty2`，是 login shell
 
+- ubunut 22.04 和 20.04 `Ctrl A|t F1` 和 `Ctrl A|t F2` 都能进入图形界面
+
 - 用户最开始登录系统创建的是 login shell（tty2），但如果是图形界面，在登录后启动图形化接口，这时进入 pts 伪终端，无需再次登录，查看可以发现该登录为 non-login shell（ubuntu 22.02）, 但用 w 命令看不到 pts 登录
 ![](img/2023-04-05-20-14-22.png)
 
@@ -670,29 +672,44 @@ if [ -n "$BASH_ENV" ]; then . "$BASH_ENV"; fi
  44 
     # 主机名 hostname
  45 HOSTNAME=`/usr/bin/hostname 2>/dev/null`
+
     # 命令行中显示的历史记录的最大数目
  46 HISTSIZE=1000
+
+    # 设置 HISTCONTROL 的值，控制哪些命令会保存在历史记录中
+    # ignorespace 表示以空格开头的命令不保存在历史记录中
+    # ignoredups 表示和上一条相同的命令不保存在历史记录中
  47 if [ "$HISTCONTROL" = "ignorespace" ] ; then
  48     export HISTCONTROL=ignoreboth
  49 else
  50     export HISTCONTROL=ignoredups
  51 fi
  52 
+    # 将上述设置好的变量导出为环境变量
  53 export PATH USER LOGNAME MAIL HOSTNAME HISTSIZE HISTCONTROL
  54 
  55 # By default, we want umask to get set. This sets it for login shell
  56 # Current threshold for system reserved uid/gids is 200
  57 # You could check uidgid reservation validity in
  58 # /usr/share/doc/setup-*/uidgid file
+    # rocky8.6 从 /etc/login.defs 文件中可看到 SYS_UID_MIN 为 201，即系统用户的最小 UID 为 201
+    # UID 大于 199，且 guid 的 name 和 uid 的 name 相同，则 umask 为 002
+    # 默认创建一个用户时其主要组的名字和用户名相同
+    # 如果 guid name 和 uid name 不同，或者 uid ≤ 199，则 umask 为 022
+    # 因此 root umask 默认为 022
  59 if [ $UID -gt 199 ] && [ "`/usr/bin/id -gn`" = "`/usr/bin/id -un`" ]; then
  60     umask 002
  61 else
  62     umask 022
  63 fi
  64 
+    # 执行 /etc/profile.d 和 /etc/profile.d 中的后缀为 .sh 和 .sh.local 的文件
+    # 自定义的脚本最好放到 /etc/profile.d 目录中执行 
+    # 这些脚本必须是可读的，有 r 权限，但没有 r 权限的脚本，root 也能读
+    # 执行的方式是用 . ，因此执行的脚本在当前的 shell 环境，即执行 /etc/profile 的 shell 环境 
  65 for i in /etc/profile.d/*.sh /etc/profile.d/sh.local ; do
  66     if [ -r "$i" ]; then
- 67         if [ "${-#*i}" != "$-" ]; then
+ 67         if [ "${-#*i}" != "$-" ]; then # 判断是否是 interactive shell，即 $- 是否含有 i 标志
  68             . "$i"
  69         else
  70             . "$i" >/dev/null
@@ -700,9 +717,13 @@ if [ -n "$BASH_ENV" ]; then . "$BASH_ENV"; fi
  72     fi
  73 done
  74 
+    # 将定义的变量和函数 unset，防止影响执行脚本的环境
  75 unset i
- 76 unset -f pathmunge
+ 76 unset -f pathmunge  # unset -f : treat each NAME as a shell function
  77 
+    # 执行 /etc/bashrc 文件，要 BASH_VERSION 内容不为空
+    # BASH_VERSION 后加的 - 表面 BASH_VERSION unset 时为空
+    # 如果 set -u 设置(变量 unset 则输出错误，而不是输出空)，加上 - 可以防止输出错误
  78 if [ -n "${BASH_VERSION-}" ] ; then
  79         if [ -f /etc/bashrc ] ; then
  80                 # Bash login shells run only /etc/profile
@@ -713,16 +734,66 @@ if [ -n "$BASH_ENV" ]; then . "$BASH_ENV"; fi
  85 fi
 ```
 
+1. 第 67 行 `[ "${-#*i}" != "$-" ]` 解释
+> [What does "${-#*i}" != "$-" mean?](https://unix.stackexchange.com/questions/129231/what-does-i-mean)
+> [${parameter#[word]}](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_02)
+
+- `$-` 显示当前 shell 设置的 flags，如 `himBHs`
+- 后面加上 `#*i` 表示从 `$-` 的结果中查找 `i`，并将找到的第一个 `i` 及其前面的字符全删除
+- 因此前面结果的 `mBHs`
+- 如果 `$-` 结果不含 `i`，则不会删除任何字符，两个字符串相同
+- 因此可以通过两个字符串不等得出有 `i` 标志
+- ubuntu 22.04 中的判断方法如下，更好理解：
+```bash
+    # If not running interactively, don't do anything
+  1 case $- in
+  2     *i*) ;;
+  3       *) return;;
+  4 esac
+```
+
+2. 注意脚本中执行其他脚本的顺序，显示 `/etc/profile.d`，再到 `/etc/bashrc`
+
+
+## /etc/profile.d 目录
+
+- 默认会有一些文件存在，被 `/etc/profile` 调用
+- 可以自定义加上一些文件放改目录中，见 `/etc/profile` 脚本中说明
+- ubuntu 22.04 目录内容如下：
+![](img/2023-04-08-19-41-51.png)
+- rocky8.6 中该目录的文件更多
+
+
+## ~/bash_profile
+- ubuntu 22.04, ubuntu 20.04 无该文件
+- rocky 8.6 有该文件，调用 `~/.bashrc`
+```bash
+# rocky8.6
+# .bash_profile
+  
+# Get the aliases and functions
+if [ -f ~/.bashrc ]; then
+        . ~/.bashrc
+fi
+
+# User specific environment and startup programs
+```
+
+## ~/bash_login
+- ubuntu 22.04, ubuntu 20.04 和 rocky 8.6 均无
 
 ## ~/.profile
-### ubuntu 22.02 带图形界面
+- rocky 8.6 无
+- ubuntu 22.04, ubuntu 20.04 有
+
 ```bash
-  1 # ~/.profile: executed by the command interpreter for login shells.      
+    # ubuntu 22.04
+  1 # ~/.profile: executed by the command interpreter for login shells.
   2 # This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
   3 # exists.
   4 # see /usr/share/doc/bash/examples/startup-files for examples.
   5 # the files are located in the bash-doc package.
-  6 
+  6                                                                          
   7 # the default umask is set in /etc/profile; for setting the umask
   8 # for ssh logins, install and configure the libpam-umask package.
   9 #umask 022
@@ -736,6 +807,8 @@ if [ -n "$BASH_ENV" ]; then . "$BASH_ENV"; fi
  17 fi
  18 
  19 # set PATH so it includes user's private bin if it exists
+    # 如果用户家目录中有 bin 或 .local/bin 目录，则将该目录加入 PATH 环境变量
+    # 默认没有该目录，可以新建目录，将自定义的一些可执行文件放入该目录中执行
  20 if [ -d "$HOME/bin" ] ; then
  21     PATH="$HOME/bin:$PATH"
  22 fi
@@ -746,7 +819,7 @@ if [ -n "$BASH_ENV" ]; then . "$BASH_ENV"; fi
  27 fi
 ```
 
-- login shell 才会读
+- login shell 才会执行该文件
 
 - 只有 `~/.bash_profile` 和 `~/.bash_login` 均不存在才会读
 ![](img/2023-04-07-11-11-25.png)
@@ -755,17 +828,195 @@ if [ -n "$BASH_ENV" ]; then . "$BASH_ENV"; fi
 
 - 该文件会执行家目录中的 `~/.bashrc` 文件
 
-- 如果用户家目录中有 `bin` 或 `.local/bin` 文件夹，则会将这两个路径加入到 PATH 环境变量中，ubuntu 22.04 中默认无这两个目录，用户可以自己创建，如将可执行文件放到 `~/bin` 目录下，则可执行文件执行时不需要写全路径，可以直接执行了
-
-- 
-
-
+- 如果用户家目录中有 `bin` 或 `.local/bin` 文件夹，则会将这两个路径加入到 PATH 环境变量中，
+  ubuntu 22.04 中默认无这两个目录，用户可以自己创建，如将可执行文件放到 `~/bin` 目录下，
+  则可执行文件执行时不需要写全路径，可以直接执行了
 
 
-- ubunut 20.04 `Ctrl A|t F1` 和 `Ctrl A|t F2` 都能进入图形界面
+## ~/.bashrc
+- `non-login shell` 执行，但 `login shell` 执行 `~/.profile` 或其他文件时会调用
 
-- login shell 和 non-login shell 创建时执行的一些环境设置脚本不同
+### ubuntu 22.04
+```bash
+    # ubuntu 22.04
+    # non-login shell 登录时直接执行该文件
+    # login-shell 登录是通过其他文件调用该文件
+  1 # ~/.bashrc: executed by bash(1) for non-login shells.
+  2 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
+  3 # for examples
+  4 
+  5 # If not running interactively, don't do anything
+    # $- 变量展开有 i 表示为 interactive shell
+  6 case $- in
+  7     *i*) ;;  # 包含 i 
+  8       *) return;;
+  9 esac
+ 10 
+ 11 # don't put duplicate lines or lines starting with space in the history.
+ 12 # See bash(1) for more options
+    # rocky8.6 将该变量设置放在 /etc/profile 文件中
+ 13 HISTCONTROL=ignoreboth
+ 14 
+ 15 # append to the history file, don't overwrite it
+    # set histappend 选项，默认开启，将历史追加到历史记录文件而非覆盖
+ 16 shopt -s histappend
+ 17 
+ 18 # for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+    # rocky8.6 将该变量设置放在 /etc/profile 文件中
+ 19 HISTSIZE=1000  # 命令行中显示的历史命令的最大数目
+ 20 HISTFILESIZE=2000  # 历史命令记录文件中的最大历史命令数目
+ 21 
+ 22 # check the window size after each command and, if necessary,
+ 23 # update the values of LINES and COLUMNS.
+    # 如果当前窗口从最大到缩小一半，执行 man bash，则窗口缩小后显示的内容
+    # 自动按照新的窗口大小排列
+ 24 shopt -s checkwinsize
+ 25 
+ 26 # If set, the pattern "**" used in a pathname expansion context will
+ 27 # match all files and zero or more directories and subdirectories.
+ 28 #shopt -s globstar
+ 29 
+ 30 # make less more friendly for non-text input files, see lesspipe(1)
+ 31 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+ 32 
+ 33 # set variable identifying the chroot you work in (used in the prompt below)
+ 34 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+ 35     debian_chroot=$(cat /etc/debian_chroot)
+ 36 fi
+ 37 
+ 38 # set a fancy prompt (non-color, unless we know we "want" color)
+    # echo $TERM 结果为 xterm-256color 表面终端类型
+ 39 case "$TERM" in
+ 40     xterm-color|*-256color) color_prompt=yes;;
+ 41 esac
+ 42 
+ 43 # uncomment for a colored prompt, if the terminal has the capability; turned
+ 44 # off by default to not distract the user: the focus in a terminal window
+ 45 # should be on the output of commands, not on the prompt
+ 46 #force_color_prompt=yes
+ 47 
+ 48 if [ -n "$force_color_prompt" ]; then
+ 49     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
+ 50         # We have color support; assume it's compliant with Ecma-48
+ 51         # (ISO/IEC-6429). (Lack of such support is extremely rare, and such
+ 52         # a case would tend to support setf rather than setaf.)
+ 53         color_prompt=yes
+ 54     else
+ 55         color_prompt=
+ 56     fi
+ 57 fi
+ 58 
+    # 设置 PS1 的值，因此如果用户想自定义 PS1，如果在 /etc/profile 或 /etc/profile.d 中定义
+    # 会被这里的定义的覆盖
+ 59 if [ "$color_prompt" = yes ]; then
+ 60     PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+ 61 else
+ 62     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+ 63 fi
+ 64 unset color_prompt force_color_prompt
+ 65 
+ 66 # If this is an xterm set the title to user@host:dir
+ 67 case "$TERM" in
+ 68 xterm*|rxvt*)
+ 69     PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+ 70     ;;
+ 71 *)
+ 72     ;;
+ 73 esac
+ 74 
+ 75 # enable color support of ls and also add handy aliases
+ 76 if [ -x /usr/bin/dircolors ]; then
+ 77     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+ 78     alias ls='ls --color=auto'
+ 79     #alias dir='dir --color=auto'
+ 80     #alias vdir='vdir --color=auto'
+ 81 
+ 82     alias grep='grep --color=auto'
+ 83     alias fgrep='fgrep --color=auto'
+ 84     alias egrep='egrep --color=auto'
+ 85 fi
+ 86 
+ 87 # colored GCC warnings and errors
+ 88 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+ 89 
+ 90 # some more ls aliases
+ 91 alias ll='ls -alF'
+ 92 alias la='ls -A'
+ 93 alias l='ls -CF'
+ 94 
+ 95 # Add an "alert" alias for long running commands.  Use like so:
+ 96 # sleep 10; alert
+ 97 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" \ 
+    "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*aler    t$//'\'')"'
+ 98 
+ 99 # Alias definitions.
+100 # You may want to put all your additions into a separate file like
+101 # ~/.bash_aliases, instead of adding them here directly.
+102 # See /usr/share/doc/bash-doc/examples in the bash-doc package.
+    # 自定义的别名可以新建一个文件 ~/.bash_aliases，然后写道该文件中
+103 
+104 if [ -f ~/.bash_aliases ]; then
+105     . ~/.bash_aliases
+106 fi
+107 
+108 # enable programmable completion features (you don't need to enable
+109 # this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+110 # sources /etc/bash.bashrc).
+    # shopt -q 不输出结果，可从返回状态中获取结果
+111 if ! shopt -oq posix; then
+112   if [ -f /usr/share/bash-completion/bash_completion ]; then
+113     . /usr/share/bash-completion/bash_completion
+114   elif [ -f /etc/bash_completion ]; then
+115     . /etc/bash_completion
+116   fi
+117 fi
+```
 
+- `non-login shell` 登录执行该文件
+- `login-shell` 登录是通过其他文件调用该文件
+- 定义一些变量如 `HISTSIZE` 等，rocky 8.6 在 `/etc/profile` 中定义
+- 定义 PS1 变量，因此用户想自定义该变量，如果在 `/etc/profile` 中定义，则会被覆盖
+- 调用 `~/.bash_aliases` 文件，该文件默认没有，如果用户需要自定义别名，可以新建
+- 调用 `/etc/bash_completion` 文件
+
+### rocky8.6
+
+```bash
+  1 # rocky8.6 .bashrc
+  2 
+  3 # Source global definitions
+  4 if [ -f /etc/bashrc ]; then
+  5         . /etc/bashrc
+  6 fi
+  7 
+  8 # User specific environment
+    # ubuntu 22.04 在 ~/.profile 中设置
+  9 if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
+ 10 then
+ 11     PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+ 12 fi
+ 13 export PATH
+ 14 
+ 15 # Uncomment the following line if you don't like systemctl's auto-paging feature:
+ 16 # export SYSTEMD_PAGER=
+ 17 
+ 18 # User specific aliases and functions
+```
+
+- `non-login shell` 登录执行该文件
+- `login-shell` 登录是通过其他文件调用该文件
+- 调用 `/etc/bashrc`，Ubuntu 22.04 没有该调用 
+- 如果用户家目录中有 `bin` 或 `.local/bin` 文件夹，则会将这两个路径加入到 PATH 环境变量中，
+  默认无这两个目录，用户可以自己创建，如将可执行文件放到 `~/bin` 目录下，
+  则可执行文件执行时不需要写全路径，可以直接执行了
+  ubuntu 22.04 在 ~/.profile 中设置这个
+- rocky8.6 中这里会调用 `/etc/bashrc`，该文件中设置 PS1，umask 等值，和 `/etc/profile` 差不多
+- `/etc/bashrc` 文件在最后会执行 `/etc/profile.d` 目录中的文件
+
+
+## /etc/bashrc
+- rocky8.6 在 `~/.bashrc` 文件中调用
+- ubuntu 22.04 和 ubuntu 20.04 无此文件
 
 
 # 引号和转义
@@ -1120,11 +1371,20 @@ ubuntu 22.04 中的 `/etc/profile` 配置文件中使用 `${PS1-}` 的用法，�
 ![1](https://img-blog.csdnimg.cn/3af7e751006b48c7b75e44ba9712a17f.png)
 
 
+//LABEL: 变量
 # 变量
+- MAIL 是什么变量?
 ## 变量名
 - 区分大小写
 - 字母、数字和下划线，不以数字开头
 - 不与保留变量名相同
+
+## 内置变量
+
+//LABEL: 环境变量
+## 环境变量
+### $TERM 
+> [$TERM variable](https://bash.cyberciti.biz/guide/%24TERM_variable)
 
 
 
