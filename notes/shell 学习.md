@@ -441,7 +441,7 @@
 > [6.3.3 interactive shell behavior](https://www.gnu.org/software/bash/manual/html_node/interactive-shell-behavior.html)
 
 
-# bash 环境配置文件（bash startup files）
+# bash 环境配置文件的执行规则（bash startup files）
 > [bash 的环境配置文件](http://cn.linux.vbird.org/linux_basic/0320bash_4.php#settings_bashrc)
 > [6.2 bash startup files](https://www.gnu.org/software/bash/manual/html_node/bash-startup-files.html)
 > [bash-doc 4.3-6ubuntu1/usr/share/doc/bash/examples/startup-files](https://www.apt-browse.org/browse/ubuntu/trusty/main/all/bash-doc/4.3-6ubuntu1/file/usr/share/doc/bash/examples/startup-files)
@@ -561,17 +561,157 @@ if [ -n "$BASH_ENV" ]; then . "$BASH_ENV"; fi
 
 
 
-
+# Bash 环境配置文件的用途说明
 ## /etc/profile
-- 该文件在哪被调用的？
-- login shell 会读该文件，在哪里定义？
 
-
-### ubuntu 22.02 带图形界面
+### ubuntu 22.02 
 ![](img/2023-04-06-21-12-09.png)
 
 - 在当前 shell 中执行 `/etc/profile.d` 目录下的全部 `.sh` 脚本
+- 自定义一些设置最好不修改，而是新写脚本放到 `/etc/profile.d` 目录中，以 `.sh` 结尾即可保证执行
 
+```bash
+  1 # /etc/profile: system-wide .profile file for the Bourne shell (sh(1))   
+  2 # and Bourne compatible shells (bash(1), ksh(1), ash(1), ...).
+  3 
+  4 
+  5 # 判断 PS1 是否为空，用 ${PS1-} 而不是 ${PS1} 可防止 set -u 选项设置后
+  6 # 如果 PS1 unset 而返回 false
+  7 if [ "${PS1-}" ]; then
+  8   if [ "${BASH-}" ] && [ "$BASH" != "/bin/sh" ]; then
+  9     # The file bash.bashrc already sets the default PS1.
+ 10     # PS1='\h:\w\$ '
+ 11     if [ -f /etc/bash.bashrc ]; then
+ 12       . /etc/bash.bashrc
+ 13     fi
+ 14   else
+ 15     if [ "$(id -u)" -eq 0 ]; then  # id -u 输出当前用户的 uid，0为root
+ 16       PS1='# '   # root的 prompt 为 #
+ 17     else
+ 18       PS1='$ '   # 非 root 的 prompt 为 $
+ 19     fi
+ 20   fi
+ 21 fi
+ 22 
+ 23 
+ 24 # 执行 /etc/profile.d 目录下的全部 .sh 文件
+ 25 if [ -d /etc/profile.d ]; then
+ 26   for i in /etc/profile.d/*.sh; do
+ 27     if [ -r $i ]; then  # 文件可读
+ 28       . $i  # . 在当前 shell 执行脚本
+ 29     fi
+ 30   done
+ 31   unset i   # unset 变量防止影响当前 shell 环境
+ 32 fi
+```
+
+
+### rocky8.6
+
+- rocky 8.6 `/etc/profile` 文件中内容更多
+- 注释中写明最好不要修改该文件，而是将自定义设置放在 `/etc/profile.d` 目录中以 `.sh` 为后缀
+
+```bash
+  1 # /etc/profile
+  2 
+  3 # System wide environment and startup programs, for login setup
+  4 # Functions and aliases go in /etc/bashrc
+  5 
+  6 # It's NOT a good idea to change this file unless you know what you
+  7 # are doing. It's much better to create a custom.sh shell script in
+  8 # /etc/profile.d/ to make custom changes to your environment, as this
+  9 # will prevent the need for merging in future updates.
+ 10 
+ 11 pathmunge () {
+ 12     case ":${PATH}:" in
+ 13         *:"$1":*)
+ 14             ;;
+ 15         *)
+ 16             if [ "$2" = "after" ] ; then
+ 17                 PATH=$PATH:$1
+ 18             else
+ 19                 PATH=$1:$PATH
+ 20             fi
+ 21     esac
+ 22 }
+ 23 
+ 24 # id 命令的路径为 /usr/bin/id 显示当前shell 用户的 id 信息
+    # id -u 显示 uid, id -ru 显示 real ID，而非 EUID 
+    # 有些程序加了 suid 权限后执行时以其他身份运行，因此 EUID 不是实际 ID
+    # 该部分根据当前用户，设置一些变量，如 shell 内置变量 EUID 等
+ 25 if [ -x /usr/bin/id ]; then
+ 26     if [ -z "$EUID" ]; then
+ 27         # ksh workaround
+ 28         EUID=`/usr/bin/id -u`
+ 29         UID=`/usr/bin/id -ru`
+ 30     fi
+ 31     USER="`/usr/bin/id -un`"
+ 32     LOGNAME=$USER
+ 33     MAIL="/var/spool/mail/$USER"
+ 34 fi
+ 35 
+ 36 # Path manipulation
+    # $EUID 为 0 表示当前程序以 root 身份执行
+    # 如果 EUID 为 root，则检查 /usr/local/sbin 和 /usr/sbin 放在环境变量的最前面（这两个路径不存在时）
+    # root login shell 方式登录，echo $PATH 的值如下：
+    # /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/root/bin
+    #
+    # 如果是普通用户，则将 /usr/local/sbin 和 /usr/sbin 放在 PATH 环境变量的最后
+    # 如普通用户 lx 登录（su -l lx）, echo $PATH 的值如下：
+    # /home/lx/.local/bin:/home/lx/bin:/usr/local/bin:/usr/bin:/usr/local/sbin:/usr/sbin
+
+ 37 if [ "$EUID" = "0" ]; then
+ 38     pathmunge /usr/sbin
+ 39     pathmunge /usr/local/sbin
+ 40 else
+ 41     pathmunge /usr/local/sbin after
+ 42     pathmunge /usr/sbin after
+ 43 fi
+ 44 
+    # 主机名 hostname
+ 45 HOSTNAME=`/usr/bin/hostname 2>/dev/null`
+    # 命令行中显示的历史记录的最大数目
+ 46 HISTSIZE=1000
+ 47 if [ "$HISTCONTROL" = "ignorespace" ] ; then
+ 48     export HISTCONTROL=ignoreboth
+ 49 else
+ 50     export HISTCONTROL=ignoredups
+ 51 fi
+ 52 
+ 53 export PATH USER LOGNAME MAIL HOSTNAME HISTSIZE HISTCONTROL
+ 54 
+ 55 # By default, we want umask to get set. This sets it for login shell
+ 56 # Current threshold for system reserved uid/gids is 200
+ 57 # You could check uidgid reservation validity in
+ 58 # /usr/share/doc/setup-*/uidgid file
+ 59 if [ $UID -gt 199 ] && [ "`/usr/bin/id -gn`" = "`/usr/bin/id -un`" ]; then
+ 60     umask 002
+ 61 else
+ 62     umask 022
+ 63 fi
+ 64 
+ 65 for i in /etc/profile.d/*.sh /etc/profile.d/sh.local ; do
+ 66     if [ -r "$i" ]; then
+ 67         if [ "${-#*i}" != "$-" ]; then
+ 68             . "$i"
+ 69         else
+ 70             . "$i" >/dev/null
+ 71         fi
+ 72     fi
+ 73 done
+ 74 
+ 75 unset i
+ 76 unset -f pathmunge
+ 77 
+ 78 if [ -n "${BASH_VERSION-}" ] ; then
+ 79         if [ -f /etc/bashrc ] ; then
+ 80                 # Bash login shells run only /etc/profile
+ 81                 # Bash non-login shells run only /etc/bashrc
+ 82                 # Check for double sourcing is done in /etc/bashrc.
+ 83                 . /etc/bashrc
+ 84        fi
+ 85 fi
+```
 
 
 ## ~/.profile

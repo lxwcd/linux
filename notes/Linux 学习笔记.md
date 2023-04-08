@@ -984,6 +984,31 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 - `man bash` 搜索 `HISTFILESIZE` 查看说明
 - 修改当前用户可在 `~/.bashrc` 中修改参数
 
+### HISTCONTROL 历史记录在保存的格式
+> [HISTCONTROL Command in Linux with Examples](https://www.geeksforgeeks.org/histcontrol-command-in-linux-with-examples/)
+
+- `man bash` 搜索 `HISTCONTROL` 查看说明
+![](img/2023-04-08-17-46-10.png)
+
+- ignorespace
+	- 该选项会导致命令前加空格时不保存到历史记录中
+	- ubuntu 22.04 和 ubuntu 20.04 中设置了该选项
+	![](img/2023-04-08-17-34-00.png)
+	- rocky8.6 没有设置该选项，因此开头带空格的命令也会记录
+	![](img/2023-04-08-17-36-58.png)
+
+- ignoredups
+	- 和上一条历史记录相同的命令不会重复记录到历史记录中
+	- 只针对上一条相同，如果中间间隔其他命令，则仍会保存
+	- rocky8.6 默认的设置
+	- ubuntu 22.04 和 ubuntu 20.04 也设置了该选项
+
+- ignoreboth
+	- 同时设置 ignorespace 和 ignoredups
+	- ubuntu 22.04 为该选项
+	- ubuntu 20.04 为 ignoredups:ignorespace
+
+
 
 # hwclock 硬件时间
 > [hwclock](https://linux.die.net/man/8/hwclock)
@@ -4684,6 +4709,20 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 
 
 
+
+# UID, EUID, RUID and SUID
+> [euid,ruid,suid](https://book.hacktricks.xyz/linux-hardening/privilege-escalation/euid-ruid-suid)
+
+## UID
+
+## EUID
+
+## RUID
+
+## SUID
+**************************
+
+
 # 重启网络
 
 - ubuntu 20.04
@@ -4717,6 +4756,8 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 ## cmatrix
 
 
+*********************************
+//LABEL: 软件管理
 # 软件管理
 > [鸟哥的 Linux 私房菜](http://cn.linux.vbird.org/linux_basic/linux_basic.php)
 
