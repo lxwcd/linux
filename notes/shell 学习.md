@@ -18,6 +18,7 @@
 > [Shell & Utilities: Detailed Toc](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/contents.html)
 > [sh - shell, the standard command language interpreter](https://pubs.opengroup.org/onlinepubs/9699919799/)
 > [Linux Bash Shell Scripting Tutorial Wiki](https://bash.cyberciti.biz/guide/Main_Page)
+> [Advanced Bash-Scripting Guide](https://tldp.org/LDP/abs/html/)
 
 
 ## 书籍
@@ -1234,6 +1235,9 @@ end
 如果用 `bash -n test.sh`，则不输出任何内容
 
 
+# shell 变量
+
+
 
 
 # 引号和转义
@@ -1241,7 +1245,7 @@ end
 
 # bash Quoting
 > 在线帮助文档：[3.1.2 Quoting](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Quoting)
-
+> [Quoting](https://bash.cyberciti.biz/guide/Quoting)
 
 
 - `man bash` 搜索 `QUOTING` 查看帮助文档
@@ -1365,7 +1369,6 @@ Error loading webview: Error: Could not register service worker: InvalidStateErr
 
 //NOTE: 参数扩展
 ## ${ } shell parameter expansion
-
 > [3.5.3 Shell Parameter Expansion](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Parameter-Expansion)
 > [变量扩展](https://wangdoc.com/bash/expansion#变量扩展)
 > [2.6.2 Parameter Expansion](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_02)
@@ -1383,6 +1386,8 @@ Error loading webview: Error: Could not register service worker: InvalidStateErr
 
 
 ### ${parameter:-word} 为输出参数添加默认值
+> [Default shell variables value](https://bash.cyberciti.biz/guide/Default_shell_variables_value)
+
 - `parameter` set and not null, 输出 `parameter`
 - `parameter` set 但为空，也输出 `word`
 - `parameter` unset，输出 `word`
@@ -1393,7 +1398,7 @@ Error loading webview: Error: Could not register service worker: InvalidStateErr
 
 ### ${parameter-word} 为输出参数添加默认值
 - `parameter` 不为空，输出 `parameter`
-- `parameter` set 但为空，输出 `parameter`
+- `parameter` set 但为空，输出 `null`
 - `parameter` unset，输出 `word`
 ![](img/2023-04-05-21-28-45.png)
 
@@ -1413,8 +1418,12 @@ ubuntu 22.04 中的 `/etc/profile` 配置文件中使用 `${PS1-}` 的用法，�
 ![](img/2023-04-06-20-54-59.png)
 
 
+### ${parameter=word} 为变量赋默认值
+- 变量 `parameter` 未设置，则将默认值 `word` 赋值给该变量
+- 变量 `parameter` 设置但为空，则输出空
+
 ### ${parameter:=word} 为变量赋默认值
-- 变量 `parameter` 不存在，则将默认值 `word` 复制给该变量
+- 变量 `parameter` 未设置或为空，则将默认值 `word` 赋值给该变量
 
 ![1](https://img-blog.csdnimg.cn/b8f12425e7804d63b14f1bd77502b68e.png)
 
@@ -1465,10 +1474,12 @@ ubuntu 22.04 中的 `/etc/profile` 配置文件中使用 `${PS1-}` 的用法，�
 ![3](https://img-blog.csdnimg.cn/aab2322e3a634f84bcb609a5b7444e97.png)
 
 
-## $(( expression )) 算数扩展
+//LABEL: 算术运算
+## $(( expression )) 算术扩展
 > [3.5.5 Arithmetic Expansion](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Arithmetic-Expansion)
 > [6.5 Shell Arithmetic](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Arithmetic)
 > [Bash 的算术运算](https://wangdoc.com/bash/arithmetic)
+> [Perform arithmetic operations](https://bash.cyberciti.biz/guide/Perform_arithmetic_operations)
 
 
 ![](img/2023-03-30-11-49-03.png)
@@ -1596,7 +1607,65 @@ ubuntu 22.04 中的 `/etc/profile` 配置文件中使用 `${PS1-}` 的用法，�
 - 字母、数字和下划线，不以数字开头
 - 不与保留变量名相同
 
+
+## set 查看全部变量和函数
+> [Variables](https://bash.cyberciti.biz/guide/Variables)
+
+- `set | less` 查看
+- 导出的结果针对当前的 shell 环境
+- 包括内置变量，自定义变量和导出的环境变量
+- 也会输出函数
+
+## env 查看当前的环境变量
+- `env | less` 查看
+- 导出的结果针对当前的 shell 环境
+- 导出的仅环境变量
+- 有些可能变化，如进入到不同的目录中，环境变量 `PWD` 会变化
+
+## printenv 查看当前全部环境变量
+- `printenv | less` 查看
+- 和 `env` 看到的区别？
+
+
+## export 查看当前的环境变量
+> [What's the difference between set, export and env and when should I use each?](https://askubuntu.com/questions/205688/whats-the-difference-between-set-export-and-env-and-when-should-i-use-each)
+
+
+- `export | less` 查看
+- 和 `env` 看到的区别？
+
+
 ## 内置变量
+### IFS 单词分隔符
+> [$IFS](https://bash.cyberciti.biz/guide/$IFS)
+
+- Internal Field Separator
+- word splitting
+- 默认为 <space>, <tab>, <newline>
+
+```bash
+cat -A <<< "$IFS"
+```
+输出：
+```bash
+ ^I$
+$
+```
+
+但用 `echo $IFS | cat -A` 输出为 `$`
+
+### MAIL
+
+### PATH
+- 也是环境变量
+
+
+### PS1
+- 内置变量，不是环境变量
+
+### PS2
+
+
 
 //LABEL: 环境变量
 ## 环境变量
@@ -1619,7 +1688,6 @@ ubuntu 22.04 中的 `/etc/profile` 配置文件中使用 `${PS1-}` 的用法，�
 
 ## 变量赋值
 ### 双引号
-
 - `$` 有特殊含义
 ![](img/2023-04-03-19-27-42.png)
 
@@ -1628,16 +1696,36 @@ ubuntu 22.04 中的 `/etc/profile` 配置文件中使用 `${PS1-}` 的用法，�
 
 ### read 从标准输入赋值给变量
 
+### 设置空变量
+```bash
+var=
+var=""
+```
+
+## 为变量设置默认值
+- 见 `${ } shell parameter expansion`
 
 
 
-
-## export 设置为环境变量
-
-## set 显示全部变量
 
 
 ## unset 取消变量
+
+> unset [-f][-v][-n] [name ...]
+
+- 在脚本中设置的临时变量最好在最后 unset，以免影响执行环境
+- 无选项时默认将 name 当作变量，如果未找到变量，则从函数中查找
+- 有些变量，如 readonly 变量不能 unset
+
+### -f unset function
+
+### -v unset variable
+
+### -n nameref 属性变量
+> Unset the variable itself rather than the variable it references.
+
+
+
 
 # Bash Conditional Expressions
 > [Bash Conditional Expressions](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Bash-Conditional-Expressions)
@@ -2100,7 +2188,7 @@ done
 > [Word Splitting](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Word-Splitting)
 
 
-# shell 内置命令
+# shell 内置命令（builtin commands）
 > [Shell Builtin Commands](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Builtin-Commands)
 
 
@@ -2198,7 +2286,24 @@ fi
 
 
 ### export
+> [export](https://www.gnu.org/software/bash/manual/html_node/Bourne-Shell-Builtins.html#index-export)
 
+> export [-fn] [-p] [name[=value]]
+> Make each name to be passed to child process in the environment.
+
+- 导出变量为环境变量，但是临时的，退出重新登录就无该变量
+- 导出后其子进程可以使用
+
+#### -f 
+- 导出为函数
+- 默认为变量
+
+#### -n
+- Remove the export property from each NAME
+- 如果后面没有参数，则将全部变量的 export 属性移除
+
+#### -p
+- Display a list of all exported variables and functions
 
 
 
@@ -2229,20 +2334,50 @@ fi
 
 
 ## Bash Builtin Commands
-## let
+> [4.2 Bash Builtin Commands](https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html)
 
-## read
+### let
+
+### read 从标准输入读取一行内容
 > [read](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-read)
+> [read Command Syntax](https://bash.cyberciti.biz/guide/Getting_User_Input_Via_Keyboard)
 
 
 ![](img/2023-03-28-19-58-29.png)
 
 
-## shift
+- $IFS 作为默认 word delimiters
+- 如果没有变量名，则将读入内容保存到 REPLY 变量中
+
+#### -p prompt 输入数据的提示
+- 在读数据前输出 PROMPT 字符串，不带换行符
+
+#### -t timeout 指定输入的时间
+- 时间单位为秒
+
+#### -s 不显示输入的内容
+- 适合输入密码的情况，看不到输入内容
+
+#### -r 不对 \ 转义
+- Do not allow backslashes to escape any characters
+- 如果输入的内容中有很多 `\` 时可用该选项
+
+
+
+### shift
 > [shift](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-shift)
 
 - shift [n]，默认 `n` 为1，即移除最左边的第 `n` 个参数，如果为 1，则原来的第二个参数变为第一个
 - 如果参数数目很多或者不固定，在脚本中可以用 shift，取走一个参数后，用 shift 移走第一个参数，这样原来的第二个参数变成第一个，脚本中只用 `$1` 取参数
+
+
+### printf
+> [printf](https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html#index-printf)
+
+> printf [-v var] format [arguments]
+
+- `-v var` assign the output to shell variable `VAR` rather than display it on the standard output 
+
 
 
 # 环境变量
