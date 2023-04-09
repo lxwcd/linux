@@ -346,81 +346,6 @@ PermitEmptyPasswords yes
 ## Ctrl + q 解锁 Ctrl + s 
 
 
-
-  
-
-# shell 配置相关文件说明
-> [bash 的环境配置文件](http://cn.linux.vbird.org/linux_basic/0320bash_4.php#settings_bashrc)
-> [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
-> [bash-doc 4.3-6ubuntu1/usr/share/doc/bash/examples/startup-files](https://www.apt-browse.org/browse/ubuntu/trusty/main/all/bash-doc/4.3-6ubuntu1/file/usr/share/doc/bash/examples/startup-files)
-
-
-![1](https://img-blog.csdnimg.cn/44be8cb3c28247dd9072f49feaa98ef5.png)
-
-
-- 不同 bash 其配置文件的执行顺序可能不同，但登录用户都是先执行 `/etc/profile` 脚本，可以看该脚本中的代码查看其执行顺序
-- 基本顺序是先执行 `/etc/` 下的文件，再执行用户家目录中的文件，有的 bash 版本会在家目录中的文件执行完后又调用 `/etc/` 目录中的某个文件
-
-
-## /etc/profile
-- 该文件在哪被调用的？
-- login shell 会读该文件，在哪里定义？
-
-- 
-
-
-### ubuntu 22.02 带图形界面
-![](img/2023-04-06-21-12-09.png)
-
-- 在当前 shell 中执行 `/etc/profile.d` 目录下的全部 `.sh` 脚本
-
-
-
-## ~/.profile
-### ubuntu 22.02 带图形界面
-```bash
-  1 # ~/.profile: executed by the command interpreter for login shells.      
-  2 # This file is not read by bash(1), if ~/.bash_profile or ~/.bash_login
-  3 # exists.
-  4 # see /usr/share/doc/bash/examples/startup-files for examples.
-  5 # the files are located in the bash-doc package.
-  6 
-  7 # the default umask is set in /etc/profile; for setting the umask
-  8 # for ssh logins, install and configure the libpam-umask package.
-  9 #umask 022
- 10 
- 11 # if running bash
- 12 if [ -n "$BASH_VERSION" ]; then
- 13     # include .bashrc if it exists
- 14     if [ -f "$HOME/.bashrc" ]; then
- 15     . "$HOME/.bashrc"
- 16     fi
- 17 fi
- 18 
- 19 # set PATH so it includes user's private bin if it exists
- 20 if [ -d "$HOME/bin" ] ; then
- 21     PATH="$HOME/bin:$PATH"
- 22 fi
- 23 
- 24 # set PATH so it includes user's private bin if it exists
- 25 if [ -d "$HOME/.local/bin" ] ; then
- 26     PATH="$HOME/.local/bin:$PATH"
- 27 fi
-```
-
-- login shell 才会读
-
-- 只有 `~/.bash_profile` 和 `~/.bash_login` 均不存在才会读
-![](img/2023-04-07-11-11-25.png)
-
-- 注释中提到的 `/usr/share/doc/bash/examples/startup-files` 找不到 `examples` 目录，可从 [bash-doc 4.3-6ubuntu1/usr/share/doc/bash/examples/startup-files](https://www.apt-browse.org/browse/ubuntu/trusty/main/all/bash-doc/4.3-6ubuntu1/file/usr/share/doc/bash/examples/startup-files) 查看
-
-- 该文件会执行家目录中的 `~/.bashrc` 文件
-
-- 如果用户家目录中有 `bin` 或 `.local/bin` 文件夹，则会将这两个路径加入到 PATH 环境变量中，ubuntu 22.04 中默认无这两个目录，用户可以自己创建，如将可执行文件放到 `~/bin` 目录下，则可执行文件执行时不需要写全路径，可以直接执行了
-
-- 
-
 # 命令放后台执行
 ## &
 > [Linux 命令中的 & 符号](https://blog.csdn.net/weixin_45505313/article/details/103749523)
@@ -1106,6 +1031,7 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 > [Linux命令 dos2unix - 将DOS格式文本文件转换成Unix格式](https://www.w3cschool.cn/linuxc/linuxc-gvjq3lbf.html)
 
 
+//LABEL: echo
 # echo
 > [echo command in Linux with Examples](https://www.geeksforgeeks.org/echo-command-in-linux-with-examples/)
 > [How to use Linux echo command](https://www.ionos.com/digitalguide/server/configuration/linux-echo-command/)
@@ -1119,6 +1045,8 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 ![](img/2023-03-14-19-46-54.png)
 ![](img/2023-03-14-19-48-11.png)
 
+
+- `echo -e "a b c \c"` 输出的内容不会换行，相当于 `echo -n "a b c "`
 ## <font color=red>echo $(ls) 和 ls</font>
 > [Difference between 'ls' and 'echo $(ls)'](https://unix.stackexchange.com/questions/283586/difference-between-ls-and-echo-ls)
 > [Command Substitution](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Substitution)

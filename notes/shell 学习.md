@@ -377,6 +377,7 @@
 > [what is the difference between login and non-login shell?](https://tecadmin.net/difference-between-login-and-non-login-shell/)
 > [interactive, non-interactive, login, non-login shells in linux](https://www.baeldung.com/linux/interactive-non-interactive-login-non-login-shells)
 > [6.1 invoking bash](https://www.gnu.org/software/bash/manual/html_node/invoking-bash.html)
+> [The role of shells in the Linux environment](https://bash.cyberciti.biz/guide/The_role_of_shells_in_the_Linux_environment)
 
 
 **********************
@@ -442,6 +443,7 @@
 ## interactive shell behavior
 > [6.3.3 interactive shell behavior](https://www.gnu.org/software/bash/manual/html_node/interactive-shell-behavior.html)
 
+- The shell will accept commands from the keyboard and execute them.
 
 # bash 环境配置文件的执行规则（bash startup files）
 > [bash 的环境配置文件](http://cn.linux.vbird.org/linux_basic/0320bash_4.php#settings_bashrc)
@@ -722,7 +724,7 @@ if [ -n "$BASH_ENV" ]; then . "$BASH_ENV"; fi
  76 unset -f pathmunge  # unset -f : treat each NAME as a shell function
  77 
     # 执行 /etc/bashrc 文件，要 BASH_VERSION 内容不为空
-    # BASH_VERSION 后加的 - 表面 BASH_VERSION unset 时为空
+    # BASH_VERSION 后加的 - 表名 BASH_VERSION unset 时为空
     # 如果 set -u 设置(变量 unset 则输出错误，而不是输出空)，加上 - 可以防止输出错误
  78 if [ -n "${BASH_VERSION-}" ] ; then
  79         if [ -f /etc/bashrc ] ; then
@@ -1017,6 +1019,221 @@ fi
 ## /etc/bashrc
 - rocky8.6 在 `~/.bashrc` 文件中调用
 - ubuntu 22.04 和 ubuntu 20.04 无此文件
+
+
+# Bash Logout Scripts
+## ~/.bash_logout
+> [Bash Logout Scripts](https://bash.cyberciti.biz/guide/The_role_of_shells_in_the_Linux_environment)
+
+> When a `login` shell exits, bash reads and executes commands from the file $HOME/.bash_log, if it exists.
+
+### ubunut 22.04
+
+```bash
+  1 # ~/.bash_logout: executed by bash(1) when login shell exits.                                                                                
+  2 
+  3 # when leaving the console clear the screen to increase privacy
+  4 
+  5 if [ "$SHLVL" = 1 ]; then
+  6     [ -x /usr/bin/clear_console ] && /usr/bin/clear_console -q
+  7 fi
+```
+
+# Bash and Command Types
+> [Bash and Command Types](https://bash.cyberciti.biz/guide/Shell_commands#Bash_and_Command_Types)
+
+- Aliases
+   - `ll`
+- Keywords
+- Functions
+- Built in
+   - `pwd`
+- Files
+   - /bin/ls
+
+
+
+# 脚本规范
+## Shebang
+> [Shebang](https://bash.cyberciti.biz/guide/Shebang)
+- 脚本第一行
+- 以 `#!` 开头，后面跟 shell 类型，且为完整路径，如 `#!/bin/bash`
+
+***********
+
+//TODO: 未看#!/usr/bin/env bash
+### `#!/usr/bin/env bash` 和 `#!/bin/bash`
+> [Make Linux/Unix Script Portable With #!/usr/bin/env As a Shebang](https://www.cyberciti.biz/tips/finding-bash-perl-python-portably-using-env.html)
+> [What is the difference between "#!/usr/bin/env bash" and "#!/usr/bin/bash"?](https://stackoverflow.com/questions/16365130/what-is-the-difference-between-usr-bin-env-bash-and-usr-bin-bash)
+
+## 注释
+- 以 `#` 开头单行注释
+- 可以在 vim 配置文件中自动生成注释
+- 非必须，但可以使脚本更规范，解释功能
+
+```bash
+  1 #! /bin/sh
+    # ubunutu 20.04 /etc/init.d/network-manager
+  2 ### BEGIN INIT INFO
+  3 # Provides:          network-manager
+  4 # Required-Start:    $remote_fs dbus udev
+  5 # Required-Stop:     $remote_fs dbus udev
+  6 # Should-Start:      $syslog
+  7 # Should-Stop:       $syslog
+  8 # Default-Start:     2 3 4 5
+  9 # Default-Stop:      0 1 6
+ 10 # Short-Description: network connection manager
+ 11 # Description:       Daemon for automatically switching network 
+ 12 #                    connections to the best available connection.
+ 13 ### END INIT INFO
+ 14 
+ 15 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+ 16 DESC="network connection manager"
+ 17 NAME="NetworkManager"
+ 18 
+ 19 DAEMON=/usr/sbin/$NAME
+ 20 
+ 21 PIDFILE=/run/$NAME/$NAME.pid
+ 22 
+ 23 SCRIPTNAME=/etc/init.d/network-manager
+ ```  
+
+### 多行注释
+- 利用 Here documents 写多行注释
+```bash
+<<COMMENT1
+   说明
+   说明
+COMMENT1
+```
+
+
+## 定义好环境变量
+- 非必须，有需要最好设置
+
+
+# 本地执行 shell 脚本的方式
+> [script 的运行方式差异 (source, sh script, ./script)](http://cn.linux.vbird.org/linux_basic/0340bashshell-scripts_2.php#some_ex_run)
+
+
+## source (.) 
+- 在当前的 shell 环境中执行，不新建子进程
+- 不需要脚本有 x 权限
+- 脚本要有 r 权限
+
+- 测试方式
+   - 写一个脚本，脚本中定义一个变量，不为环境变量，set 变量后不 unset
+   - 用 `.` 或 `source` 执行脚本后，`echo` 查看变量的值
+
+
+
+## 直接执行脚本
+- 脚本需要有 r 和 x 权限
+- 在一个新的子进程中执行
+- 需要写明路径
+- 如 `./test.sh` 
+
+## 指定 shell 执行脚本
+- 脚本要有 r 权限，可以没有 x 权限
+- 如果不在当前目录，需要指明路径；当前目录不用
+- 在新子进程中执行脚本
+- 通过管道传给 bash 执行，同样在子进程执行
+- 通过 Here string 传给 bash 执行，同样在子进程执行
+
+```bash
+# 当前目录
+bash test.sh
+
+# 上级目录
+bash 1/test.sh
+
+# 当前目录
+cat test.sh | bash
+
+# Here string 当前目录
+bash <<< $(cat test.sh)
+```
+
+# 本地不需要路径执行脚本
+- `non-login shell` 只执行 `~/.bashrc` 
+## rocky8.6
+- `~/.bashrc` 中将 `~/bin` 和  `~/.local/bin` 两个目录（如果存在）加到 PATH 环境变量中，因此将脚本放在这两个目录下可以在任意地方输入脚本名字执行。（注意不能是子目录，必须直接在这两个目录下）
+
+- ubuntu 22.04 的 `~/.bashrc` 文件中没有环境变量的设置，在 `~/.profile` 文件中，而该文件 `non-login shell` 不会执行，需要将 PATH 添加到 `~/.bashrc` 文件中
+
+
+//TODO:远程脚本执行
+# 本地执行远程脚本
+## curl
+
+## wget
+
+# 远程主机执行本地脚本
+## ssh
+
+
+# 调试脚本
+> [Debug a script](https://bash.cyberciti.biz/guide/Debug_a_script)
+
+## -x 
+- `set --help | less` 可以看到 `-x` 的作用
+- `man bash` 也可看到 `-x` 选项解释
+- Print commands and their arguments as they are executed
+- `-x` 选项会将命令和参数展开
+- 可以 `bash -x script_name`，或者在脚本中加上 `set -x`
+
+## -v
+- `set --help | less` 可以看到 `-v` 的作用
+- `man bash` 也可看到 `-v` 选项解释
+- Print shell input lines as they are read
+- 会将读到的命令显示在输出结果上，但不展开
+
+## -n
+- `set --help | less` 可以看到 `-n` 的作用
+- Read commands but do not execute them
+- 只读命令但不执行，该选项写到脚本中不起作用
+- 用 `bash -n script_name` 方式可以起作用，检查语法
+- 如果没有问题，不输出，有错误则提示错误
+
+```bash
+  1 #!/bin/bash 
+  2 
+    # test.sh
+  3 set -n
+  4 #set -o noexec
+  5 
+  6 echo "Hello ${LOGNAME}"
+  7 echo "Today is $(date)"
+  8 
+  9 case $- in
+ 10     *i*)
+ 11         echo "current shell is an interactive shell"
+ 12         ;;
+ 13     *)
+ 14         echo "current shell is a non-interactive shell"
+ 15         ;;
+ 16 esac
+ 17 
+ 18 shopt -oq noexec;
+ 19 [ $? ] && echo "noexec is unset" || echo "noexec is set"
+ 20 
+ 21 echo "end"
+ 22 
+ 23 set +n 
+ ```
+
+直接在当前目录执行 `. test.sh`，结果如下：
+```bash
+Hello lx
+Today is 2023年 04月 09日 星期日 15:58:12 CST
+current shell is an interactive shell
+noexec is unset
+end
+```
+
+如果用 `bash -n test.sh`，则不输出任何内容
+
+
 
 
 # 引号和转义
