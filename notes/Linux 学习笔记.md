@@ -5436,3 +5436,127 @@ sudo systemctl stop firewalld.service
 
 ## Ubuntu
 
+
+
+************************
+
+# 域名解析
+- host 文件中列出域名与 IP 对应的关系
+- DNS 服务器解析域名
+
+# hosts 文件
+- `/etc/hosts` 
+- 主机中的文本文件，定义域名和 IP 地址的对应关系
+- DNS 解析时最先查看的文件，找到对应 IP 则直接请求 IP 地址，如 ping 命令会找该文件，但有些域名解析工具会忽略该文件
+- hosts 文件中找不到，则会向本机配置的 DNS 服务器提出域名解析请求
+- 修改该文件后会立即生效，除非某些情况该文件被应用程序缓存了
+
+
+## hosts 文件引入
+- hosts 文件解析域名是早期网络规模较小时使用的方案
+- 管理机构提供该文件的下载地址并定期更新
+- 但目前网络规模太大，因此引入 DNS 来管理域名解析
+
+
+
+# DNS 域名系统
+- DNS 只解析域名，不负责 IP 是否可达
+
+# 公有云上配置 DNS 解析
+
+
+# DNS 检测工具
+## dig
+
+
+### cname 查询别名
+
+
+## host 根据域名查询 IP 
+- DNS lookup utility
+- 不会查本地 hosts 文件中的域名和 IP 对应
+
+
+```bash
+[lx@Rocky8 ~]$ host www.baidu.com
+www.baidu.com has address 220.181.38.150
+www.baidu.com has address 220.181.38.149
+www.baidu.com is an alias for www.a.shifen.com.
+www.baidu.com is an alias for www.a.shifen.com.
+```
+
+### host -a 显示全部信息
+
+
+### host -c 指定查询类型
+
+
+## nslookup 查询域名
+- name server lookup
+- 不会查本地 hosts 文件中的域名和 IP 对应
+- 不能指定用递归还是迭代方式查询
+- 支持交互式和非交互式
+- windows 和 linux 都能用
+
+### 交互式查询
+
+### 非交互式查询
+
+
+## whois 查询域名注册信息
+
+
+### nslookup
+
+
+# bind 自建 DNS 
+
+域名劫持
+
+## bind 配置文件
+### /etc/named.conf
+
+### /etc/named.rfc1912.zones
+- 存放域名和具体解析规则对应关系
+
+
+# DNS 自解析
+
+# 主从 DNS
+
+## 主从 DNS 区别
+- master DNS server 停了后对 slave DNS server 的影响？
+
+# DNS 反解析
+
+# DNS 缓存
+
+## nscd
+
+# DNS 子域
+
+# DNS 视图
+
+named.conf zone . 为什么删掉
+增加网卡用 仅主机？
+
+
+
+
+# 负载均衡
+
+## GLSB 全球负载均衡
+- Global Server Load Balancing
+- 
+
+
+
+## CND
+- Content Delivery Network
+- 静态资源加速
+- 在各地建大量机房
+- cname 
+
+# 网站测速
+
+www.boce.com
