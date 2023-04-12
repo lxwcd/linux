@@ -1,4 +1,6 @@
 ﻿# 学习资源
+笔记主要来源于 `鸟哥的 Linux 私房菜基础篇（第四版）` 和 `鸟哥的 Linux 私房菜服务器架设篇（第三版）`
+
 
 ## 官方文档
 > [ubuntu](https://ubuntu.com/tutorials?q=bash#community)
@@ -7,10 +9,10 @@
 > [Linux Documentation](https://linux.die.net/)
 
 ## 教程
+> [鸟哥的 Linux 私房菜](http://cn.linux.vbird.org/linux_basic/linux_basic.php)
 > [Ubuntu 中文社区](https://forum.ubuntu.org.cn/index.php)
 > [UNIX Tutorial for Beginners](http://www.ee.surrey.ac.uk/Teaching/Unix/)
 > [Linux学习教程](http://c.biancheng.net/linux_tutorial/)
-> [鸟哥的 Linux 私房菜](http://cn.linux.vbird.org/linux_basic/linux_basic.php)
 > [Linux 教程](https://www.runoob.com/linux/linux-tutorial.html)
 > [w3cschool](https://www.w3cschool.cn/linuxc/linuxc-612m3l6o.html)
 > [Linux 入门教程](http://www.imooc.com/wiki/linuxlesson)
@@ -5334,6 +5336,356 @@ sudo systemctl stop firewalld.service
 ### pstree
 
 
+**************************
+
+# 信号（Signals）
+> 深入理解计算机系统——第八章 Exceptional Control Flow
+
+## kill -L|-l 查看全部信号 
+- `kill -l` 或 `kill -L` 查看全部信号和对应编号
+- 信号可以写全程或者简写（省略 `SIG`）
+
+```bash
+[lx@Rocky8 ~]$ kill -L
+ 1) SIGHUP	 2) SIGINT	 3) SIGQUIT	 4) SIGILL	 5) SIGTRAP
+ 6) SIGABRT	 7) SIGBUS	 8) SIGFPE	 9) SIGKILL	10) SIGUSR1
+11) SIGSEGV	12) SIGUSR2	13) SIGPIPE	14) SIGALRM	15) SIGTERM
+16) SIGSTKFLT	17) SIGCHLD	18) SIGCONT	19) SIGSTOP	20) SIGTSTP
+21) SIGTTIN	22) SIGTTOU	23) SIGURG	24) SIGXCPU	25) SIGXFSZ
+26) SIGVTALRM	27) SIGPROF	28) SIGWINCH	29) SIGIO	30) SIGPWR
+31) SIGSYS	34) SIGRTMIN	35) SIGRTMIN+1	36) SIGRTMIN+2	37) SIGRTMIN+3
+38) SIGRTMIN+4	39) SIGRTMIN+5	40) SIGRTMIN+6	41) SIGRTMIN+7	42) SIGRTMIN+8
+43) SIGRTMIN+9	44) SIGRTMIN+10	45) SIGRTMIN+11	46) SIGRTMIN+12	47) SIGRTMIN+13
+48) SIGRTMIN+14	49) SIGRTMIN+15	50) SIGRTMAX-14	51) SIGRTMAX-13	52) SIGRTMAX-12
+53) SIGRTMAX-11	54) SIGRTMAX-10	55) SIGRTMAX-9	56) SIGRTMAX-8	57) SIGRTMAX-7
+58) SIGRTMAX-6	59) SIGRTMAX-5	60) SIGRTMAX-4	61) SIGRTMAX-3	62) SIGRTMAX-2
+63) SIGRTMAX-1	64) SIGRTMAX	
+```
+
+## kill -l|L sigNumber 根据编号查看信号名称
+- `sigNumber` 为信号的编号，返回的是信号的简写，如 `HUB` 表示 `SIFHUB`
+
+```bash
+[lx@Rocky8 ~]$ kill -l 1
+HUP
+[lx@Rocky8 ~]$ 
+[lx@Rocky8 ~]$ kill -L 1
+HUP
+[lx@Rocky8 ~]$ 
+[lx@Rocky8 ~]$ kill -l | head -n1
+ 1) SIGHUP	 2) SIGINT	 3) SIGQUIT	 4) SIGILL	 5) SIGTRAP
+```
+
+
+//LABLE：工作管理
+# 工作管理（Job Control）
+
+
+
+## 背景（background）
+- 不能被 `Ctrl c` 中断
+
+
+## & 将工作放到背景
+- 放到当前终端的背景，非系统的背景
+- 背景的工作与终端绑定
+一个终端中将一个工作放到背景，用 `ctrl z` 快捷键
+```bash
+[1]+  Stopped                 vim 1.txt
+[lx@Rocky8 ~]$ jobs
+[1]+  Stopped                 vim 1.txt
+[lx@Rocky8 ~]$ tty
+/dev/pts/0
+[lx@Rocky8 ~]$ 
+```
+在另一个终端打开，用 jobs 查看，无背景工作：
+```bash
+[lx@Rocky8 ~]$ jobs
+[lx@Rocky8 ~]$ tty
+/dev/pts/1
+[lx@Rocky8 ~]$ 
+```
+
+## nohup 后台执行，与终端无关
+
+
+## kill -signal %jobnumber 处理背景中工作
+- `signal` 可以是具体信号名或信号编号
+- 
+
+```bash
+[lx@Rocky8 ~]$ jobs
+[1]-  Stopped                 vim 1.txt
+[2]+  Stopped                 vim 2.txt
+[lx@Rocky8 ~]$ 
+[lx@Rocky8 ~]$ kill -15 %1
+[lx@Rocky8 ~]$ 
+
+[1]+  Stopped                 vim 1.txt
+[lx@Rocky8 ~]$ jobs
+[1]+  Stopped                 vim 1.txt
+[2]-  Stopped                 vim 2.txt
+[lx@Rocky8 ~]$ 
+[lx@Rocky8 ~]$ kill -15 %1
+[lx@Rocky8 ~]$ jobs
+[1]+  Stopped                 vim 1.txt
+[2]-  Stopped                 vim 2.txt
+[lx@Rocky8 ~]$ kill -9 %1
+
+[1]+  Stopped                 vim 1.txt
+[lx@Rocky8 ~]$ 
+[1]+  Killed                  vim 1.txt
+[lx@Rocky8 ~]$ kill -l 9
+KILL
+[lx@Rocky8 ~]$ kill -KILL %1
+-bash: kill: %1: no such job
+[lx@Rocky8 ~]$ jobs
+[2]+  Stopped                 vim 2.txt
+[lx@Rocky8 ~]$ kill -KILL %2
+
+[2]+  Stopped                 vim 2.txt
+[lx@Rocky8 ~]$ jobs
+[2]+  Killed                  vim 2.txt
+[lx@Rocky8 ~]$ jobs
+[lx@Rocky8 ~]$ ls 
+```
+
+
+//LABEL: 进程
+# 进程管理
+
+## 进程介绍
+> 深入理解计算机系统——第八章 Exceptional Control Flow
+
+
+## 进程的状态
+> [Process state](https://en.wikipedia.org/wiki/Process_state)
+
+
+> These distinct states may not be recognized as such by the operating system kernel. However, they are a useful abstraction for the understanding of processes.
+> &nbsp;
+> ![](img/2023-04-12-20-41-10.png)
+
+### Created
+- The process awaits admission to the "ready" state.
+- Admission will be approved or delayed by a long-term, or admission, scheduler.
+
+- 需要申请一个空白的 PCB，完成资源分配
+
+### Ready
+- A "ready" or "waiting" process has been loaded into main memory and is awaiting execution on a CPU. 
+
+### Running
+- A process moves into the running state when it is chosen for execution.
+- There is at most one running process per CPU or core.
+- A process can run in either of the two modes, namely kernel mode or user mode.
+
+### Blocked
+- A process transitions to a blocked state when it cannot carry on without an external change in state or event occurring.
+
+- 例如需要用户输入内容
+
+### Terminated
+- A process may be terminated, either from the "running" state by completing its execution or by explicitly being killed.
+- The terminated process remains in the process table as a zombie process until its parent process calls the `wait` system call to read its exit status, at which point the process is removed from the process table, finally ending the process's lifetime.
+- If the parent failes to call `wait`, this process continues to consume the process table entry (concretely the process identifier or PID), and causes a resource leak.
+
+
+### Additional process states
+> Two additional states are available for processes in systems that support virtual memory. In both of these states, processes are "stored" on secondary memory (typically a hard disk).
+
+#### Swapped out and waiting
+- suspended and waiting
+- The process is removed from main memory and placed on external storage by the scheduler.
+- It may be swapped back into the waiting state.
+#### Swapped out and blocked
+- suspended and blocked
+- The process is both blocked and swapped out
+- It may be swapped back in again under the same circumstances as a swapped out and waiting process.
+
+
+
+
+## 查看进程的状态
+### ps 查看某个时间点进程的状态
+- report a snapshot of the current process
+
+
+#### ps 显示和当前用户相同 UID 且相同终端的进程
+
+> By default, ps selects all processes with the same effective user ID (euid=EUID) as the
+> current user and associated with the same terminal as the invoker.  
+
+
+- 如果用 `su -l` 切换到另一个用户，用 `ps -l` 看不到之前用户所在 bash 的进程，
+  只看到进程 UID 和当前用户 UID 相同的进程 
+- 用 `sudo` 命令以 root 身份执行一个命令，`ps` 也看不到，因为 UID 不同
+- 当前 bash 相关，如果在当前终端 bash 中又输入 bash 打开一个子进程，也会显示出来，
+  后面的为当前 bash 的子进程，同属于一个终端
+
+
+#### ps -l 查询当前 bash 相关程序
+- `ps` 命令的长格式
+
+```bash
+[lx@Rocky8 ~]$ vim 1.txt &
+[1] 5212
+[lx@Rocky8 ~]$ ps -l
+F S   UID     PID    PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+0 S  1004    4461    4456  0  80   0 - 58874 -      pts/1    00:00:00 bash
+0 S  1004    5170    4461  0  80   0 - 58447 -      pts/1    00:00:00 sh
+0 S  1004    5171    5170  0  80   0 - 58813 -      pts/1    00:00:00 bash
+0 T  1004    5212    5171  5  80   0 - 60829 -      pts/1    00:00:00 vim
+0 R  1004    5213    5171  0  80   0 - 63823 -      pts/1    00:00:00 ps
+
+[1]+  Stopped                 vim 1.txt
+[lx@Rocky8 ~]$ 
+```
+
+- F
+进程标志，process flags
+	- 4：表示进程的权限为 root
+	- 1：forked but didn't exec
+
+- S
+process stat codes
+```bash
+D    uninterruptible sleep (usually IO)
+I    Idle kernel thread
+R    running or runnable (on run queue)
+S    interruptible sleep (waiting for an event to complete)
+T    stopped by job control signal
+t    stopped by debugger during the tracing
+W    paging (not valid since the 2.6.xx kernel)
+X    dead (should never be seen)
+Z    defunct ("zombie") process, terminated but not reaped by its parent
+```
+
+
+- UID
+该进程被该 UID 拥有，如果执行的文件有 SUID，权限有可能和执行的用户不同，
+
+- PID
+进程 ID
+
+- PPID
+父进程 PID
+
+- C
+CPU 使用率，百分比
+
+- PRI/NI
+Priority/Nice，表示进程被 CPU 调度的优先顺序，数值越小则优先级越高，越快被 CPU 执行
+
+- ADDR
+kernel function，指出程序在内存的哪个部分
+running 的程序，显示 `-`
+
+- SZ
+表示程序用掉多少内存
+
+
+- WCHAN
+表示目前程序是否运行中，`-` 表示在运行中
+
+- TTY
+登陆者终端机的位置，用 `tty` 命令看到的结果
+
+- TIME
+进程实际使用 CPU 的时间
+
+-CMD
+造成次进程的触发指令
+
+
+#### ps -A 显示所有进程
+
+#### ps -a 不与 terminal 有关的所有 process
+
+#### ps -u 有效使用者（effective user）相关进程
+
+#### ps aux 查看系统所有进程
+
+
+### top 动态观察进程的变化
+- 相比 ps 只能查看此刻的进程状态，top 可以动态持续的查看进程状态
+
+
+#### ?|h 查看帮助
+- `top` 进入页面后按 `?` 或 `h` 查看帮助
+
+
+#### top -d 指定刷新的秒数
+- 指定以多少秒刷新一次，rocky8.6 默认 3 秒，可以通过最上面一行第一个当前时间看到刷新频率
+
+
+#### top -p PID 查看指定进程的数据
+- `echo $$` 可以查看当前 bash 的PID
+
+#### 实时修改排序
+- 默认排序是 CPU 使用率
+- `P` 大写，以 CPU 使用率排序，%CPU 字段
+- `M` 大写，以内存使用率排序，%MEM 字段
+- `T` 大写，以 CPU 使用时长排序，TIME+ 字段
+
+#### 实时修改 NI 数值
+- 在数据显示界面，按 `r` 修改 NI 值，即 renice
+- 需要先输入要修改的 PID，不输入则默认修改第一个进程
+- 然后输入要改的 NI 值
+
+
+### pstree 进程树显示程序的相关性
+
+
+#### pstree -A 以 ASCII 字符 
+- 不同语系可能出现乱码问题，用 `-A` 克服线段乱码问题
+
+
+
+#### pstree -u 列出 uid 
+- 只有和父进程 uid 不同时才会列出，在小括号中显示
+- 如果同时指定了 `-p` 选项，即显示 PID，则和父进程 uid 不同时列在 PID 后面
+
+![](img/2023-04-12-19-58-00.png)
+
+
+#### pstree -sp 列出 PID
+- `pstree -p` 列出进程树时显示 PID
+- `pstree -sp PID` 列出某个指定进程的信息，加上 `-s` 可以列出其父进程信息
+
+![](img/2023-04-12-20-00-00.png)
+![](img/2023-04-12-20-12-21.png)
+
+#### pstree -T 不显示线程
+- `--hide-threads`
+- 默认显示线程，用 `{}` 显示
+
+![](img/2023-04-12-20-16-32.png)
+
+
+
+
+
+
+## kill -signal PID
+The **/bin/kill** program **sends** an **arbitrary signal** to another **process**. 
+
+下面命令发送信号 9（SIGKILL）到进程 15213：
+```bash
+linux> /bin/kill -9 15213
+```
+
+**PID为负数时**：下面命令发送信号 9（SIGKILL）到进程组 15213 中的每个信号：
+```bash
+linux> /bin/kill -9 -15213
+```
+
+
+
+
+
+
+
 ******************
 # 网络配置
 - ip
@@ -5560,3 +5912,77 @@ named.conf zone . 为什么删掉
 # 网站测速
 
 www.boce.com
+
+
+****************************
+
+# 网络安全
+
+# 入侵检测系统 IDS
+- 旁路部署
+- 监听设备
+- 不影响网络通信，网络流量不经过 IDS
+- 清洗统计，找到入侵和攻击数据，发现后阻止吗？
+
+## 基于主机的 IDS
+
+## 基于网络
+
+# 入侵防御系统 IPS
+- 串行方式接入系统
+- 发现网络攻击可以采取措施
+
+
+# 防水墙
+- 防止内部信息泄露的安全产品
+- 
+# 防火墙
+- 串行方式接入系统
+- 所有流入流出的数据都经过防火墙
+
+## 分类
+### 保护范围划分
+
+### 实现方式划分
+#### 硬件防火墙
+
+#### 软件防火墙
+
+### 网络协议划分
+
+#### 网络层防火墙
+- 根据包头的协议端口号等过滤
+- 不能过滤实际应用层数据
+
+
+
+
+#### 应用层防火墙
+- 部署在主链路上
+
+
+*******************************
+
+# 防火墙
+## netfilter
+- linux 内核的子系统
+- 模块化设计
+
+## iptables
+- 由 iptables 提供的命令行工具
+- 工作在用户空间
+- 编写规则后送到 netfilter 
+
+## firewalld
+
+## nftables
+- netfilter 升级
+
+## n
+
+
+
+
+
+
+## kvm
