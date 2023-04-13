@@ -5453,14 +5453,14 @@ KILL
 
 //LABEL: 进程
 # 进程管理
+结合 **深入理解计算机系统——第八章 Exceptional Control Flow ** 看，理解进程和信号的概念
 
 ## 进程介绍
-> 深入理解计算机系统——第八章 Exceptional Control Flow
 
 
 ## 进程的状态
 > [Process state](https://en.wikipedia.org/wiki/Process_state)
-
+> [States of a Process in Operating Systems](https://www.geeksforgeeks.org/states-of-a-process-in-operating-systems/)
 
 > These distinct states may not be recognized as such by the operating system kernel. However, they are a useful abstraction for the understanding of processes.
 > &nbsp;
@@ -5482,8 +5482,11 @@ KILL
 
 ### Blocked
 - A process transitions to a blocked state when it cannot carry on without an external change in state or event occurring.
+- For example, a process may block on a call to an I/O device such as a printer, if the printer is not available.
+- Processes also commonly block when they require user input,
+- or require access to a critical section which must be executed [atomically](https://stackoverflow.com/questions/15054086/what-does-atomic-mean-in-programming).
+- Such critical sections are protected using a synchronization object such as a semaphore or mutex.
 
-- 例如需要用户输入内容
 
 ### Terminated
 - A process may be terminated, either from the "running" state by completing its execution or by explicitly being killed.
@@ -5492,24 +5495,55 @@ KILL
 
 
 ### Additional process states
-> Two additional states are available for processes in systems that support virtual memory. In both of these states, processes are "stored" on secondary memory (typically a hard disk).
+> Two additional states are available for processes in systems that support virtual memory. 
+> In both of these states, processes are "stored" on secondary memory (typically a hard disk).
 
-#### Swapped out and waiting
+#### stoped
+- 进程被**挂起**（suspended）且**不会被调度**。
+A process **stops** as a result of receiving a **SIGSTOP**, **SIGTSTP**, **SIGTTIN**, or **SIGTTOU** signal, 
+and it **remains** **stopped** **until** it receives a **SIGCONT** signal, at which point it becomes running again.
+
+- 按 `Ctrl z` 可以让进程处于 suspended 的状态，相当于发送信号 `SIGSTOP` 
+
+
+##### Swapped out and waiting
 - suspended and waiting
 - The process is removed from main memory and placed on external storage by the scheduler.
 - It may be swapped back into the waiting state.
-#### Swapped out and blocked
+##### Swapped out and blocked
 - suspended and blocked
 - The process is both blocked and swapped out
 - It may be swapped back in again under the same circumstances as a swapped out and waiting process.
 
 
+## 进程执行优先级 Priority 和 NICE
+- Linux 给予一个进程的 Priority，即 PRI，该值越优先级越高，即更快被执行
+- PRI 由 CPU 动态调整，使用者无法直接调整 PRI 的值
+- 使用者可以通过调整 NICE 的值来修改优先级，PRI (new) = PRI (old) + NICE
 
+### NICE 值的范围
+- -20 ~ 19
+- root 可以随意调整自己或他人程序的 NICE 值，且范围 -20 ~ 19
+- 一般使用者仅可调整自己程序的 NICE 值，范围为 0 ~ 19，避免一般用户抢占系统资源
+- 一般使用者仅可将 NICE 值调高，即降低优先级，不能调低
+
+### 设置 NICE 值
+#### 执行程序时设置 NICE 值
+- `nice [-n num] command`，普通用户数值 num 为 0 ~ 19，不在该范围会设置失败
+![](img/2023-04-13-10-55-15.png)
+
+
+#### 调整某个已存在的 PID 的 NICE 值
+- renice 
+`renice [num] PID`
+可通过 `ps -l` 查看 PID
+
+- top
+`top -p PID` 查看进程信息，按 `r` 后根据指示调整 NICE，只能调高不能调低
 
 ## 查看进程的状态
 ### ps 查看某个时间点进程的状态
 - report a snapshot of the current process
-
 
 #### ps 显示和当前用户相同 UID 且相同终端的进程
 
@@ -5681,8 +5715,217 @@ linux> /bin/kill -9 -15213
 ```
 
 
+# 观察系统资源
+## free 观察内存使用
+```bash
+Usage:
+ free [options]
+
+Options:
+ -b, --bytes         show output in bytes
+     --kilo          show output in kilobytes
+     --mega          show output in megabytes
+     --giga          show output in gigabytes
+     --tera          show output in terabytes
+     --peta          show output in petabytes
+ -k, --kibi          show output in kibibytes
+ -m, --mebi          show output in mebibytes
+ -g, --gibi          show output in gibibytes
+     --tebi          show output in tebibytes
+     --pebi          show output in pebibytes
+ -h, --human         show human-readable output
+     --si            use powers of 1000 not 1024
+ -l, --lohi          show detailed low and high memory statistics
+ -t, --total         show total for RAM + swap
+ -s N, --seconds N   repeat printing every N seconds
+ -c N, --count N     repeat printing N times, then exit
+ -w, --wide          wide output
+
+     --help     display this help and exit
+ -V, --version  output version information and exit
+```
+
+```bash
+[11:10 lx@ubunut22 ~]$free -ht
+               total        used        free      shared  buff/cache   available
+Mem:           3.8Gi       1.8Gi       1.0Gi        27Mi       1.0Gi       1.7Gi
+Swap:          3.8Gi          0B       3.8Gi
+Total:         7.6Gi       1.8Gi       4.8Gi
+[11:11 lx@ubunut22 ~]$
+```
+
+## uname 查看系统和内核相关信息
+
+```bash
+Usage: uname [OPTION]...
+Print certain system information.  With no OPTION, same as -s.
+
+  -a, --all                print all information, in the following order,
+                             except omit -p and -i if unknown:
+  -s, --kernel-name        print the kernel name
+  -n, --nodename           print the network node hostname
+  -r, --kernel-release     print the kernel release
+  -v, --kernel-version     print the kernel version
+  -m, --machine            print the machine hardware name
+  -p, --processor          print the processor type (non-portable)
+  -i, --hardware-platform  print the hardware platform (non-portable)
+  -o, --operating-system   print the operating system
+      --help     display this help and exit
+      --version  output version information and exit
+```
+
+```bash
+[11:15 lx@ubunut22 ~]$uname -a
+Linux ubunut22 5.19.0-38-generic #39~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Mar 17 21:16:15 UTC 2 x86_64 x86_64 x86_64 GNU/Linux
+[11:15 lx@ubunut22 ~]$
+[11:15 lx@ubunut22 ~]$uname -s
+Linux
+[11:15 lx@ubunut22 ~]$
+[11:15 lx@ubunut22 ~]$uname -n
+ubunut22
+[11:15 lx@ubunut22 ~]$
+[11:15 lx@ubunut22 ~]$uname -r
+5.19.0-38-generic
+[11:15 lx@ubunut22 ~]$uname -v
+#39~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Mar 17 21:16:15 UTC 2
+[11:16 lx@ubunut22 ~]$
+[11:16 lx@ubunut22 ~]$uname -m
+x86_64
+[11:16 lx@ubunut22 ~]$uname -p
+x86_64
+[11:16 lx@ubunut22 ~]$uname -i
+x86_64
+[11:16 lx@ubunut22 ~]$uname -o
+GNU/Linux
+[11:16 lx@ubunut22 ~]$
+```
+
+## uptime 观察系统启动时间
+```bash
+Usage:
+ uptime [options]
+
+Options:
+ -p, --pretty   show uptime in pretty format
+ -h, --help     display this help and exit
+ -s, --since    system up since
+ -V, --version  output version information and exit
+```
+
+```bash
+[11:19 lx@ubunut22 ~]$uptime
+ 11:19:18 up 27 min,  2 users,  load average: 0.14, 0.17, 0.18
+[11:19 lx@ubunut22 ~]$
+[11:19 lx@ubunut22 ~]$uptime -p
+up 28 minutes
+[11:19 lx@ubunut22 ~]$uptime -s
+2023-04-13 10:51:23
+```
+
+## netstat 追踪网络
+> [How to Install netstat on Ubuntu 20.04 LTS (Focal Fossa)](https://www.cyberithub.com/how-to-install-netstat-on-ubuntu-20-04-lts-focal-fossa/)
 
 
+- ubuntu 22.04 安装需要先装 `net-tools` 包
+
+```bash
+usage: netstat [-vWeenNcCF] [<Af>] -r         netstat {-V|--version|-h|--help}
+       netstat [-vWnNcaeol] [<Socket> ...]
+       netstat { [-vWeenNac] -i | [-cnNe] -M | -s [-6tuw] }
+
+        -r, --route              display routing table
+        -i, --interfaces         display interface table
+        -g, --groups             display multicast group memberships
+        -s, --statistics         display networking statistics (like SNMP)
+        -M, --masquerade         display masqueraded connections
+
+        -v, --verbose            be verbose
+        -W, --wide               don't truncate IP addresses
+        -n, --numeric            don't resolve names
+        --numeric-hosts          don't resolve host names
+        --numeric-ports          don't resolve port names
+        --numeric-users          don't resolve user names
+        -N, --symbolic           resolve hardware names
+        -e, --extend             display other/more information
+        -p, --programs           display PID/Program name for sockets
+        -o, --timers             display timers
+        -c, --continuous         continuous listing
+
+        -l, --listening          display listening server sockets
+        -a, --all                display all sockets (default: connected)
+        -F, --fib                display Forwarding Information Base (default)
+        -C, --cache              display routing cache instead of FIB
+        -Z, --context            display SELinux security context for sockets
+
+  <Socket>={-t|--tcp} {-u|--udp} {-U|--udplite} {-S|--sctp} {-w|--raw}
+           {-x|--unix} --ax25 --ipx --netrom
+  <AF>=Use '-6|-4' or '-A <af>' or '--<af>'; default: inet
+```
+
+```bash
+[11:31 lx@ubunut22 ~]$netstat -tulnp
+(Not all processes could be identified, non-owned process info
+ will not be shown, you would have to be root to see it all.)
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:6010          0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 0.0.0.0:80              0.0.0.0:*               LISTEN      -                   
+tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN      -                   
+tcp6       0      0 :::22                   :::*                    LISTEN      -                   
+tcp6       0      0 :::80                   :::*                    LISTEN      -                   
+tcp6       0      0 ::1:631                 :::*                    LISTEN      -                   
+tcp6       0      0 ::1:6010                :::*                    LISTEN      -                   
+udp        0      0 0.0.0.0:631             0.0.0.0:*                           -                   
+udp        0      0 0.0.0.0:5353            0.0.0.0:*                           -                   
+udp        0      0 127.0.0.53:53           0.0.0.0:*                           -                   
+udp        0      0 0.0.0.0:55580           0.0.0.0:*                           -                   
+udp6       0      0 :::46208                :::*                                -                   
+udp6       0      0 :::5353                 :::*                                -                   
+```
+
+
+## dmesg 分析内核产生的消息
+- 需要 root 权限才能查看
+- 系统开机和运行过程中内核产生的信息会记录到一个保护区段，可以通过 `dmesg` 查看
+
+
+## vmstat 查看虚拟内存的状态
+
+```bash
+Usage:
+ vmstat [options] [delay [count]]
+
+Options:
+ -a, --active           active/inactive memory
+ -f, --forks            number of forks since boot
+ -m, --slabs            slabinfo
+ -n, --one-header       do not redisplay header
+ -s, --stats            event counter statistics
+ -d, --disk             disk statistics
+ -D, --disk-sum         summarize disk statistics
+ -p, --partition <dev>  partition specific statistics
+ -S, --unit <char>      define display unit
+ -w, --wide             wide output
+ -t, --timestamp        show timestamp
+
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+
+For more details see vmstat(8)
+```
+
+```bash
+[11:36 lx@ubunut22 ~]$vmstat
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 0  0      0 715812  56024 1297232    0    0   189    73   92  155  1  1 97  0  0
+[11:36 lx@ubunut22 ~]$
+[11:36 lx@ubunut22 ~]$whatis vmstat
+vmstat (8)           - Report virtual memory statistics
+[11:36 lx@ubunut22 ~]$
+```
 
 
 
