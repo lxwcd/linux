@@ -5096,7 +5096,209 @@ sudo systemctl stop firewalld.service
 ![](img/2023-04-01-17-48-07.png)
 
 
+# 查询已打开文件
+## fuser
+- fuser  displays  the PIDs of processes using the specified files or file systems.
+- 找出使用文件或文件系统的进程
+
+```bash
+fuser: Invalid option --help
+Usage: fuser [-fIMuvw] [-a|-s] [-4|-6] [-c|-m|-n SPACE]
+             [-k [-i] [-SIGNAL]] NAME...
+       fuser -l
+       fuser -V
+Show which processes use the named files, sockets, or filesystems.
+
+  -a,--all              display unused files too
+  -i,--interactive      ask before killing (ignored without -k)
+  -I,--inode            use always inodes to compare files
+  -k,--kill             kill processes accessing the named file
+  -l,--list-signals     list available signal names
+  -m,--mount            show all processes using the named filesystems or
+                        block device
+  -M,--ismountpoint     fulfill request only if NAME is a mount point
+  -n,--namespace SPACE  search in this name space (file, udp, or tcp)
+  -s,--silent           silent operation
+  -SIGNAL               send this signal instead of SIGKILL
+  -u,--user             display user IDs
+  -v,--verbose          verbose output
+  -w,--writeonly        kill only processes with write access
+  -V,--version          display version information
+  -4,--ipv4             search IPv4 sockets only
+  -6,--ipv6             search IPv6 sockets only
+  -                     reset options
+
+  udp/tcp names: [local_port][,[rmt_host][,[rmt_port]]]
+```
+
+## lsof 列出被程序所打开的文件
+- 找出进程打开或使用的文件
+
+## pidof 查看正在运行的程序的 PID
+- find the process ID of a running program.
+
+```bash
+pidof usage: [options] <program-name>
+
+ -c           Return PIDs with the same root directory
+ -d <sep>     Use the provided character as output separator
+ -h           Display this help text
+ -n           Avoid using stat system function on network shares
+ -o <pid>     Omit results with a given PID
+ -q           Quiet mode. Do not display output
+ -s           Only return one PID
+ -x           Return PIDs of shells running scripts with a matching name
+ -z           List zombie and I/O waiting processes. May cause pidof to hang.
+```
+
+```bash
+[14:40 lx@ubunut22 ~/Documents]$pidof init
+1
+```
+
+
+# SELinux
+- 避免资源误用，如不小心将某个重要程序权限设置为 777 而引发的安全隐患
+- 进行程序、文件等细部权限设置依据的一个核心模块
+
+## 自助式存取控制 DAC
+- Discretionary Access Control
+- 传统的文件权限与账号关系
+- 依据程序的拥有者和文件资源的 rwx 权限绝对有无存取能力
+
+缺点：
+- root 有最高权限，若不小心被其他人获取，则该程序可以在系统上进行任何资源的存取
+- 使用者可以取得程序来变更文件资源的存取权限
+
+## 委任式存取控制 MAC
+- Mandatory Access Control
+- 可以对特定程序与特定的文件资源来进行权限控制
+- SELinux 提供一些默认政策，并在该政策中提供多个规则，来选择是否启用该控制规则
+- 控制的主体是程序
+
+## SELinux 运行模式
+- 通过 MAC 管理程序
+- 控制的主体为程序
+- 目标为该程序能否读取的文件资源
+- 通过制定政策来管理
+- 政策中有详细的规则指定不同的服务的开放的资源
+	- targeted
+	针对网络服务限制多，本机限制少，默认政策
+	- minimum
+	仅针对选择的程序保护
+	- mls
+	限制较严格
+- 主体与目标的安全性文本（security context）必须一致才能存取目标，类似 rwx
+- SELinux 放行后，最终能否存取目标还是要看文件系统的 rwx 权限
+- 安全性文本在 inode 中，可以通过 `ls -Z` 查看，前提是开启 SELinux
+
+## SELinux 三种模式
+- enforcing
+强制模式，SELinux 运行中，且已开始限制 domain/type
+- permissive
+宽容模式，SELinux 运行中，但不实际限制，仅警告
+- disabled
+SELinux 未运行
+
+## getenforce 查看 SELinux 模式
+
+- rocky8.6
+```bash
+[lx@Rocky8 ~]$ getenforce 
+Enforcing
+```
+
+- ubuntu 22.04
+要先安装 `selinux-utils`
+```bash
+[14:40 lx@ubunut22 ~/Documents]$getenforce
+Command 'getenforce' not found, but can be installed with:
+sudo apt install selinux-utils
+[15:28 lx@ubunut22 ~/Documents]$sudo apt install selinux-utils
+```
+```bash
+[15:32 lx@ubunut22 ~/Documents]$getenforce 
+Disabled
+```
+
+## sestatus 查看 SELinux 政策
+- rocky8.6 
+```bash
+[lx@Rocky8 ~]$ sestatus 
+SELinux status:                 enabled
+SELinuxfs mount:                /sys/fs/selinux
+SELinux root directory:         /etc/selinux
+Loaded policy name:             targeted
+Current mode:                   enforcing
+Mode from config file:          enforcing
+Policy MLS status:              enabled
+Policy deny_unknown status:     allowed
+Memory protection checking:     actual (secure)
+Max kernel policy version:      33
+```
+
+- ubuntu 22.04 
+先安装 policycoreutils
+```bash
+[15:33 lx@ubunut22 ~/Documents]$sestatus
+Command 'sestatus' not found, but can be installed with:
+sudo apt install policycoreutils
+[15:34 lx@ubunut22 ~/Documents]$sudo apt install policycoreutils
+```
+
+```bash
+[15:38 lx@ubunut22 ~/Documents]$sestatus 
+SELinux status:                 disabled
+```
+
+## 修改 SELinux 的模式
+### 配置文件修改 SELinux 的模式
+- 修改 `/etc/selinux/config` 文件
+- 修改后重启
+
+```bash
+  1 # This file controls the state of SELinux on the system.
+  2 # SELINUX= can take one of these three values:
+  3 #     enforcing - SELinux security policy is enforced.
+  4 #     permissive - SELinux prints warnings instead of enforcing.
+  5 #     disabled - No SELinux policy is loaded.
+  6 SELINUX=enforcing
+  7 # SELINUXTYPE= can take one of these three values:
+  8 #     targeted - Targeted processes are protected,
+  9 #     minimum - Modification of targeted policy. Only selected processes are protected. 
+ 10 #     mls - Multi Level Security protection.
+ 11 SELINUXTYPE=targeted
+```
+
+### setenforce  
+- 不能关闭，仅其他两种模式切换
+- 修改后要重启，因为 SELinux 在内核中
+
+```bash
+[lx@Rocky8 ~]$ setenforce --help
+usage:  setenforce [ Enforcing | Permissive | 1 | 0 ]
+
+[lx@Rocky8 ~]$ sudo setenforce 0
+[lx@Rocky8 ~]$ getenforce 
+Permissive
+```
+
+
+
+
+//LABEL：文件系统
 # 文件系统
+
+
+## 目录结构
+### /proc 查看内存数据
+- 程序在内存中，内存的数据写入到 `/proc` 目录下
+- 主机上各程序的 PID 以目录的形式在 `/proc` 目录中，目录的名为 PID
+- 开机的第一个程序 `systemd` 的 PID 为 1，因此在 `/proc/1` 目录中
+
+![](img/2023-04-13-14-11-38.png)
+
+
 
 ## 文件系统的定义
 - 什么是文件系统
@@ -5322,21 +5524,6 @@ sudo systemctl stop firewalld.service
 ### -r 自动重置文件系统大小
 
 
-# 进程
-
-## 进程状态
-### 三态
-
-### 五态
-
-## 观察进程
-
-### ps
-
-### pstree
-
-
-**************************
 
 # 信号（Signals）
 > 深入理解计算机系统——第八章 Exceptional Control Flow
@@ -6050,14 +6237,18 @@ vmstat (8)           - Report virtual memory statistics
 ## hosts 文件引入
 - hosts 文件解析域名是早期网络规模较小时使用的方案
 - 管理机构提供该文件的下载地址并定期更新
-- 但目前网络规模太大，因此引入 DNS 来管理域名解析
+- 但目前网络
 
 
 
 # DNS 域名系统
+> [DNS Records Explained](https://www.youtube.com/watch?v=HnUDtycXSNE&list=LL&index=1&t=625s&ab_channel=PowerCertAnimatedVideos)
+
+
 - DNS 只解析域名，不负责 IP 是否可达
 
 # 公有云上配置 DNS 解析
+
 
 
 # DNS 检测工具
