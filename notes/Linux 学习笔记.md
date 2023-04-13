@@ -6353,8 +6353,9 @@ www.boce.com
 # 网络安全
 
 # 入侵检测系统 IDS
+- Instrusion Detection System
 - 旁路部署
-- 监听设备
+- 监听设备，类似监控摄像头，只能记录，不能阻止
 - 不影响网络通信，网络流量不经过 IDS
 - 清洗统计，找到入侵和攻击数据，发现后阻止吗？
 
@@ -6363,19 +6364,41 @@ www.boce.com
 ## 基于网络
 
 # 入侵防御系统 IPS
+- Instrusion Prevention System
 - 串行方式接入系统
 - 发现网络攻击可以采取措施
 
 
 # 防水墙
 - 防止内部信息泄露的安全产品
-- 
+- 防止内部人员攻击
+
+
 # 防火墙
+- 隔离功能
 - 串行方式接入系统
 - 所有流入流出的数据都经过防火墙
+- 工作在网络模型的哪层？可能多层都有防火墙？如在核心层只上设防火墙
+
+DMZ 非军事化区
+
+
+## 防火墙的作用
+- 安全
+- 路由器无法安全隔离
+
+
 
 ## 分类
 ### 保护范围划分
+#### 主机防火墙
+- 防火墙在一个主机中，保护该主机
+All-in-One
+
+
+#### 网络防火墙
+- 保护一个网络
+
 
 ### 实现方式划分
 #### 硬件防火墙
@@ -6387,25 +6410,368 @@ www.boce.com
 #### 网络层防火墙
 - 根据包头的协议端口号等过滤
 - 不能过滤实际应用层数据
+- 包含 OSI 模型的下四层，又称包过滤防火墙
 
+53/tcp 53/udp ?
 
 
 
 #### 应用层防火墙
 - 部署在主链路上
+- 包含 OSI 模型 7 层
+- 比网络层防火墙更安全
+- 又称 proxy 代理网关
+- 消耗资源更多，增加防火墙的负载
+
+带机量
 
 
 *******************************
 
-# 防火墙
-## netfilter
+# Linux 防火墙
+- Linux 内核提供一个默认防火墙
+
+内核配置，内核中的文件
+```bash
+[lx@Rocky8 ~]$ ll /boot/config-4.18.0-372.9.1.el8.x86_64 -rw-r--r--. 1 root root 195983 May 10  2022 /boot/config-4.18.0-372.9.1.el8.x86_64
+```
+
+
+## 关闭系统默认防火墙策略
+- 关闭后为了以后自定义防火墙策略
+
+```bash
+systemctl disable --now firewalld
+```
+
+# netfilter
+- Linux 内核中的模块
+- 工作在内核空间
 - linux 内核的子系统
 - 模块化设计
+- Linux 防火墙由 Linux 内核的模块 Netfilter 组件提供
+- Linux 2.4.x 之后新一代的 Linux 防火墙机制
 
-## iptables
-- 由 iptables 提供的命令行工具
+
+## 五个勾子函数
+- 五个勾子函数对外开放使用
+
+### PRE_ROUTING
+
+### LOCAL_IN
+
+### FORWARD
+
+### LOCAL_OUT
+
+
+### POST_ROUTING
+
+
+
+# iptables
+- 命令行工具，用来配置 netfilter
 - 工作在用户空间
-- 编写规则后送到 netfilter 
+- 编写规则后送到 netfilter
+- 自定义防火墙规则先关闭默认 firewalld 防火墙，防止规则冲突
+
+
+```bash
+
+
+```
+
+## 五链
+- 对应 netfilter 五个勾子函数 
+
+## 五表
+
+### filter
+- 过滤规则表，根据预定义的规则过滤符合条件的数据报
+- 默认表
+
+### nat
+- NAT 地址转换规则表
+
+
+### mangle
+- 修改数据标记规则表
+
+
+### raw
+- 关闭启用的连接跟踪机制，加快封包穿越防火墙速度
+
+### security 
+- 由 SELinux 实现
+
+
+## 表和链的对应关系
+
+
+
+## 五表优先级
+- 一个链上可以支持多个表，多个表可能会冲突，因此有优先级
+
+
+
+*********************
+```bash
+对 10.0.0.151 主机限制，DROP 
+iptables -A INPUT -s 10.0.0.151 -j DROP
+ping 无法和 10.0.0.151 通信
+
+网络不通分析
+一个终端 ping 10.0.0.151 
+另一个终端监控分析
+tcpdump -i eth0 -nn 10.0.0.151
+
+结果如下：
+# 本机 10.0.0.158 目标 10.0.0.151 本机网卡名：eth0
+
+结果和视频不同，也能看到 151 回来的报文?
+```
+
+
+## iptables 格式
+
+```bash
+iptables v1.8.4
+
+Usage: iptables -[ACD] chain rule-specification [options]
+        iptables -I chain [rulenum] rule-specification [options]
+        iptables -R chain rulenum rule-specification [options]
+        iptables -D chain rulenum [options]
+        iptables -[LS] [chain [rulenum]] [options]
+        iptables -[FZ] [chain] [options]
+        iptables -[NX] chain
+        iptables -E old-chain-name new-chain-name
+        iptables -P chain target [options]
+        iptables -h (print this help information)
+
+Commands:
+Either long or short options are allowed.
+  --append  -A chain            Append to chain
+  --check   -C chain            Check for the existence of a rule
+  --delete  -D chain            Delete matching rule from chain
+  --delete  -D chain rulenum
+                                Delete rule rulenum (1 = first) from chain
+  --insert  -I chain [rulenum]
+                                Insert in chain as rulenum (default 1=first)
+  --replace -R chain rulenum
+                                Replace rule rulenum (1 = first) in chain
+  --list    -L [chain [rulenum]]
+                                List the rules in a chain or all chains
+  --list-rules -S [chain [rulenum]]
+                                Print the rules in a chain or all chains
+  --flush   -F [chain]          Delete all rules in  chain or all chains
+  --zero    -Z [chain [rulenum]]
+                                Zero counters in chain or all chains
+  --new     -N chain            Create a new user-defined chain
+  --delete-chain
+             -X [chain]         Delete a user-defined chain
+```
+
+
+
+## iptables -nvL 查看定义的规则
+- L 要写在后面
+
+```bash
+[root@Rocky8 lx]# iptables -nvL
+Chain INPUT (policy ACCEPT 935 packets, 60528 bytes)
+ pkts bytes target     prot opt in     out     source               d
+  417 35017 DROP       all  --  *      *       10.0.0.151           0
+
+Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               d
+
+Chain OUTPUT (policy ACCEPT 1155 packets, 117K bytes)
+ pkts bytes target     prot opt in     out     source 
+```
+
+- 如果不指定源地址，如具体主机 ip 或某个网段，如 `10.0.0.0/24`，则表示全部对象
+```bash
+# 拒绝全部
+iptables -A INPUT -j REJECT
+```
+
+
+
+## 规则顺序影响
+- 如果有多条规则，冲突，以前面的为准，检查到第一个满足的规则时就会停止检查，因此后面的规则不会生效
+- 因此条件范围越小的放前面，如针对某个 IP 设定的规则放前面，针对包含该 IP 的网络的规则放后面
+- 如果多个规则无包含关系，最好将范围大的放在前面，效率更高
+
+
+## 查看规则编号
+```bash
+iptables -vnL --line-number
+```
+
+
+
+## 规则制定方案
+
+### 白名单
+- 指定允许访问的，其他的不能访问
+
+### 黑名单
+- 只指定拒绝的，其他的都能访问
+
+
+
+## 指定匹配条件
+### -s 指定源地址
+- `--source address[/mask][,...]`
+- `Address` can be either a network name，hostname, network IP address (with `/mask`), or a plain IP address.
+- hostname will be resolved once only, before the rule is submitted to the kernel.
+- An iptables mask of `24` is equivalent to `255.255.255.0`
+- A `!` before the address specification `inverts` the sense of the address.
+地址前加 `!` 表示除了该地址外的其他是所有地址
+
+
+```bash
+
+
+```
+
+### -d 指定目标地址
+- 多网卡多 ip 时可以指定目标地址
+
+```bash
+
+```
+
+### -p 指定协议
+- 不指定默认全部协议
+- `[!] -p, --protocol protocol`
+- The  protocol  of  the  rule  or  of  the  packet to check.  
+- The specified protocol can be one of `tcp, udp, udplite, icmp, ikmpv6,esp, ah, sctp, mh`
+- or the special keyword **all**, 
+- or it can be a **numeric value**, representing one of these protocols or a different one.  
+- A protocol name from /etc/protocols is also allowed. 
+- A `!` argument **before** the protocol inverts the test.  
+- The number **zero** is equivalent to **all**. 
+- **all** will match with all protocols and is taken as default when this option is omitted.  
+- Note that, in **ip6tables**, IPv6 extension headers except **esp** are not allowed.  
+- esp and ipv6-nonext can be used with Kernel version 2.6.11 or later.  
+- The number **zero** is equivalent to **all**, which means that you cannot test the protocol field for the value 0 directly.
+- To match on a HBH header, even if it were the last, you cannot use -p 0, but always need -m hbh.
+```
+
+
+
+
+
+### -i 指定数据报文流入的接口 
+- --in-interface
+- only for packets entering the `INPUT, FORWARD and PREROUTING` chains.
+- When the `!` argument is used before the interface name, the sense is inverted.
+- If the interface name ends in a `+`, then any interface which begins with this name will match. 
+- If this option is omitted, any interface name will match.
+- 如指定网卡
+
+
+### -o 指定报文流出的接口
+- --out-interface name
+- Name of an interface via which a packet is going to be sent.
+- For packets entering the `FORWARD, OUTPUT and POSTROUTING` chains.
+- When the `!` argument is used before the interface name, the sense is inverted.
+- If the interface name ends in a `+`, then any interface which begins with this name will match. 
+- If this option is omitted, any interface name will match.
+
+
+## iptables 扩展匹配条件
+- 需要加载扩展模块
+- `man iptables-extensions` 查看扩展模块
+- 不同模块的选项不同
+- rocky8.6 `rpm -ql iptables` 可查看 `iptables` 中的模块
+```bash
+[lx@Rocky8 ~]$  rpm -ql iptables | grep -i "tcp"
+/usr/lib64/xtables/libxt_TCPMSS.so
+/usr/lib64/xtables/libxt_TCPOPTSTRIP.so
+
+/usr/lib64/xtables/libxt_tcp.so
+
+/usr/lib64/xtables/libxt_tcpmss.so
+
+[lx@Rocky8 ~]$  rpm -ql iptables | grep -i "udp"
+/usr/lib64/xtables/libxt_udp.so
+
+[lx@Rocky8 ~]$  rpm -ql iptables | grep -i "icmp"
+/usr/lib64/xtables/libip6t_icmp6.so
+/usr/lib64/xtables/libipt_icmp.so
+```
+
+### 隐式扩展
+- 不需要显示的用 `-m` 指定模块，如指定 tcp 协议
+```bash
+iptables -p tcp 
+```
+
+
+### 显示扩展
+`ss -nlt`
+`arp -n`
+修改 MAC 地址：
+编辑网卡配置文件`/etc/sysconfig/network-scripts/ifcfg-网卡名`，添加 MAC 地址：
+```
+MACADDR=MAC 地址
+```
+然后重启服务 `systemctl restart network`
+
+
+#### multiport 多端口匹配
+- 定义多端口匹配
+- 最多指定 15 个端口
+
+
+#### iprange 连续的 ip 地址范围
+
+
+
+#### mac 指明源的目标地址
+- 为什么没有目标地址？
+
+#### string 应用层数据做字符串模式匹配检测
+- 如筛选敏感词
+
+#### time 根据报文到达的时间匹配
+- 报文到达的时间于指定的时间范围进行匹配
+- UTC 时区
+
+#### connlimit 根据客户端 ip 做并发连接数量匹配
+- 针对特定 IP 并发连接数
+- 可防止 Dox 攻击
+
+
+#### limit 根据收发报文的速率做匹配
+- 可控制一段时间内总的连接数
+
+icmp 如果限制 20/minute ，因为默认 ping 是 60/minute, 限制后变为 1/3s，即 3s 才反馈，3s 才刷新一次
+
+
+## 规则管理类选项
+
+### -A 在最后追加规则
+- 追加的规则放在最后
+
+### -I [rulenum] 在指定的编号前插入规则
+- 不指定编号则默认在最前面插入
+
+### -D 删除规则
+
+### -R 替换规则
+
+### -Z 清空计数
+
+### iptables -F
+清空表中的全部规则
+- 不指定表则默认表为 filter
+
+
+******************
+
 
 ## firewalld
 
