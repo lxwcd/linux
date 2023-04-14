@@ -6117,6 +6117,97 @@ vmstat (8)           - Report virtual memory statistics
 
 
 ******************
+
+# 端口号
+> [Port (computer networking)](https://en.wikipedia.org/wiki/Port_(computer_networking))
+> [TCP port 0 reserved for what purpose?](https://networkengineering.stackexchange.com/questions/11234/tcp-port-0-reserved-for-what-purpose)
+
+
+- 不是所有的应用程序都有端口，如不需要网络的应用程序，不需要端口号
+- 应用程序进行网络连接时才分配端口号
+- 端口号 0 是保留端口号，不能使用
+
+
+## 熟知端口号
+- 熟知端口号为服务器的端口号，非客户端的端口号，客户端的端口号是随机动态分配
+- 熟知端口号是服务器默认端口号，不指定时默认使用的端口号，但也可以修改，修改后访问服务器时需要指定新端口号
+- `cat /etc/services | less` 查看熟知端口号，部分内容如下：
+
+
+```bash
+# /etc/services:
+# $Id: services,v 1.49 2017/08/18 12:43:23 ovasik Exp $
+#
+# Network services, Internet style
+# IANA services version: last updated 2016-07-08
+#
+# Note that it is presently the policy of IANA to assign a single well-known
+# port number for both TCP and UDP; hence, most entries here have two entries
+# even if the protocol doesn't support UDP operations.
+# Updated from RFC 1700, ``Assigned Numbers'' (October 1994).  Not all ports
+# are included, only the more common ones.
+#
+# The latest IANA port assignments can be gotten from
+#       http://www.iana.org/assignments/port-numbers
+# The Well Known Ports are those from 0 through 1023.
+# The Registered Ports are those from 1024 through 49151
+# The Dynamic and/or Private Ports are those from 49152 through 65535
+#
+# Each line describes one service, and is of the form:
+#
+# service-name  port/protocol  [aliases ...]   [# comment]
+
+tcpmux          1/tcp                           # TCP port service multiplexer
+tcpmux          1/udp                           # TCP port service multiplexer
+rje             5/tcp                           # Remote Job Entry
+rje             5/udp                           # Remote Job Entry
+echo            7/tcp
+echo            7/udp
+discard         9/tcp           sink null
+discard         9/udp           sink null
+systat          11/tcp          users
+systat          11/udp          users
+daytime         13/tcp
+daytime         13/udp
+qotd            17/tcp          quote
+qotd            17/udp          quote
+chargen         19/tcp          ttytst source
+chargen         19/udp          ttytst source
+ftp-data        20/tcp
+ftp-data        20/udp
+# 21 is registered to ftp, but also used by fsp
+ftp             21/tcp
+ftp             21/udp          fsp fspd
+ssh             22/tcp                          # The Secure Shell (SSH) Protocol
+ssh             22/udp                          # The Secure Shell (SSH) Protocol
+telnet          23/tcp
+telnet          23/udp
+# 24 - private mail system
+lmtp            24/tcp                          # LMTP Mail Delivery
+lmtp            24/udp                          # LMTP Mail Delivery
+smtp            25/tcp          mail
+smtp            25/udp          mail
+time            37/tcp          timserver
+time            37/udp          timserver
+rlp             39/tcp          resource        # resource location
+rlp             39/udp          resource        # resource location
+nameserver      42/tcp          name            # IEN 116
+nameserver      42/udp          name            # IEN 116
+nicname         43/tcp          whois
+nicname         43/udp          whois
+tacacs          49/tcp                          # Login Host Protocol (TACACS)
+tacacs          49/udp                          # Login Host Protocol (TACACS)
+re-mail-ck      50/tcp                          # Remote Mail Checking Protocol
+re-mail-ck      50/udp                          # Remote Mail Checking Protocol
+domain          53/tcp                          # name-domain server
+domain          53/udp
+whois++         63/tcp          whoispp
+whois++         63/udp          whoispp
+```
+
+
+
+
 # 网络配置
 - ip
 - netmask
@@ -6597,10 +6688,15 @@ iptables -A INPUT -j REJECT
 
 
 
-## 规则顺序影响
+### 规则顺序影响
 - 如果有多条规则，冲突，以前面的为准，检查到第一个满足的规则时就会停止检查，因此后面的规则不会生效
 - 因此条件范围越小的放前面，如针对某个 IP 设定的规则放前面，针对包含该 IP 的网络的规则放后面
 - 如果多个规则无包含关系，最好将范围大的放在前面，效率更高
+- 
+
+## 最佳规则方案
+- 默认规则，即无匹配时的默认规则 
+
 
 
 ## 查看规则编号
@@ -6736,6 +6832,14 @@ MACADDR=MAC 地址
 #### string 应用层数据做字符串模式匹配检测
 - 如筛选敏感词
 
+算法的影响
+
+ bm aparch 可以，ngnix 有问题
+ kbm 支持 ngnix 
+
+
+
+
 #### time 根据报文到达的时间匹配
 - 报文到达的时间于指定的时间范围进行匹配
 - UTC 时区
@@ -6749,6 +6853,49 @@ MACADDR=MAC 地址
 - 可控制一段时间内总的连接数
 
 icmp 如果限制 20/minute ，因为默认 ping 是 60/minute, 限制后变为 1/3s，即 3s 才反馈，3s 才刷新一次
+
+
+#### state 
+
+- NEW
+第一次连接
+
+拒绝新用户连接
+```
+iptables -A INPUT -m state --state NEW -j REJECT
+```
+
+- ESTABLISHED
+回应的报文不是 NEW？
+- RELATED
+有些协议会打开其他端口，如 ftp 是 21 端口，但又会打开 20 端口
+
+- INVALID
+无效的连接
+已经追踪到的并记录在内存中下来的
+/proc/net/nf
+
+能记录的最大连接数查看：
+ nf_conntrack table full,  以达到连接数最大数目
+
+
+定时清理记录，
+
+sysctl -p 
+
+
+
+lsmod 显示模块
+lsmod | grep nf 
+
+- UNTRACKED
+
+#### Target
+自定义，如记录日志
+记录日志
+/var/log/syslog ubutnu
+/var/log/message
+
 
 
 ## 规则管理类选项
@@ -6770,10 +6917,132 @@ icmp 如果限制 20/minute ，因为默认 ping 是 60/minute, 限制后变为 
 - 不指定表则默认表为 filter
 
 
+## iptables -P 修改默认规则
+
+```bash
+Chain INPUT (policy ACCEPT 3141 packets, 19M bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+ 3123   19M LIBVIRT_INP  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+
+Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 LIBVIRT_FWX  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+    0     0 LIBVIRT_FWI  all  --  *      *       0.0.0.0/0            0.0.0.0/0           
+    0     0 LIBVIRT_FWO  all  --  *      *       0.0.0.0/0            0.0.0.0/0 
+```
+
+- 第一行圆括号中 policy 后面的即为默认规则
+- 不在匹配项的均采用默认规则
+- 修改后要重启？
+
+
+## 保存 iptables 规则
+- 在命令中用 iptables 命令制定的规则只是临时生效
+- 生效期限为 kernel 的存活期限
+
+### 写到文件中设置开机执行
+要重定向到文件，还需要设置开机加载
+iptables-save > 
+
+iptables -S 
+
+iptables-restore < 规则文件
+
+开机启动执行脚本
+开机加载规则文件
+/etc/rc.local 
+
+### iptables-services 装软件包
+
+
+iptables 和 firewalld 都是指定防火墙规则，同时启动会冲突
+## 默认规则文件
+
+
+
+# 网络防火墙
+- iptables 是针对一个主机保护
+
+## NAT 
+
+> NAT 原理看 计算机网络-谢希仁-第7版 4.8.2
+
+NAT 作用
+- 安全，保护内网私有 IP 主机？
+
+- 局域网用私有地址，更安全
+- ipv4 地址不够
+
+### SNAT
+```bash
+
+```
+
+拨号网络 ？ 
+动态的公网 IP ?
+
+winvr
+
+
+
+### DNAT
+
+
+### PNAT NAPT 
+
+
+### REDIRECT
+- 本机端口转发
+
+
+
+## 查看主机访问公网时的 IP 地址
+```bash
+
+```
+
+
+
+route -n
+ip_forward
+
+iptables -vnL -t nat 
+
+ab 命令
+
+互联网来源端口和被访问主机的端口 可以不一样
+
+常用端口号 80 81 等
+
+
+ss -ntlp 监听端口，监听应用程序，不能看到 netfilter 内核的监听端口
+
+
+FORWARD 和 INPUT ?
+
 ******************
 
+## 自定义链
+- 类似函数
 
-## firewalld
+## iptables -N 新增自定义链
+```bash
+iptables -N cusChain
+```
+
+## iptables -E 重命名自定义链
+- `--rename-chain old new`
+
+## 删除自定链表
+
+
+
+
+# firewalld
+- 和 iptables 类似，同样命令行工具，管理 netfilter
+- 和 iptables 冲突，只用一个
+
+
 
 ## nftables
 - netfilter 升级
