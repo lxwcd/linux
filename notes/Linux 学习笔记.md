@@ -6128,9 +6128,20 @@ vmstat (8)           - Report virtual memory statistics
 - 端口号 0 是保留端口号，不能使用
 
 
+**************
+
+> [2.4.1 可靠联机的 TCP 协议](http://cn.linux.vbird.org/linux_server/0110network_basic_4.php#tcpip_transfer_tcp)
+
+- 如果客户端想要访问一个服务器的 www 服务，则服务器会开启 80 端口等待客户端的连接
+- 客户端通过浏览器访问服务器的 wwww 服务，客户端浏览器的端口则是客户端主机随机分配的
+
+
+
 ## 熟知端口号
+- 0 ~ 1023
 - 熟知端口号为服务器的端口号，非客户端的端口号，客户端的端口号是随机动态分配
 - 熟知端口号是服务器默认端口号，不指定时默认使用的端口号，但也可以修改，修改后访问服务器时需要指定新端口号
+- 只有 root 才能开启熟知端口号，因此也叫特权端口号
 - `cat /etc/services | less` 查看熟知端口号，部分内容如下：
 
 
@@ -6206,8 +6217,27 @@ whois++         63/udp          whoispp
 ```
 
 
+# 连上 Internet 的必要网络参数
+> [2.5.2 一组可以连上 Internet 的必要网络参数](http://cn.linux.vbird.org/linux_server/0110network_basic_5.php#prepare_con)
+
+- IP
+- Netmask
+- Network
+- Broadcast
+- Gateway
+- DNS
+
+如 IP 为 `192.168.1.0/24`：
+- IP 为 192.168.1.1 ~ 192.168.1.254
+- 子网掩码 Netmask 为：255.255.255.0
+- Broadcast 为：192.168.1.255 (主机号全 1 对本网络的全部主机广播)
 
 
+  
+
+
+
+//LABEL: 网络配置
 # 网络配置
 - ip
 - netmask
@@ -6330,7 +6360,7 @@ whois++         63/udp          whoispp
 - 管理机构提供该文件的下载地址并定期更新
 - 但目前网络
 
-
+# /etc/resolve.conf
 
 # DNS 域名系统
 > [DNS Records Explained](https://www.youtube.com/watch?v=HnUDtycXSNE&list=LL&index=1&t=625s&ab_channel=PowerCertAnimatedVideos)
@@ -6489,6 +6519,13 @@ All-in-One
 
 #### 网络防火墙
 - 保护一个网络
+
+##### 封包过滤式网络防火墙
+> [2.4.4 网络防火墙与 OSI 七层协定](http://cn.linux.vbird.org/linux_server/0110network_basic_4.php#tcpip_transfer_firewall)
+
+
+> 封包过滤式网络防火墙可以抵挡一些有问题的封包
+> 过滤特定 IP，端口，或特定的封包信息（SYN/ACK等）
 
 
 ### 实现方式划分
