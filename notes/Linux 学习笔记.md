@@ -6392,20 +6392,225 @@ search localdomain
 
 ## IP 封包协议相关数据 /etc/protocols
 
-# 网络相关启动指令
 
-## 重启网络
-### ubuntu 20.04 /etc/init.d/network restart
+
+
+
+## 网络相关启动指令
+
+### 重启网络
+#### ubuntu 20.04 /etc/init.d/network restart
 - `/etc/init.d/network restart`
 
+
+
+# 网络接口与网络适配器
+
+## 网络接口（network interface）
+> [Network interfaces](https://learn.microsoft.com/en-us/windows/win32/network-interfaces)
+
+- 计算机与网络之间的连接点 
+- 可以是物理的，也可以是虚拟的
+- 允许计算机通过网络发送和接收数据
+
+
+## 网络适配器（network adapter）
+- 也叫网络接口卡（network interface card）
+- 是一种硬件设备，提供计算机与网络之间的物理连接
+
+
+# 查看当前网络接口
+> [What is the virbr0 interface used for](https://askubuntu.com/questions/246343/what-is-the-virbr0-interface-used-for)
+> [abelardojarab/virbr0_ifconfig_explanation.md](https://gist.github.com/abelardojarab/e10ed30ab69bf9636929e17e3446bc2a)
+> [libvirt](https://wiki.libvirt.org/Networking.html)
+
+## ip a 
+- `ip a` 或 `ip addr` 或 `ip addr show`
+
+```bash
+root@Rocky8 network-scripts $ ip addr
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:88:25:14 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.158/24 brd 10.0.0.255 scope global dynamic noprefixroute eth0
+       valid_lft 1568sec preferred_lft 1568sec
+    inet6 fe80::20c:29ff:fe88:2514/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+3: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default qlen 1000
+    link/ether 52:54:00:69:47:f2 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.122.1/24 brd 192.168.122.255 scope global virbr0
+       valid_lft forever preferred_lft forever
+```
+
+### rocky8.6
+- vmware 安装 rocky8.6 虚拟机查看，配置网卡为 NAT 模式
+- `ip a` 命令查看
+- 可看到三个网络接口
+- `lo` 为本地环回测试接口，ip 为 `127.0.0.1`
+- 一块网卡 `eth0`（名字被修改过），该网卡是创建虚拟机时添加的网卡，选择的模式为 NAT 模式
+![](img/2023-04-16-10-53-24.png)
+- `eht0` 的 ip 为 10.0.0.158，是虚拟网络中使用的 ip，和外部通信时会被 NAT 设备转换为物理主机的 ip 
+- `virbr0` 是虚拟网络接口，即 virtual bridge 0，用于 NAT
+- `virbr0` 由 [libvirt](https://wiki.libvirt.org/Networking.html)库提供
+
+```bash
+root@Rocky8 ~ $ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:88:25:14 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.158/24 brd 10.0.0.255 scope global dynamic noprefixroute eth0
+       valid_lft 1729sec preferred_lft 1729sec
+    inet6 fe80::20c:29ff:fe88:2514/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+3: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default qlen 1000
+    link/ether 52:54:00:69:47:f2 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.122.1/24 brd 192.168.122.255 scope global virbr0
+       valid_lft forever preferred_lft forever
+root@Rocky8 ~ $ 
+root@Rocky8 ~ $ cd /etc/sysconfig/network-scripts/
+root@Rocky8 network-scripts $ ls
+ifcfg-eth0
+```
+
+
+## ip link 
+- `ip link` 或 `ip link show`
+```bash
+root@Rocky8 network-scripts $ ip link 
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:88:25:14 brd ff:ff:ff:ff:ff:ff
+3: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:69:47:f2 brd ff:ff:ff:ff:ff:ff
+```
+
+
+## 查看网络接口配置文件
+- 一个网络接口对应一个配置文件，在该配置文件中设置 ip，netmask 等
+
+### rocky8.6 /etc/sysconfig/network-scripts 目录
+- 进入 `/etc/sysconfig/network-scripts/` 目录，可看到有 `ifcfg-` 开头的文件名，
+  文件名格式固定，第一部分为 `ifcfg-`，第二部分为网络接口的设备名，即 `ip a` 中看到的名字
+![](img/2023-04-02-13-54-45.png)
+
+- 打开网络接口配置文件查看
+该文件的内容就是 bash 变量设置的格式
+如果在当前 shell 中执行该文件，如 `. /etc/sysconfig/network-scripts/ifcfg-eth0`，则可以使用该文件中的变量
+变量的值可以用双引号括起来，如果有空格，必须引起来
+
+```bash
+root@Rocky8 ~ $ cd /etc/sysconfig/network-scripts/
+root@Rocky8 network-scripts $ ls
+ifcfg-eth0
+root@Rocky8 network-scripts $ vim ifcfg-eth0
+
+  1 TYPE=Ethernet                                                                                                                           
+  2 PROXY_METHOD=none
+  3 BROWSER_ONLY=no
+  4 BOOTPROTO=dhcp
+  5 DEFROUTE=yes
+  6 IPV4_FAILURE_FATAL=no
+  7 IPV6INIT=yes
+  8 IPV6_AUTOCONF=yes
+  9 IPV6_DEFROUTE=yes
+ 10 IPV6_FAILURE_FATAL=no
+ 11 NAME=eth0
+ 12 UUID=7fb201c8-1ad7-4ad5-9e94-44ac4fa4faa8
+ 13 DEVICE=eth0
+ 14 ONBOOT=yes
+```
+
+1. TYPE 局域网类型
+- 第一行表名局域网类型为以太网
+2. PROXY_METHOD
+
+3. BROWSER_ONLY
+
+4. BOOTPROTO 获取 ip 的方式
+- dhcp 表示通过 DHCP 服务自动获取
+- none 表示手动设置
+
+5. DEFROUTE 默认路由
+
+6. IPV4_FAILURE_FATAL
+
+7. IPV6INIT
+
+8. NAME 该配置的名字
+- 只该网络接口配置的名字，用 `nmcli` 工具时使用的名字
+- 可以和设备名相同，也可以不同
+```bash
+root@Rocky8 network-scripts $ nmcli connection 
+NAME    UUID                                  TYPE      DEVICE 
+eth0    7fb201c8-1ad7-4ad5-9e94-44ac4fa4faa8  ethernet  eth0   
+virbr0  25fcd9c2-6677-453b-a64d-366e2622174e  bridge    virbr0
+```
+
+9. UUID 网络接口的 UUID
+
+10. DEVICE 网络接口的设备名
+必须和该文件名的第二部分一致，也和 `ip a` 看到的设备名一致
+
+11.  ONBOOT 开机启动
+- `yes` 表示开机启动该网络接口
+
+********
+
+其他未列出来的设置
+
+1. IPADDR 手动指定 ip 地址
+- 不用 DHCP 自动分配 ip 时指定
+
+2. NETMASK 子网掩码
+- 如 `255.255.255.0`
+
+3. PREFIX 子网掩码位数
+- 如 `255.255.255.0` 子网掩码可以直接写 `PREFIX=24`
+
+4. GATEWAY 网关
+- 整个主机的 default gateway
+- 不能重复设置，如配置几个网络接口，但每个配置文件设置不同的默认网关
+
+5. MTU
+- 以太网默认 1500，也可自己设置
+
+6. HARDADDR 网络接口的地址，MAC 地址
+
+7. DOMAIN 域后缀
+
+8. DNS1 主 DNS
+
+9. DNS2 次 DNS
+
+10. DNS3 第三 DNS
+
+
+# 重启网络接口
+
+1. `/etc/init.d/network restart` 
+- ubuntu22.04, rocky8.6 不能用此方法
+
+2. 
 
 
 
 //LABEL: 网络配置
 # 网络配置
-- ip
-- netmask
-- getway
+
+## 网络接口配置
+
+
 
 # 查看启动方式
 
