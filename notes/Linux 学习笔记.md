@@ -195,7 +195,12 @@ PermitRootLogin yes
 
 - Ubuntu 22.04 和 Ubuntu 20.04
 ```bash
-/etc/init.d/ssh restart
+sudo systemctl restart ssh.service
+```
+
+- rocky8.6
+```bash
+sudo systemctl restart sshd.service
 ```
 
 ### 删除用户密码后 xshell 中不输入
@@ -6238,6 +6243,9 @@ whois++         63/udp          whoispp
 
 ## 网卡配置文件
 ### rocky8.6
+> [11.2.4 About the /etc/sysconfig/network File](https://docs.oracle.com/en/operating-systems/oracle-linux/6/admin/about-etc-sysconfig.html)
+
+
 - `/etc/sysconfig/network-scripts/` 目录
 
 如用 `ip a` 查看有网卡的名为 `eth0`
@@ -6280,12 +6288,38 @@ DEVICE=eth0
 ONBOOT=yes
 ```
 
-## 网络接口配置文件
+### ubuntu22.04
+> [How to Configure Networking in Ubuntu 20.04 with NetPlan](https://www.serverlab.ca/tutorials/linux/administration-linux/how-to-configure-networking-in-ubuntu-20-04-with-netplan/)
 
-### rocky8.6
-> [11.2.4 About the /etc/sysconfig/network File](https://docs.oracle.com/en/operating-systems/oracle-linux/6/admin/about-etc-sysconfig.html)
 
-- `/etc/sysconfig/network`
+- `/etc/netplan` 目录中以 `.yaml` 结尾的文件
+
+```bash
+root@ubuntu22 ~ $ ip link 
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:12:a4:95 brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+
+root@ubuntu22 ~ $ cd /etc/netplan/
+root@ubuntu22 netplan $ ls
+00-installer-config.yaml
+
+root@ubuntu22 netplan $ cat 00-installer-config.yaml 
+# This is the network config written by 'subiquity'
+network:
+  ethernets:
+    ens33:
+      dhcp4: true
+  version: 2
+```
+
+#### netplan 配置文件配置项
+
+- renderer
+
+
 
 
 
@@ -6381,14 +6415,15 @@ search localdomain
 ```
 
 - 常用端口号
-|||
-|:--:|:--:|
+
+|协议|端口号|
+|:---|:---|
 |ssh|22/tcp|
 |smtp|25/tcp|
 |domain|53/tcp|
 |domain|53/udp|
 |http|80/tcp|
-|443|https/tcp|
+|https|443/tcp|
 
 ## IP 封包协议相关数据 /etc/protocols
 
@@ -6418,6 +6453,339 @@ search localdomain
 - 也叫网络接口卡（network interface card）
 - 是一种硬件设备，提供计算机与网络之间的物理连接
 
+
+# 查看网卡的硬件信息
+## lshw -class network
+
+```bash
+root@ubuntu22 ~ $ lshw -class network
+  *-network                 
+       description: Ethernet interface
+       product: 82545EM Gigabit Ethernet Controller (Copper)
+       vendor: Intel Corporation
+       physical id: 1
+       bus info: pci@0000:02:01.0
+       logical name: eth0
+       version: 01
+       serial: 00:0c:29:e7:c8:8e
+       size: 1Gbit/s
+       capacity: 1Gbit/s
+       width: 64 bits
+       clock: 66MHz
+       capabilities: pm pcix bus_master cap_list rom ethernet pgotiation
+       configuration: autonegotiation=on broadcast=yes driver=elatency=0 link=yes mingnt=255 multicast=yes port=twisted pair s
+       resources: irq:19 memory:fd5c0000-fd5dffff memory:fdff00
+```
+
+
+# 检查网卡状态
+
+## ip
+- `ip addr show` 或 `ip a` 查看全部网络接口和 ip
+- `ip link show` 或 `ip link` 查看全部网络接口
+- `ip link show ethX`，`ethX` 为网络接口名，查看某个具体的网络接口
+- `ifconfig` 也可查看
+
+
+`ip` 命令看到网卡的状态中有 `UP` 即表示网卡状态正常
+
+```bash
+root@ubuntu22 netplan $ ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:e7:c8:8e brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+    altname ens33
+```
+
+## ethtool 
+- `ethtool 网卡设备名` 查看网卡状态
+- 最后一行 `Link detected: yes` 表示正常
+
+```bash
+root@ubuntu22 ~ $ ethtool eth0
+Settings for eth0:
+	Supported ports: [ TP ]
+	Supported link modes:   10baseT/Half 10baseT/Full
+	                        100baseT/Half 100baseT/Full
+	                        1000baseT/Full
+	Supported pause frame use: No
+	Supports auto-negotiation: Yes
+	Supported FEC modes: Not reported
+	Advertised link modes:  10baseT/Half 10baseT/Full
+	                        100baseT/Half 100baseT/Full
+	                        1000baseT/Full
+	Advertised pause frame use: No
+	Advertised auto-negotiation: Yes
+	Advertised FEC modes: Not reported
+	Speed: 1000Mb/s
+	Duplex: Full
+	Auto-negotiation: on
+	Port: Twisted Pair
+	PHYAD: 0
+	Transceiver: internal
+	MDI-X: off (auto)
+	Supports Wake-on: d
+	Wake-on: d
+        Current message level: 0x00000007 (7)
+                               drv probe link
+	Link detected: yes
+```
+
+## nmcli  
+- 如果没有 nmcli 命令，根据提示安装 `network-manager` 工具
+```bash
+root@ubuntu22 netplan $ nmcli
+Command 'nmcli' not found, but can be installed with:
+snap install network-manager  # version 1.2.2-30, or
+apt  install network-manager  # version 1.36.6-0ubuntu2
+See 'snap info network-manager' for additional versions.
+
+root@ubuntu22 netplan $ apt install -y network-manager 
+```
+
+- ubuntu22.04 如果用 `ip a` 看到网卡状态正常，用 `nmcli connection` 看不到网卡状态，
+  需要在 `/etc/netplan` 目录下的 `/.yaml` 网卡配置文件中指定 `renderer` 为 `NetworkManager`
+  注意配置文件中网卡的名要与 `ip a` 中显示的网卡设备名一致，即 `nmcli connection` 显示的 `DEVICE`
+
+```bash
+root@ubuntu22 ~ $ cd /etc/netplan/
+root@ubuntu22 netplan $ ls
+eth0.yaml
+
+root@ubuntu22 netplan $ nmcli connection show 
+NAME          UUID                                  TYPE      DEVICE 
+netplan-eth0  626dd384-8b3d-3690-9511-192b2c79b3fd  ethernet  eth0   
+
+root@ubuntu22 netplan $ cat eth0.yaml 
+# This is the network config written by 'subiquity'
+network:
+  ethernets:
+    eth0:
+      dhcp4: true
+  version: 2
+  renderer: NetworkManager
+```
+
+
+
+
+### nmcli c[onnection] 
+
+```bash
+[18:47 lx@ubunut22 ~]$nmcli connection 
+NAME                UUID                                  TYPE      DEVICE 
+Wired connection 1  a5cf956e-08b4-391a-82fd-53837a505bea  ethernet  ens33  
+```
+
+### nmcli device
+
+```bash
+root@Rocky8 network-scripts $ nmcli device 
+DEVICE  TYPE      STATE                   CONNECTION 
+eth0    ethernet  connected               eth0       
+virbr0  bridge    connected (externally)  virbr0     
+lo      loopback  unmanaged 
+```
+
+
+
+# 查看默认网关 
+
+## 虚拟机中查看
+如果用虚拟机安装系统，在装系统时会有一个网卡，如选择的网卡模式为 NAT，在 **虚拟机 --> 设置** 可以查看选择的网卡模式：
+![](img/2023-04-16-18-17-26.png)
+
+在 **编辑 --> 虚拟网络编辑器 --> NAT设置** 可以查看或修改默认网关的 IP 地址，如果不能修改，则点击 **虚拟网络编辑器** 右下角的更改设置：
+![](img/2023-04-16-18-20-52.png)
+
+## 命令查看
+### ip r[oute]
+- `ip r` 或 `ip route`
+
+### route -n
+- `route -n` 
+- 下面命令查询可见默认网关为 `10.0.0.2`，主机 IP 为 `10.0.0.157`
+
+```bash
+root@ubuntu22 netplan $ ip r
+default via 10.0.0.2 dev eth0 proto dhcp src 10.0.0.157 metric 100 
+10.0.0.0/24 dev eth0 proto kernel scope link src 10.0.0.157 metric 100 
+10.0.0.2 dev eth0 proto dhcp scope link src 10.0.0.157 metric 100 
+root@ubuntu22 netplan $ 
+root@ubuntu22 netplan $ route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         10.0.0.2        0.0.0.0         UG    100    0        0 eth0
+10.0.0.0        0.0.0.0         255.255.255.0   U     100    0        0 eth0
+10.0.0.2        0.0.0.0         255.255.255.255 UH    100    0        0 eth0
+```
+
+# 更新网络配置文件
+
+## rocky8.6
+
+//TODO: nmcli 更新配置文件
+### nmcli
+> [nmcli](https://networkmanager.dev/docs/api/latest/nmcli.html)
+> [RHEL8.x - issue with nmcli con reload](https://access.redhat.com/discussions/6303851)
+
+- nmcli reload 和 nmcli con up 区别
+- nmcli device reapply 
+## ubuntu22.04
+
+### netplan 
+> [Network configuration](https://ubuntu.com/server/docs/network-configuration)
+> [Netplan static IP on Ubuntu configuration](https://linuxconfig.org/how-to-configure-static-ip-address-on-ubuntu-18-04-bionic-beaver-linux)
+
+
+- `netplan apply`
+
+
+
+
+
+# 网卡命名规则
+> [Linux Network Interface Naming](https://leo.leung.xyz/wiki/Linux_Network_Interface_Naming)
+> [Consistent Network Device Naming](https://en.wikipedia.org/wiki/Consistent_Network_Device_Naming)
+> [Network interface naming](https://library.netapp.com/ecmdocs/ECMP1155586/html/GUID-60DA02FA-B824-4B4E-862F-6862D1407453.html)
+
+
+## 传统的网卡命名规则
+- 传统的网卡命名统一叫 `ethX`，`X`为编号，如 `eth0`，`eth1` 等
+- 编号根据启动时内核识别的顺序命名
+- CentOS 6 之前版本采用
+
+缺点：
+- 如果机器上有多个网卡，一旦移除已存在的网卡或者新增网卡，
+  则已存在的旧网卡名可能变化，可能造成安全隐患，如不便于防火墙制定规则管理
+
+
+## 新网卡命名规则 Predictable Network Naming
+- 根据硬件位置对网卡命名
+
+命名规则：
+1. 前缀
+- en
+ethernet
+- wl
+wireless LAN
+- ww
+wireless wide area network
+
+2. 后缀  
+- oN
+onboard device, where N is the onboard index
+- sN
+hot plug, where N is the slot index
+- xMAC
+based on MAC address
+- pN/sX
+devices connected on a bus, where N is the bus number and X is the slot number
+
+
+示例：
+- `eno0` is the first onboard ethnet device
+- `wlp2s1` is a wireless device located at a PCI bus 2, slot 1
+
+
+
+
+
+# 修改新命名规则为旧命名规则
+> [Linux: Disable assignment of new styled names for network interfaces](https://michlstechblog.info/blog/linux-disable-assignment-of-new-names-for-network-interfaces/)
+> 
+
+
+- 编辑 `/etc/default/grub` 文件，在变量 `GRUB_CMDLINE_LINUX`的值中添加两个内核参数 `net.ifnames=1 biosdevname=0`
+
+
+
+## ubuntu22.04
+
+`ip a` 或者 `ip link` 查看初始网卡名为 ens33：
+```bash
+root@ubuntu22 init.d $ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 00:0c:29:e7:c8:8e brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+    inet 10.0.0.157/24 metric 100 brd 10.0.0.255 scope global dynamic ens33
+       valid_lft 921sec preferred_lft 921sec
+    inet6 fe80::20c:29ff:fee7:c88e/64 scope link 
+       valid_lft forever preferred_lft forever
+```
+
+1. 修改 /etc/default/grub 配置文件
+```bash
+root@ubuntu22 init.d $ vim /etc/default/grub
+
+# If you change this file, run 'update-grub' afterwards to update
+# /boot/grub/grub.cfg.
+# For full documentation of the options in this file, see:
+#   info -f grub -n 'Simple configuration'
+
+GRUB_DEFAULT=0
+GRUB_TIMEOUT_STYLE=hidden
+GRUB_TIMEOUT=0
+GRUB_DISTRIBUTOR=`lsb_release -i -s 2> /dev/null || echo Debian`
+GRUB_CMDLINE_LINUX_DEFAULT=""
+#GRUB_CMDLINE_LINUX="" #默认该变量为空
+
+# 新增两个内核参数
+GRUB_CMDLINE_LINUX="net.ifnames=0 biosdevname=0" 
+```
+
+2. 更新 /boot/grub/grub.cfg
+测试系统为 BIOS 引导方式
+
+- 方法一：执行 update-grub 命令更新 /boot/grub/grub.cfg
+```bash
+root@ubuntu22 init.d $ update-grub
+Sourcing file `/etc/default/grub'
+Sourcing file `/etc/default/grub.d/init-select.cfg'
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-5.15.0-69-generic
+Found initrd image: /boot/initrd.img-5.15.0-69-generic
+Found linux image: /boot/vmlinuz-5.15.0-67-generic
+Found initrd image: /boot/initrd.img-5.15.0-67-generic
+Warning: os-prober will not be executed to detect other bootable partitions.
+Systems on them will not be added to the GRUB boot configuration.
+Check GRUB_DISABLE_OS_PROBER documentation entry.
+done
+```
+
+- 方法二： 执行命令 `grub-mkconfig -o /boot/grub/grub.cfg` 
+结果和上面方法相同
+
+
+
+1. reboot
+此时用 `ip a` 或 `ip link` 可看到网卡名已修改，变为 `eth0`
+```bash
+root@ubuntu22 ~ $ ip link 
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:e7:c8:8e brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+    altname ens33
+```
+
+1. 修改网卡配置文件
+- 需要在 `/etc/netplan` 目录下的 `.yaml` 网卡配置文件中的网卡名改为新的网卡名
+- 可以将网卡配置名字改为新网卡名，如 `eth0.yaml`
+- 让网卡配置文件生效 `netplan apply`
+
+
+
+# 修改网卡名
 
 # 查看当前网络接口
 > [What is the virbr0 interface used for](https://askubuntu.com/questions/246343/what-is-the-virbr0-interface-used-for)
@@ -6515,7 +6883,7 @@ root@Rocky8 network-scripts $ ls
 ifcfg-eth0
 root@Rocky8 network-scripts $ vim ifcfg-eth0
 
-  1 TYPE=Ethernet                                                                                                                           
+  1  1 TYPE=Ethernet                                                                                                                           
   2 PROXY_METHOD=none
   3 BROWSER_ONLY=no
   4 BOOTPROTO=dhcp
@@ -6596,12 +6964,18 @@ virbr0  25fcd9c2-6677-453b-a64d-366e2622174e  bridge    virbr0
 10. DNS3 第三 DNS
 
 
+
+
+
+
 # 重启网络接口
 
 1. `/etc/init.d/network restart` 
 - ubuntu22.04, rocky8.6 不能用此方法
 
 2. 
+
+
 
 
 
