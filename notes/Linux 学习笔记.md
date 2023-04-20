@@ -400,21 +400,21 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 > [6.9 Controlling the Prompt](https://www.gnu.org/software/bash/manual/html_node/Controlling-the-Prompt.html)
 
 
-要想设置永久生效，将设置放在文件中，如 `/etc/profile` 或 `.bashrc` 等都可以。
-
 - `man bash` 帮助文档查看环境变量 `$PS1` 的介绍
 ![1](https://img-blog.csdnimg.cn/73a3f9095dc1413e8de842dc0318a530.png)
+
 - 提示符说明：`man bash` 搜索 `PROMPTING`
 ![2](https://img-blog.csdnimg.cn/16d7d4f2437049f485ab801d1a428124.png)
 
 - 注意 `\h` 显示主机名只到第一个 `.`前，之后的不显示，`\H` 显示完整主机名
 ![3](https://img-blog.csdnimg.cn/5fb00cec78d54535ba7f7a31f42ce3ee.png)
+
 - 示例
 ![3](https://img-blog.csdnimg.cn/7dd9cc7760b949aabb89c0877902cd49.png)
 
-### <font color=red>问题</font>
-- ubuntu 22.04 虚拟机中修改 PS1 （`/etc/profile`），需要 source 后生效，重新打开终端还原，且 `echo $PS1` 后查看的还是原来的变量
-
+- 注意该变量设置最好在 `~/.bashrc` 中，如果在 `/etc/profile` 中设置，可能被覆盖
+Ubuntu22.04 中 `~/.bashrc` 中会设置 `PS1`，因此覆盖之前的设置
+不同 bash 版本可能有差异，注意脚本调用顺序和规则
 
 //TODO: 补充
 # PS2
@@ -7042,6 +7042,11 @@ virbr0  25fcd9c2-6677-453b-a64d-366e2622174e  bridge    virbr0
 - 为什么修改网卡名
 - CentOS 7 以后用硬件生成的网卡名，不会和其他重复，插入新网卡也不会重复
 - 但网卡名不方便管理，不能标准化，不好大规模管理
+
+
+# 修改网卡 IP
+- 通过网卡配置文件修改
+- 修改 BOOTPROTO 的值为 static
 
 
 # 添加域名解析服务器地址
