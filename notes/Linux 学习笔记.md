@@ -430,6 +430,24 @@ Ubuntu22.04 中 `~/.bashrc` 中会设置 `PS1`，因此覆盖之前的设置
 
 - 注意主机名不规范可能出现错误
 
+## 主机名规则
+- rocky8.6
+- 大小写字母，数字，连字符（-），不能以连字符开头
+
+```bash
+[lx@rocky8 ~]$ whatis hostname
+hostname (7)         - hostname resolution description
+hostname (1)         - show or set the system's host name
+hostname (5)         - Local hostname configuration file
+[lx@rocky8 ~]$ man 7 hostname
+```
+```bash
+Each  element  of  the hostname must be from 1 to 63 characters long and the entire host‐
+       name, including the dots, can be at most 253 characters long.  Valid characters for host‐
+       names  are  ASCII(7)  letters from a to z, the digits from 0 to 9, and the hyphen (-).  A
+       hostname may not start with a hyphen.
+```
+
 ## 查看主机名
 ![1](https://img-blog.csdnimg.cn/5d474bdd9e3b4c94b700d1f7c36bc022.png)
 
@@ -6650,6 +6668,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 > [Linux Network Interface Naming](https://leo.leung.xyz/wiki/Linux_Network_Interface_Naming)
 > [Consistent Network Device Naming](https://en.wikipedia.org/wiki/Consistent_Network_Device_Naming)
 > [Network interface naming](https://library.netapp.com/ecmdocs/ECMP1155586/html/GUID-60DA02FA-B824-4B4E-862F-6862D1407453.html)
+> [NetworkInterfaceNames](https://wiki.debian.org/NetworkInterfaceNames)
 
 
 ## 传统的网卡命名规则
@@ -6690,15 +6709,12 @@ devices connected on a bus, where N is the bus number and X is the slot number
 - `wlp2s1` is a wireless device located at a PCI bus 2, slot 1
 
 
-
-
-
 # 修改新命名规则为旧命名规则
 > [Linux: Disable assignment of new styled names for network interfaces](https://michlstechblog.info/blog/linux-disable-assignment-of-new-names-for-network-interfaces/)
 > 
 
 
-- 编辑 `/etc/default/grub` 文件，在变量 `GRUB_CMDLINE_LINUX`的值中添加两个内核参数 `net.ifnames=1 biosdevname=0`
+- 编辑 `/etc/default/grub` 文件，在变量 `GRUB_CMDLINE_LINUX`的值中添加两个内核参数 `net.ifnames=0 biosdevname=0`
 
 
 
@@ -6764,9 +6780,12 @@ done
 - 方法二： 执行命令 `grub-mkconfig -o /boot/grub/grub.cfg` 
 结果和上面方法相同
 
+3. 修改网卡配置文件
+- 需要在 `/etc/netplan` 目录下的 `.yaml` 网卡配置文件中的网卡名改为新的网卡名
+- 可以将网卡配置名字改为新网卡名，如 `eth0.yaml`
+- 让网卡配置文件生效 `netplan apply`
 
-
-1. reboot
+4. reboot
 此时用 `ip a` 或 `ip link` 可看到网卡名已修改，变为 `eth0`
 ```bash
 root@ubuntu22 ~ $ ip link 
@@ -6778,10 +6797,7 @@ root@ubuntu22 ~ $ ip link
     altname ens33
 ```
 
-1. 修改网卡配置文件
-- 需要在 `/etc/netplan` 目录下的 `.yaml` 网卡配置文件中的网卡名改为新的网卡名
-- 可以将网卡配置名字改为新网卡名，如 `eth0.yaml`
-- 让网卡配置文件生效 `netplan apply`
+
 
 
 

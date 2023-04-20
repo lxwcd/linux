@@ -147,3 +147,130 @@ PS1="[\u@\h \W]\$ "
 - 注意该变量设置最好在 `~/.bashrc` 中，如果在 `/etc/profile` 中设置，可能被覆盖
 Ubuntu22.04 中 `~/.bashrc` 中会设置 `PS1`，因此覆盖之前的设置
 不同 bash 版本可能有差异，注意脚本调用顺序和规则
+
+
+# 修改主机名
+- 主机名命名规则
+大小写字母，数字，连字符（-），不能以连字符开头
+
+```bash
+[lx@rocky8 ~]$ whatis hostname
+hostname (7)         - hostname resolution description
+hostname (1)         - show or set the system's host name
+hostname (5)         - Local hostname configuration file
+[lx@rocky8 ~]$ man 7 hostname
+```
+
+```bash
+Each  element  of  the hostname must be from 1 to 63 characters long and the entire host‐
+       name, including the dots, can be at most 253 characters long.  Valid characters for host‐
+       names  are  ASCII(7)  letters from a to z, the digits from 0 to 9, and the hyphen (-).  A
+       hostname may not start with a hyphen.
+```
+
+- 查看主机名
+`hostname` 或 `hostnamectl`
+
+```bash
+[root@rocky8 ~]$ hostname
+rocky8
+[root@rocky8 ~]$ cat /etc/hostname 
+rocky8
+[root@rocky8 ~]$ 
+[root@rocky8 ~]$ hostnamectl --static 
+rocky8
+[root@rocky8 ~]$ hostnamectl --pretty 
+
+[root@rocky8 ~]$ hostnamectl --transient 
+rocky8
+```
+
+- 永久修改主机名 hostnamectl set-hostname
+修改后提示符中不能立即看到效果，可以用 `bash` 重开一个 shell 进程看到效果
+要当前 shell 中主机名生效，需要重启
+```bash
+[root@rocky8 ~]$ hostnamectl set-hostname "rocky8-1"
+[root@rocky8 ~]$ hostname
+rocky8-1
+[root@rocky8 ~]$ bash
+[root@rocky8-1 ~]$ exit
+```
+
+# 修改网卡名  
+> [NetworkInterfaceNames](https://wiki.debian.org/NetworkInterfaceNames)
+
+## 传统的网卡命名规则
+- 传统的网卡命名统一叫 `ethX`，`X`为编号，如 `eth0`，`eth1` 等
+- 编号根据启动时内核识别的顺序命名
+- CentOS 6 之前版本采用
+
+缺点：
+- 如果机器上有多个网卡，一旦移除已存在的网卡或者新增网卡，
+  则已存在的旧网卡名可能变化，可能造成安全隐患，如不便于防火墙制定规则管理
+
+## 查看初始网卡名
+查询可见初始网卡名为 `ens160`
+
+- ip a
+```bash
+[root@rocky8 ~]$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: ens160: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:54:b6:1a brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.162/24 brd 10.0.0.255 scope global dynamic noprefixroute ens160
+       valid_lft 1759sec preferred_lft 1759sec
+    inet6 fe80::20c:29ff:fe54:b61a/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+3: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default qlen 1000
+    link/ether 52:54:00:96:30:10 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.122.1/24 brd 192.168.122.255 scope global virbr0
+       valid_lft forever preferred_lft forever
+```
+
+- ip link show
+```bash
+[root@rocky8 ~]$ ip link show 
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: ens160: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:54:b6:1a brd ff:ff:ff:ff:ff:ff
+3: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:96:30:10 brd ff:ff:ff:ff:ff:ff
+```
+
+- nmcli connection
+```bash
+[root@rocky8 ~]$ nmcli connection 
+NAME    UUID                                  TYPE      DEVICE 
+ens160  26fbfd70-8518-4b0d-a0bc-69669c59622a  ethernet  ens160 
+virbr0  10ddff8f-58f4-45b8-ab58-a3ebd1caf6c5  bridge    virbr0 
+```
+
+## 修改网卡命名规则为旧的命名规则
+编辑 `etc/default/grub` 文件，在 `GRUB_CMDLINE_LINUX` 的值中加入 `net.ifnames=0`
+
+```bash
+GRUB_TIMEOUT=5
+GRUB_DISTRIBUTOR="$(sed 's, release .*$,,g' /etc/system-release)"
+GRUB_DEFAULT=saved
+GRUB_DISABLE_SUBMENU=true
+GRUB_TERMINAL_OUTPUT="console"
+GRUB_CMDLINE_LINUX="crashkernel=auto resume=/dev/mapper/rl_rocky8-swap rd.lvm.lv=rl_rocky8/root rd.lvm.lv=rl_rocky8/swap rhgb quiet net.ifnames=0"
+GRUB_DISABLE_RECOVERY="true"
+GRUB_ENABLE_BLSCFG=true
+```
+
+可以 `. /etc/default/grub` 该文件查看值
+
+```bash
+[root@rocky8 ~]$ . /etc/default/grub 
+[root@rocky8 ~]$ 
+[root@rocky8 ~]$ echo $GRUB_CMDLINE_LINUX 
+crashkernel=auto resume=/dev/mapper/rl_rocky8-swap rd.lvm.lv=rl_rocky8/root rd.lvm.lv=rl_rocky8/swap rhgb quiet net.ifnames=0
+```
+
