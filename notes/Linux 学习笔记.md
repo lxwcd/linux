@@ -7122,7 +7122,6 @@ virbr0  25fcd9c2-6677-453b-a64d-366e2622174e  bridge    virbr0
 > [Guide To Check UEFI or BIOS In Windows/Linux System](https://servonode.com/check-uefi-or-bios-in-widows-or-linux)
 
 
-
 ## 方法一：查看 /sys/firmware/efi 目录
 
 `/sys/firmware/efi` 目录存在则为 UEFI 启动
@@ -7189,7 +7188,7 @@ root@rocky86 firmware $ dmesg | grep efi:
 - 修改网卡配置文件中 `DEVICE` 和 `NAME` 都修改，`DEVICE` 为网卡名 
 - 如原来的网卡名为 `ens160`，则配置文件名为 `ifcfg-ens160`，将其改为 `ifcfg-eth0`
 
-- 重读网卡配置文件
+- 重读配置文件
 	- UEFI 模式引导的系统重读配置
 	
 	- BIOS 模式引导的系统重读配置 
@@ -7211,7 +7210,6 @@ root@rocky86 firmware $ dmesg | grep efi:
 ## 识别新网卡
 - 先用 `nmcli connection` 查看是否有新网卡
 
-# 查看是 BIOS 还是
 # 修改网卡名
 - 为什么修改网卡名
 - CentOS 7 以后用硬件生成的网卡名，不会和其他重复，插入新网卡也不会重复

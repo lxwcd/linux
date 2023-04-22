@@ -199,6 +199,7 @@ rocky8-1
 # 修改网卡名  
 > [NetworkInterfaceNames](https://wiki.debian.org/NetworkInterfaceNames)
 
+- 以身份执行，普通用户有些操作需要 sudo 命令执行
 ## 传统的网卡命名规则
 - 传统的网卡命名统一叫 `ethX`，`X`为编号，如 `eth0`，`eth1` 等
 - 编号根据启动时内核识别的顺序命名
@@ -251,8 +252,60 @@ ens160  26fbfd70-8518-4b0d-a0bc-69669c59622a  ethernet  ens160
 virbr0  10ddff8f-58f4-45b8-ab58-a3ebd1caf6c5  bridge    virbr0 
 ```
 
+## 查看启动方式 BIOS 还是 UEFI
+> [Guide To Check UEFI or BIOS In Windows/Linux System](https://servonode.com/check-uefi-or-bios-in-widows-or-linux)
+
+
+### 方法一：查看 /sys/firmware/efi 目录
+
+`/sys/firmware/efi` 目录存在则为 UEFI 启动
+
+- ubuntu20.04 UEFI 启动
+```bash
+[10:17:49 root@ubuntu2004 /sys/firmware]#ls
+acpi  dmi  efi  memmap
+[10:17:50 root@ubuntu2004 /sys/firmware]#
+```
+
+- rocky8.6 BIOS 启动
+```bash
+root@rocky86 ~ $ cd /sys/firmware/
+root@rocky86 firmware $ ls
+acpi  dmi  memmap  qemu_fw_cfg
+```
+
+### 方法二：dmesg
+
+- ubuntu20.04 UEFI 启动
+```bash
+root@ubuntu2004 ~# dmesg | grep efi:
+[    0.000000] efi: EFI v2.60 by HUAWEI
+[    0.000000] efi:  ACPI 2.0=0x8f7fe014  SMBIOS=0x8c4ed000  SMBIOS 3.0=0x8c4eb000  ESRT=0x8c4e9c18  MEMATTR=0x88fd9018  MOKvar=0x88fd7000 
+```
+
+- rocky8.6 BIOS 启动
+```bash
+root@rocky86 firmware $ dmesg | grep efi
+[    0.000000] clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1910969940391419 ns
+[    5.408252] tsc: Refined TSC clocksource calibration: 2918.420 MHz
+root@rocky86 firmware $ 
+root@rocky86 firmware $ dmesg | grep efi:
+```
+
+
+### 方法三：适合虚拟机安装查看
+- VMware ---> 虚拟机 ---> 设置 ---> 选项 ---> 高级
+![](img/2023-04-02-15-27-03.png)
+
+
 ## 修改网卡命名规则为旧的命名规则
-1. 编辑 `etc/default/grub` 文件，在 `GRUB_CMDLINE_LINUX` 的值中加入 `net.ifnames=0`
+> [CentOS / RHEL 7 : How to modify Network Interface names](https://www.thegeekdiary.com/centos-rhel-7-how-to-modify-network-interface-names/)
+> [Linux kernel parameters: what is the difference of net.ifnames=0 and biosdevname=0](https://unix.stackexchange.com/questions/637295/linux-kernel-parameters-what-is-the-difference-of-net-ifnames-0-and-biosdevname)
+> [11.6. Consistent Network Device Naming Using biosdevname](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/networking_guide/sec-consistent_network_device_naming_using_biosdevname)
+
+### 编辑内核 boot 参数让网卡命名规则改为旧规则
+- 编辑 `etc/default/grub` 文件，在 `GRUB_CMDLINE_LINUX` 的值中加入内核参数 `net.ifnames=0`
+- 有的文档写的还要写一项 `biosdevname=0` ，rocky8.6 测试未写这个修改网卡名成功，具体含义见参考文档 
 
 ```bash
 GRUB_TIMEOUT=5
@@ -274,3 +327,252 @@ GRUB_ENABLE_BLSCFG=true
 crashkernel=auto resume=/dev/mapper/rl_rocky8-swap rd.lvm.lv=rl_rocky8/root rd.lvm.lv=rl_rocky8/swap rhgb quiet net.ifnames=0
 ```
 
+
+### 重新生成新的 GRUB 配置文件并使其生效
+需要先查询系统启动方式是 BIOS 还是 UEFI
+
+- BIOS 启动
+
+```bash
+[root@rocky8-1 ~]$ grub2-mkconfig -o /boot/grub2/grub.cfg 
+Generating grub configuration file ...
+done
+```
+
+- UEFI 启动
+
+未测试该情况，只需要将 grub.cfg 文件的路径修改一下，如 Ubuntu20.04 的路径为
+```bash
+root@ubuntu2004 ~# ls /boot/efi/EFI/
+BOOT  ubuntu
+root@ubuntu2004 ~# ls /boot/efi/EFI/ubuntu/grub.cfg 
+/boot/efi/EFI/ubuntu/grub.cfg
+```
+
+rocky8.6 的路径为 `/boot/efi/EFI/redhat/grub.cfg`
+
+### 修改 ifcfg 网卡配置文件
+
+- 每个网卡的配置，包括 IP 地址等有一个单独的配置文件
+- 配置文件的命名格式固定，前缀为 `ifcfg-`，后缀为网卡的设备名，即该配置文件中 `DEVICE` 变量的值
+- 配置文件在 `/etc/sysconfig/network-scripts/` 目录中
+
+```bash
+[root@rocky8-1 ~]$ cd /etc/sysconfig/network-scripts/
+[root@rocky8-1 network-scripts]$ ls
+ifcfg-ens160
+[root@rocky8-1 network-scripts]$ mv ifcfg-ens160 ifcfg-eth0
+[root@rocky8-1 network-scripts]$ vim ifcfg-eth0
+```
+
+- 修改网卡配置文件中 `DEVICE` 和 `NAME`
+- `DEVICE` 为网卡的设备名 
+- `NAME` 为这个网卡整个配置的名字，用 `nmcli` 操作该网卡时使用的名字，`man nmcli` 查看帮助
+- `NAME` 可以和 `DEVICE` 不同
+- `DEVICE` 的名字必须和网卡配置文件名字的后缀相同
+```bash
+name
+               if specified, the connection will use the name (else NM creates a name itself).
+```
+```bash
+lx@rocky86 firmware $ nmcli connection 
+NAME    UUID                                  TYPE      DEVICE 
+eth1    9c92fad9-6ecb-3e6c-eb4d-8a47c6f50c04  ethernet  eth1   
+virbr0  0aab604c-fa07-4672-9588-1cb101daaded  bridge    virbr0 
+ens160  c2ef03db-c87c-4a0a-b30b-609635ecccdf  ethernet  --     
+```
+
+- `ifcfg-eth0` 配置文件内容如下：
+```bash
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=dhcp
+DEFROUTE=yes
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+NAME=eth0
+UUID=26fbfd70-8518-4b0d-a0bc-69669c59622a
+DEVICE=eth0
+ONBOOT=yes
+```
+
+### 重启系统
+- 有的文中写在重启前先禁用网卡：`systemctl disable NetworkManager`，测试时未禁用重启后也能生效
+- reboot
+- 重启后查看网卡名是否生效
+    - `ip a` 查看网卡是否生效
+    - `ping` 测试网络是否正常
+
+```bash
+[lx@rocky8-1 ~]$ ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:54:b6:1a brd ff:ff:ff:ff:ff:ff
+    altname enp3s0
+    altname ens160
+3: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:96:30:10 brd ff:ff:ff:ff:ff:ff
+[lx@rocky8-1 ~]$ 
+[lx@rocky8-1 ~]$ ip addr show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:54:b6:1a brd ff:ff:ff:ff:ff:ff
+    altname enp3s0
+    altname ens160
+    inet 10.0.0.162/24 brd 10.0.0.255 scope global dynamic noprefixroute eth0
+       valid_lft 1592sec preferred_lft 1592sec
+    inet6 fe80::20c:29ff:fe54:b61a/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+[lx@rocky8-1 ~]$ 
+[lx@rocky8-1 ~]$ nmcli connection 
+NAME    UUID                                  TYPE      DEVICE 
+eth0    26fbfd70-8518-4b0d-a0bc-69669c59622a  ethernet  eth0   
+virbr0  9eac4062-fdc2-4208-9aba-f053addb47bc  bridge    virbr0 
+```
+
+```bash
+[lx@rocky8-1 ~]$ ping 10.0.0.111
+PING 10.0.0.111 (10.0.0.111) 56(84) bytes of data.
+64 bytes from 10.0.0.111: icmp_seq=1 ttl=64 time=1.73 ms
+64 bytes from 10.0.0.111: icmp_seq=2 ttl=64 time=1.17 ms
+64 bytes from 10.0.0.111: icmp_seq=3 ttl=64 time=0.700 ms
+```
+
+# 修改网卡 IP 
+- 在 xshell 中使用多个虚拟机时，为了查看方便，将 IP 修改为方便辨认的格式
+- 如 `rocky8.6` 安装多个虚拟机，第二个虚拟机该名字为 `10.0.0.82`
+
+## 修改网卡配置文件
+> [Understanding the Network interface configuration file /etc/sysconfig/network-scripts/ifcfg-eth#](https://www.thegeekdiary.com/understanding-the-network-interface-configuration-file-etc-sysconfig-network-scripts-ifcfg-eth/)
+> [11.2. Interface Configuration Files](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/deployment_guide/s1-networkscripts-interfaces)
+> [Understanding the Network interface configuration file /etc/sysconfig/network-scripts/ifcfg-eth#](https://www.thegeekdiary.com/understanding-the-network-interface-configuration-file-etc-sysconfig-network-scripts-ifcfg-eth/)
+> [Chapter 13. Network Scripts](https://mirror.apps.cam.ac.uk/pub/doc/redhat/redhat7.3/rhl-rg-en-7.3/ch-networkscripts.html)
+> [nm-settings-ifcfg-rh](https://developer-old.gnome.org/NetworkManager/stable/nm-settings-ifcfg-rh.html)
+
+
+### 查看默认网络参数
+- `ip a` 查看 IP 地址，子网掩码，广播地址等
+
+```bash
+[root@rocky8-1 network-scripts]$ ip addr show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:54:b6:1a brd ff:ff:ff:ff:ff:ff
+    altname enp3s0
+    altname ens160
+    inet 10.0.0.162/24 brd 10.0.0.255 scope global dynamic noprefixroute eth0
+       valid_lft 1467sec preferred_lft 1467sec
+    inet6 fe80::20c:29ff:fe54:b61a/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+```
+
+1. 上面 IPv4 地址为 `10.0.0.162`
+2. PREFIX 为 24，即子网掩码为 `255.255.255.0`
+
+- `route -n` 查看默认路由
+
+```bash
+[root@rocky8-1 network-scripts]$ route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         10.0.0.2        0.0.0.0         UG    100    0        0 eth0
+10.0.0.0        0.0.0.0         255.255.255.0   U     100    0        0 eth0
+192.168.122.0   0.0.0.0         255.255.255.0   U     0      0        0 virbr0
+```
+
+1. 上面可看到默认路由为 `10.0.0.2`
+
+- 从虚拟机中查看（这里使用的是 NAT 网络）
+编辑 ---> 虚拟网络编辑器 ---> NAT 设置
+
+![](img/2023-04-22-14-31-57.png)
+
+
+### 修改配置文件的参数
+- BOOTPROTO
+    - 地址配置协议，默认 dhcp
+    - 需要修改为 none
+
+- IPADDR
+    - 指明 IP 地址，默认没有，由 DHCP 自动分配
+    - 如果配置多个 IP，则第二个 IP 用 `IPADDR2`
+
+- PREFIX 
+    - 指定子网掩码位数，和 `NETMASK` 作用相同
+    - 如 24 则子网掩码为 `255.255.255.0`
+
+- GATEWAY
+    - 默认网关
+    - 可用 `route -n` 查看，`Destination` 为 `0.0.0.0` 对应的 `Gateway` 即为默认网关
+
+- IPV4_FAILURE_FATAL
+    - no
+    This interface is not disabled if configuration fails
+    - yes
+    This interface is disabled if IPv4 or IPv6 configuration failes
+
+```bash
+TYPE=Ethernet
+PROXY_METHOD=none
+BROWSER_ONLY=no
+BOOTPROTO=none
+DEFROUTE=yes
+IPADDR=10.0.0.82
+PREFIX=24
+GATEWAY=10.0.0.2
+IPV4_FAILURE_FATAL=no
+IPV6INIT=yes
+IPV6_AUTOCONF=yes
+IPV6_DEFROUTE=yes
+IPV6_FAILURE_FATAL=no
+NAME=eth0
+UUID=26fbfd70-8518-4b0d-a0bc-69669c59622a
+DEVICE=eth0
+ONBOOT=yes
+```
+
+### 让新网卡配置文件生效
+修改网卡配置文件后保存，并不能让配置立刻生效
+
+- `nmcli connection down NAME`
+`NAME` 为网卡配置文件中定义的 `NAME`
+- `nmcli connection reload`
+- `nmmcli connection up NAME`
+
+```bash
+[root@rocky8-1 network-scripts]$ nmcli connection down eth0
+Connection 'eth0' successfully deactivated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/2)
+
+
+[root@rocky8-1 network-scripts]$ nmcli connection 
+NAME    UUID                                  TYPE      DEVICE 
+virbr0  9eac4062-fdc2-4208-9aba-f053addb47bc  bridge    virbr0 
+eth0    26fbfd70-8518-4b0d-a0bc-69669c59622a  ethernet  --     
+
+
+[root@rocky8-1 network-scripts]$ nmcli connection reload 
+
+[root@rocky8-1 network-scripts]$ nmcli connection up eth0
+Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/3)
+```
+
+检查新的 IP 是否生效
+```bash
+[root@rocky8-1 network-scripts]$ nmcli connection 
+NAME    UUID                                  TYPE      DEVICE 
+eth0    26fbfd70-8518-4b0d-a0bc-69669c59622a  ethernet  eth0   
+virbr0  9eac4062-fdc2-4208-9aba-f053addb47bc  bridge    virbr0 
+
+[root@rocky8-1 network-scripts]$ ip addr show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:54:b6:1a brd ff:ff:ff:ff:ff:ff
+    altname enp3s0
+    altname ens160
+    inet 10.0.0.82/24 brd 10.0.0.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::20c:29ff:fe54:b61a/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+```
