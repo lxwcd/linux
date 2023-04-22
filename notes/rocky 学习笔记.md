@@ -252,7 +252,7 @@ virbr0  10ddff8f-58f4-45b8-ab58-a3ebd1caf6c5  bridge    virbr0
 ```
 
 ## 修改网卡命名规则为旧的命名规则
-编辑 `etc/default/grub` 文件，在 `GRUB_CMDLINE_LINUX` 的值中加入 `net.ifnames=0`
+1. 编辑 `etc/default/grub` 文件，在 `GRUB_CMDLINE_LINUX` 的值中加入 `net.ifnames=0`
 
 ```bash
 GRUB_TIMEOUT=5

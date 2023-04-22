@@ -4762,7 +4762,7 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 - 官方网站
 
 
-## RPM 
+## RPM 包管理器
 - 环境：rocky 8.6
 - 最早由 Red Hat 开发的包管理器
 - Package Manager
@@ -4773,11 +4773,12 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 - 通常不同的 distribution 所释出的 RPM 文件不能用在其他的 distributions 上
 
 ![](img/2023-03-21-17-46-43.png)
-### RPM 文件名
+### RPM 包文件命令
 > [Package filename and label](https://en.wikipedia.org/wiki/RPM_Package_Manager#Package_filename_and_label)
 
 
 ![](img/2023-03-21-11-45-30.png)
+
 
 - 版本号后面的 release 第一个数字为相同的版本 rebuilt 的次数，可能是修复一些小 bug 或重设一些编译参数等
 - release 中的 `el` 时 `Red Hat Enterprise Linux` 的缩写，`8.7.0` 是适配 red hat 以及 centos 8.7.0 以上的版本 
@@ -4945,8 +4946,16 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 
 
 
+### Verify 校验文件
+- `man rpm` 搜索 `Verify`
+- 校验功能用于检查文件是否修改过
+- 软件安装包中的文件修改后卸载后会备份
+  
+![](img/2023-03-20-14-29-12.png)
+![](img/2023-03-20-14-30-20.png)
 
-### 查询
+
+
 
 ## SRPM
 - Source RPM，即 RPM 文件里含的未编译的源代码
@@ -4966,7 +4975,26 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 - 为了解决 RPM 属性相依的问题
 - 安装软件时可自动装上需要的依赖
 
-## dpkg
+
+### rocky 配置私有 yum 仓库
+环境：rocky 8.6
+
+- 安装 httpd
+```bash
+sudo yum install -y httpd
+```
+- 开启 httpd 服务
+```bash
+systemctl restart httpd.service
+```
+- 关闭防火墙
+```bash
+sudo systemctl stop firewalld.service
+```
+
+
+
+## dpkg 包管理器
 - Debian 社区开发的包管理器
 - Debian Package
 - 软件包后缀为 .deb
@@ -4992,30 +5020,118 @@ ubuntu 仓库分成 4 种类：
 ![](img/2023-03-21-19-22-16.png) 
 - 软件安装包在 pool 目录中
 
-### Verify 校验文件
-- `man rpm` 搜索 `Verify`
-- 校验功能用于检查文件是否修改过
-- 软件安装包中的文件修改后卸载后会备份
-  
-![](img/2023-03-20-14-29-12.png)
-![](img/2023-03-20-14-30-20.png)
+
+### dpkg-query 查询 dpkg 包
+- `dpkg-query --help | less` 简要查看命令帮助
+- `man dpkg-query`
+
+#### dpkg-query -l 查询已安装的包
+- `dpkg-query -l` 或 `dpkg-query --list` 显示全部已安装的包
+- `dpkg-query -l | less` 搜索安装包
+- `dpkg -l packageName` 查询具体某个安装包的简要说明
+指明具体包名时查询会忽略包的状态？如未安装的包？
+
+```bash
+[root@ubunut22:~]$ dpkg-query -l mysql
+dpkg-query: no packages found matching mysql
+```
+```bash
+[root@ubunut22:~]$ dpkg-query -l mysql*
+Desired=Unknown/Install/Remove/Purge/Hold
+| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
+|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
+||/ Name                  Version                 Architecture Description
++++-=====================-=======================-============-===================================================================
+un  mysql-client-5.7      <none>                  <none>       (no description available)
+ii  mysql-client-8.0      8.0.32-0ubuntu0.22.04.2 amd64        MySQL database client binaries
+un  mysql-client-core-5.7 <none>                  <none>       (no description available)
+ii  mysql-client-core-8.0 8.0.32-0ubuntu0.22.04.2 amd64        MySQL database core client binaries
+ii  mysql-common          5.8+1.0.8               all          MySQL database common files, e.g. /etc/mysql/my.cnf
+un  mysql-common-5.6      <none>                  <none>       (no description available)
+ii  mysql-server          8.0.32-0ubuntu0.22.04.2 all          MySQL database server (metapackage depending on the latest version)
+un  mysql-server-5.5      <none>                  <none>       (no description available)
+un  mysql-server-5.7      <none>                  <none>       (no description available)
+ii  mysql-server-8.0      8.0.32-0ubuntu0.22.04.2 amd64        MySQL database server binaries and system database setup
+un  mysql-server-core-5.7 <none>                  <none>       (no description available)
+ii  mysql-server-core-8.0 8.0.32-0ubuntu0.22.04.2 amd64        MySQL database server binaries
+```
+```bash
+[root@ubunut22:~]$ dpkg-query -l | grep -E "\bmysql"
+ii  mysql-client-8.0                           8.0.32-0ubuntu0.22.04.2                 amd64        MySQL database client binaries
+ii  mysql-client-core-8.0                      8.0.32-0ubuntu0.22.04.2                 amd64        MySQL database core client binaries
+ii  mysql-common                               5.8+1.0.8                               all          MySQL database common files, e.g. /etc/mysql/my.cnf
+ii  mysql-server                               8.0.32-0ubuntu0.22.04.2                 all          MySQL database server (metapackage depending on the latest version)
+ii  mysql-server-8.0                           8.0.32-0ubuntu0.22.04.2                 amd64        MySQL database server binaries and system database setup
+ii  mysql-server-core-8.0                      8.0.32-0ubuntu0.22.04.2                 amd64        MySQL database server binaries
+```
 
 
-## rocky 配置私有 yum 仓库
-环境：rocky 8.6
 
-- 安装 httpd
+#### dpkg-query -s 列出包的状态 
+
+> -s, --status [<package>...]      Display package status details.
+
+
 ```bash
-sudo yum install -y httpd
+[root@ubunut22:~]$ dpkg-query -s mysql-common 
+Package: mysql-common
+Status: install ok installed
+Priority: optional
+Section: database
+Installed-Size: 34
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Architecture: all
+Multi-Arch: foreign
+Source: mysql-defaults (1.0.8)
+Version: 5.8+1.0.8
+Replaces: mariadb-server-5.5, mysql-common-5.6, mysql-server-5.5, percona-xtradb-cluster-common-5.5
+Provides: mysql-common-5.6
+Breaks: mariadb-common (<< 10.0.20-3~)
+Conflicts: mariadb-server-5.5, mysql-common-5.6, mysql-server-5.5, percona-xtradb-cluster-common-5.5
+Conffiles:
+ /etc/mysql/conf.d/mysql.cnf 61e0993270966cc6bc96b46c01ade21f
+ /etc/mysql/conf.d/mysqldump.cnf 20890decb4486ce539753193908fb356
+ /etc/mysql/my.cnf.fallback cfe2bc1819d5e200eca8ca6912f714af
+Description: MySQL database common files, e.g. /etc/mysql/my.cnf
+ MySQL is a fast, stable and true multi-user, multi-threaded SQL database
+ server. SQL (Structured Query Language) is the most popular database query
+ language in the world. The main goals of MySQL are speed, robustness and
+ ease of use.
+ .
+ This package includes files needed by all versions of the client library,
+ e.g. /etc/mysql/my.cnf.
+Original-Maintainer: Debian MySQL Maintainers <pkg-mysql-maint@lists.alioth.debian.org>
 ```
-- 开启 httpd 服务
+
+#### dpkg-query -L 列出包中全部文件
+
+>  -L, --listfiles <package>...     List files 'owned' by package(s).
+
 ```bash
-systemctl restart httpd.service
+[root@ubunut22:~]$ dpkg -L mysql-common 
+/.
+/etc
+/etc/mysql
+/etc/mysql/conf.d
+/etc/mysql/conf.d/mysql.cnf
+/etc/mysql/conf.d/mysqldump.cnf
+/etc/mysql/my.cnf.fallback
+/usr
+/usr/share
+/usr/share/doc
+/usr/share/doc/mysql-common
+/usr/share/doc/mysql-common/changelog.gz
+/usr/share/doc/mysql-common/copyright
+/usr/share/doc/mysql-common/frozen-mode
+/usr/share/doc/mysql-common/frozen-mode/README
+/usr/share/doc/mysql-common/frozen-mode/downgrade
+/usr/share/lintian
+/usr/share/lintian/overrides
+/usr/share/lintian/overrides/mysql-common
+/usr/share/mysql-common
+/usr/share/mysql-common/configure-symlinks
 ```
-- 关闭防火墙
-```bash
-sudo systemctl stop firewalld.service
-```
+
 
 
 
@@ -7002,10 +7118,52 @@ virbr0  25fcd9c2-6677-453b-a64d-366e2622174e  bridge    virbr0
 
 
 
-# 查看启动方式
+# 查看启动方式 BIOS 还是 UEFI
+> [Guide To Check UEFI or BIOS In Windows/Linux System](https://servonode.com/check-uefi-or-bios-in-widows-or-linux)
 
+
+
+## 方法一：查看 /sys/firmware/efi 目录
+
+`/sys/firmware/efi` 目录存在则为 UEFI 启动
+
+- ubuntu20.04 UEFI 启动
+```bash
+[10:17:49 root@ubuntu2004 /sys/firmware]#ls
+acpi  dmi  efi  memmap
+[10:17:50 root@ubuntu2004 /sys/firmware]#
+```
+
+- rocky8.6 BIOS 启动
+```bash
+root@rocky86 ~ $ cd /sys/firmware/
+root@rocky86 firmware $ ls
+acpi  dmi  memmap  qemu_fw_cfg
+```
+
+## 方法二：dmesg
+
+- ubuntu20.04 UEFI 启动
+```bash
+root@ubuntu2004 ~# dmesg | grep efi:
+[    0.000000] efi: EFI v2.60 by HUAWEI
+[    0.000000] efi:  ACPI 2.0=0x8f7fe014  SMBIOS=0x8c4ed000  SMBIOS 3.0=0x8c4eb000  ESRT=0x8c4e9c18  MEMATTR=0x88fd9018  MOKvar=0x88fd7000 
+```
+
+- rocky8.6 BIOS 启动
+```bash
+root@rocky86 firmware $ dmesg | grep efi
+[    0.000000] clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1910969940391419 ns
+[    5.408252] tsc: Refined TSC clocksource calibration: 2918.420 MHz
+root@rocky86 firmware $ 
+root@rocky86 firmware $ dmesg | grep efi:
+```
+
+
+## 方法三：适合虚拟机安装查看
 - VMware ---> 虚拟机 ---> 设置 ---> 选项 ---> 高级
 ![](img/2023-04-02-15-27-03.png)
+
 
 # 添加一块新网卡
 - 环境：虚拟机（VMware） Rocky 8.6
