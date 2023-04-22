@@ -403,6 +403,7 @@ ONBOOT=yes
 ### 重启系统
 - 有的文中写在重启前先禁用网卡：`systemctl disable NetworkManager`，测试时未禁用重启后也能生效
 - reboot
+如果之前禁用网络，重启后用 `systemctl enable --now NetworkManager` 开启网络管理，且需要加上 `--now` 参数让开启自动启动该功能
 - 重启后查看网卡名是否生效
     - `ip a` 查看网卡是否生效
     - `ping` 测试网络是否正常
@@ -575,4 +576,152 @@ virbr0  9eac4062-fdc2-4208-9aba-f053addb47bc  bridge    virbr0
        valid_lft forever preferred_lft forever
     inet6 fe80::20c:29ff:fe54:b61a/64 scope link noprefixroute 
        valid_lft forever preferred_lft forever
+```
+
+
+#### reload, reapply and up 
+> [nmcli](https://developer-old.gnome.org/NetworkManager/unstable/nmcli.html)
+> [difference between nmcli connection reload and nmcli device reapply?](https://askubuntu.com/questions/1463458/difference-between-nmcli-connection-reload-and-nmcli-device-reapply)
+> [RHEL8.x - issue with nmcli con reload](https://access.redhat.com/discussions/6303851)
+
+
+`nmcli connection` 命令中 `reload` `reapply` `up` 三个子命令的区别？
+
+- nmcli connection reload
+> Reload all connection files from disk. NetworkManager does not monitor changes to connection. So you need to use this command in order to tell NetworkManager to re-read the connection profiles from disk when a change was made to them.
+
+
+- nmcli connection reapply
+> Attempt to update device with changes to the currently active connection made since it was last applied.
+
+
+# SSH 服务设置
+
+## 查看系统是否安装 SSH 软件
+- SSH (Secure Shell) 是一种网络协议，用于加密两台计算机之间的通信
+- OpenSSH 为 SSH 的软件实现
+- SSH 的软件架构为 Server-Client 模式
+- OpenSSH 的客户端实现为 ssh
+- OpenSSH 的服务端实现为 sshd
+- rocky8.6 默认安装
+
+- `rpm -q` 查询软件是否安装
+需要写对软件名，不支持通配符查询
+```bash
+[root@rocky8-1 network-scripts]$ rpm -q openssh-server
+openssh-server-8.0p1-17.el8_7.x86_64
+
+[root@rocky8-1 network-scripts]$ rpm -q openssh-clients
+openssh-clients-8.0p1-17.el8_7.x86_64
+```
+
+- `rpm -qa | grep -i "openssh"`
+用 `grep` 在全部已安装的软件中搜索关键字，`-i` 忽略大小写
+
+```bash
+[root@rocky8-1 network-scripts]$ rpm -qa | grep -i "openssh"
+openssh-askpass-8.0p1-17.el8_7.x86_64
+openssh-server-8.0p1-17.el8_7.x86_64
+openssh-clients-8.0p1-17.el8_7.x86_64
+openssh-8.0p1-17.el8_7.x86_64
+```
+
+- `rpm -qi` 可查询软件的具体信息
+
+## 查看配置文件位置
+- `rpm -qc` 查看配置文件位置
+
+```bash
+[root@rocky8-1 network-scripts]$ rpm -qc openssh-server
+/etc/pam.d/sshd
+/etc/ssh/sshd_config
+/etc/sysconfig/sshd
+
+
+[root@rocky8-1 network-scripts]$ rpm -qc openssh-clients
+/etc/ssh/ssh_config
+/etc/ssh/ssh_config.d/05-redhat.conf
+```
+
+## 查看 SSH 服务是否开启
+- `systemctl status sshd`
+- `Active` 项显示 `active(running)` 则表示服务开启
+- 默认监听端口为 `22`
+- 默认监听地址为 `0.0.0.0`
+- `systemctl status sshd` 或者 `ss -tlpn` 均可查看
+
+```bash
+[root@rocky8-1 network-scripts]$ systemctl status sshd
+● sshd.service - OpenSSH server daemon
+   Loaded: loaded (/usr/lib/systemd/system/sshd.service; enabled; vendor preset: ena>
+   Active: active (running) since Sat 2023-04-22 15:28:35 CST; 1h 1min ago
+     Docs: man:sshd(8)
+           man:sshd_config(5)
+ Main PID: 1129 (sshd)
+    Tasks: 1 (limit: 11058)
+   Memory: 1.9M
+   CGroup: /system.slice/sshd.service
+           └─1129 /usr/sbin/sshd -D -oCiphers=aes256-gcm@openssh.com,chacha20-poly13>
+
+Apr 22 15:28:35 rocky8-1 systemd[1]: Starting OpenSSH server daemon...
+Apr 22 15:28:35 rocky8-1 sshd[1129]: Server listening on 0.0.0.0 port 22.
+Apr 22 15:28:35 rocky8-1 sshd[1129]: Server listening on :: port 22.
+Apr 22 15:28:35 rocky8-1 systemd[1]: Started OpenSSH server daemon.
+```
+
+- `ss -tnpl` 也可看到 sshd 服务已开启处于监听状态
+  
+```bash
+[root@rocky8-1 network-scripts]$ ss -tlpn
+State      Recv-Q     Send-Q         Local Address:Port         Peer Address:Port    Process                                                                              
+LISTEN     0          128                  0.0.0.0:111               0.0.0.0:*        users:(("rpcbind",pid=925,fd=4),("systemd",pid=1,fd=322))                           
+LISTEN     0          32             192.168.122.1:53                0.0.0.0:*        users:(("dnsmasq",pid=1910,fd=6))                                                   
+LISTEN     0          128                  0.0.0.0:22                0.0.0.0:*        users:(("sshd",pid=1129,fd=3))                                                      
+LISTEN     0          5                  127.0.0.1:631               0.0.0.0:*        users:(("cupsd",pid=1130,fd=7))                                                     
+LISTEN     0          128                     [::]:111                  [::]:*        users:(("rpcbind",pid=925,fd=6),("systemd",pid=1,fd=324))                           
+LISTEN     0          128                     [::]:22                   [::]:*        users:(("sshd",pid=1129,fd=4))                                                      
+LISTEN     0          5                      [::1]:631                  [::]:*        users:(("cupsd",pid=1130,fd=6)) 
+```
+
+
+### 监听地址 `0.0.0.0` 
+> [How to read NETSTAT -AN resluts](https://sites.google.com/site/xiangyangsite/home/technical-tips/linux-unix/networks-related-commands-on-linux/how-to-read-netstat--an-results)
+> &nbsp;
+> If it says 0.0.0.0 on the Local Address column, it means that port is listening on all 'network interfaces' (i.e. your computer, your modem(s) and your network card(s)).
+  
+- 监听地址 `0.0.0.0` 表示监听本主机上的全部网络接口
+- 如果地址为 `127.0.0.1` 则只针对换回地址
+
+
+> [What's the difference between IP address 0.0.0.0 and 127.0.0.1?](https://serverfault.com/questions/78048/whats-the-difference-between-ip-address-0-0-0-0-and-127-0-0-1)
+
+
+
+## 允许 root 登录和空密码登录
+- 本地 root 默认可以登录，也可以设置空密码
+- 这里的 root 登录是指通过 SSH 协议允许客户端以 root 身份登录，并非本地 root 登录
+- 允许空密码登录也是通过 SSH 协议连接时可以空密码登录
+- 如用 XShell 连接登录时，修改设置后能以 root 身份和空密码登录
+- 通过 `rpm -qc openssh-server` 查询到 sshd 的配置文件位置
+- 编辑 `/etc/ssh/sshd_config` 配置文件
+- `PermitRootLogin` 的值设置为 `yes` 允许 root 登录
+- `PermitEmptyPasswords` 的值设置为 `yes` 允许空密码登录
+
+
+```bash
+[root@rocky8-1 network-scripts]$ rpm -qc openssh-server 
+/etc/pam.d/sshd
+/etc/ssh/sshd_config
+/etc/sysconfig/sshd
+```
+
+```bash
+PermitRootLogin yes
+PermitEmptyPasswords yes
+```
+
+- 修改设置后重启服务
+
+```bash
+[root@rocky8-1 network-scripts]$ systemctl restart sshd.service
 ```
