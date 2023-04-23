@@ -1,9 +1,15 @@
 Rocky 学习
 
-- 环境：Rocky8.6
+- 环境：Rocky8.6 桌面版
+
 
 # 虚拟机安装带图形界面的 Rocky8.6 
 - 环境：VMware 
+
+
+# 虚拟机中使用配置
+
+## 快捷键打开终端
 
 
 # 修改密码
@@ -195,6 +201,10 @@ rocky8-1
 [root@rocky8 ~]$ bash
 [root@rocky8-1 ~]$ exit
 ```
+
+# 修改 bash 编辑模式为 vi-mode
+
+
 
 # 修改网卡名  
 > [NetworkInterfaceNames](https://wiki.debian.org/NetworkInterfaceNames)
@@ -595,6 +605,71 @@ virbr0  9eac4062-fdc2-4208-9aba-f053addb47bc  bridge    virbr0
 > Attempt to update device with changes to the currently active connection made since it was last applied.
 
 
+
+# 关闭防火墙
+- 什么情况需要关闭 firewalld 
+- 虚拟机中学习时做一些操作需要关闭防火墙
+- `systemctl disable` 禁止服务开机启动，`--now` 禁止服务立即生效
+
+
+```bash
+[root@localhost lx]$ systemctl disable --now firewalld.service 
+[root@localhost lx]$ systemctl status firewalld.service 
+● firewalld.service - firewalld - dynamic firewall daemon
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; disabled; vendor prese>
+   Active: inactive (dead) since Sun 2023-04-23 09:45:05 CST; 1s ago
+     Docs: man:firewalld(1)
+  Process: 1029 ExecStart=/usr/sbin/firewalld --nofork --nopid $FIREWALLD_ARGS (code>
+ Main PID: 1029 (code=exited, status=0/SUCCESS)
+
+Apr 23 09:08:56 localhost.localdomain systemd[1]: Starting firewalld - dynamic firew>
+Apr 23 09:08:57 localhost.localdomain systemd[1]: Started firewalld - dynamic firewa>
+Apr 23 09:08:57 localhost.localdomain firewalld[1029]: WARNING: AllowZoneDrifting is>
+Apr 23 09:45:04 localhost.localdomain systemd[1]: Stopping firewalld - dynamic firew>
+Apr 23 09:45:05 localhost.localdomain systemd[1]: firewalld.service: Succeeded.
+Apr 23 09:45:05 localhost.localdomain systemd[1]: Stopped firewalld - dynamic firewa>
+```
+
+# 关闭 SELinux 
+- 什么时候需要关闭？
+- 虚拟机环境学习时暂时关闭
+
+- `man selinux` 查看 selinux 的配置文件
+- 根据提示将 `SELINUX` 的值设置为 `disabled`，即禁用 `SELinux` 安全策略
+
+```bash
+# /etc/selinux/config
+# This file controls the state of SELinux on the system.
+# SELINUX= can take one of these three values:
+#     enforcing - SELinux security policy is enforced.
+#     permissive - SELinux prints warnings instead of enforcing.
+#     disabled - No SELinux policy is loaded.
+#SELINUX=enforcing
+SELINUX=disabled
+# SELINUXTYPE= can take one of these three values:
+#     targeted - Targeted processes are protected,
+#     minimum - Modification of targeted policy. Only selected processes are protected. 
+#     mls - Multi Level Security protection.
+SELINUXTYPE=targeted
+```
+
+- 修改后用 `getenforce` 查看 SELinux 策略，未改变
+```bash
+[root@localhost lx]$ getenforce 
+Enforcing
+```
+
+- 需要重启后生效（帮助文档中有说明）
+
+```bash
+[lx@localhost ~]$ getenforce 
+Disabled
+
+[lx@localhost ~]$ whatis getenforce 
+getenforce (8)       - get the current mode of SELinux
+```
+
+
 # SSH 服务设置
 
 ## 查看系统是否安装 SSH 软件
@@ -724,4 +799,365 @@ PermitEmptyPasswords yes
 
 ```bash
 [root@rocky8-1 network-scripts]$ systemctl restart sshd.service
+```
+
+# 安装 mysql
+
+## 查询 mysql 是否安装
+- `rpm -qa | grep -i "mysql"` 查询是否安装 `mysql` 
+`rpm -qa` 查询全部已安装的包
+
+```bash
+[root@rocky8-2 ~]$ rpm -qa | grep -i "mysql"
+[root@rocky8-2 ~]$ echo $?
+1
+```
+
+- `yum list` 或 `yum search` 可以查找 yum 所管理的全部包，包括未安装的
+
+```bash
+[root@rocky8-2 ~]$ yum list | grep -Ei "^mysql" | tr -s '[[:blank:]]' '\t'
+mysql.x86_64	8.0.30-1.module+el8.6.0+1057+4d6a1721	appstream	
+mysql-common.x86_64	8.0.30-1.module+el8.6.0+1057+4d6a1721	appstream	
+mysql-devel.x86_64	8.0.30-1.module+el8.6.0+1057+4d6a1721	appstream	
+mysql-errmsg.x86_64	8.0.30-1.module+el8.6.0+1057+4d6a1721	appstream	
+mysql-libs.x86_64	8.0.30-1.module+el8.6.0+1057+4d6a1721	appstream	
+mysql-selinux.noarch	1.0.5-1.el8_6	appstream	
+mysql-server.x86_64	8.0.30-1.module+el8.6.0+1057+4d6a1721	appstream	
+mysql-test.x86_64	8.0.30-1.module+el8.6.0+1057+4d6a1721	appstream	
+```
+
+## yum 安装
+
+- 安装 mysql-server
+```bash
+yum install -y mysql-server
+```
+
+- 查看已安装的包，默认将客户端一起安装
+```bash
+[root@localhost lx]$ rpm -qa | grep mysql
+mysql-8.0.30-1.module+el8.6.0+1057+4d6a1721.x86_64
+mysql-common-8.0.30-1.module+el8.6.0+1057+4d6a1721.x86_64
+mysql-server-8.0.30-1.module+el8.6.0+1057+4d6a1721.x86_64
+mysql-errmsg-8.0.30-1.module+el8.6.0+1057+4d6a1721.x86_64
+```
+
+## 查看配置文件
+- 客户端没有配置文件
+```bash
+[root@localhost lx]$ rpm -qc mysql
+```
+
+- 查看服务端配置文件
+```bash
+[root@localhost lx]$ rpm -qc mysql-server
+/etc/logrotate.d/mysqld
+/etc/my.cnf.d/mysql-default-authentication-plugin.cnf
+/etc/my.cnf.d/mysql-server.cnf
+/var/log/mysql/mysqld.log
+```
+
+## 配置文件生效顺序
+- `mysql --help | less` 查看简要帮助说明
+
+```bash
+Default options are read from the following files in the given order:
+/etc/my.cnf /etc/mysql/my.cnf ~/.my.cnf 
+```
+
+### /etc/my.cnf
+
+```bash
+#
+# This group is read both both by the client and the server
+# use it for options that affect everything
+#
+[client-server]
+
+#
+# include all files from the config directory
+#
+!includedir /etc/my.cnf.d
+```
+
+### /etc/my.cnf.d/mysql-server.cnf
+- `/etc/my.cnf` 配置文件中调用 `my.cnf.d` 目录下的全部文件
+
+```bash
+# /etc/my.cnf.d/mysql-server.cnf
+#
+# This group are read by MySQL server.
+# Use it for options that only the server (but not clients) should see
+#
+# For advice on how to change settings please see
+# http://dev.mysql.com/doc/refman/en/server-configuration-defaults.html
+
+# Settings user and group are ignored when systemd is used.
+# If you need to run mysqld under a different user or group,
+# customize your systemd unit file for mysqld according to the
+# instructions in http://fedoraproject.org/wiki/Systemd
+
+[mysqld]
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+log-error=/var/log/mysql/mysqld.log
+pid-file=/run/mysqld/mysqld.pid
+```
+
+### /etc/my.cnf.d/mysql-default-authentication-plugin.cnf
+- `/etc/my.cnf` 配置文件中调用 `my.cnf.d` 目录下的全部文件
+
+```bash
+# /etc/my.cnf.d/mysql-default-authentication-plugin.cnf
+# 
+# MySQL 8.0.4 introduced 'caching_sha2_password' as its default authentication plugin.
+# It is faster and provides better security then the previous default authentication plugin.
+#
+# Until now (09/2018), it does not work with some other software (eg. MariaDB client, MariaDB connectors,  ...)
+#
+# This configuration file changes MySQL default server configuration, so it behaves the same way as in MySQL 5.7.
+#
+# To change the behaviour back to the upstream default, comment out the following lines:
+
+[mysqld]
+default_authentication_plugin=mysql_native_password
+```
+
+
+## 启动 mysql 服务
+- 启动 mysql 服务并设置开机启动
+
+```bash
+systemctl enable --now mysqld.service 
+```
+
+```bash
+[root@localhost ~]$ systemctl status mysqld.service 
+● mysqld.service - MySQL 8.0 database server
+   Loaded: loaded (/usr/lib/systemd/system/mysqld.service; enabled; vendor preset: disabled)
+   Active: active (running) since Sun 2023-04-23 11:02:49 CST; 15min ago
+  Process: 4145 ExecStopPost=/usr/libexec/mysql-wait-stop (code=exited, status=0/SUCCESS)
+  Process: 4324 ExecStartPost=/usr/libexec/mysql-check-upgrade (code=exited, status=0/SUCCESS)
+  Process: 4233 ExecStartPre=/usr/libexec/mysql-prepare-db-dir mysqld.service (code=exited, status=0/SUCCESS)
+  Process: 4208 ExecStartPre=/usr/libexec/mysql-check-socket (code=exited, status=0/SUCCESS)
+ Main PID: 4269 (mysqld)
+   Status: "Server is operational"
+    Tasks: 38 (limit: 11045)
+   Memory: 363.5M
+   CGroup: /system.slice/mysqld.service
+           └─4269 /usr/libexec/mysqld --basedir=/usr
+
+Apr 23 11:02:45 localhost.localdomain systemd[1]: Starting MySQL 8.0 database server...
+Apr 23 11:02:49 localhost.localdomain systemd[1]: Started MySQL 8.0 database server.
+```
+
+- 查看监听状态
+监听端口 `3306`，监听地址为全部("*")
+```bash
+[root@localhost ~]$ ss -tnlp | grep mysql
+LISTEN 0      70                 *:33060            *:*    users:(("mysqld",pid=4269,fd=22))                        
+LISTEN 0      128                *:3306             *:*    users:(("mysqld",pid=4269,fd=24))                        
+```
+
+# 安装 mycli
+- mycli 是基于 python 开发的，用 pip 包管理器
+
+## 升级 python
+
+### 查看是否安装 python 和 pip
+```bash
+[root@localhost ~]$ rpm -qa | grep -Ei "^python" | tail -n5
+python3-requests-ftp-0.3.1-11.el8.noarch
+python3-libsemanage-2.9-9.el8_6.x86_64
+python3-slip-0.6.4-13.el8.noarch
+python3-productmd-1.11-3.el8.noarch
+python3-gobject-base-3.28.3-2.el8.x86_64
+```
+
+```bash
+[root@localhost ~]$ python3 --version
+Python 3.6.8
+```
+
+```bash
+[root@localhost ~]$ rpm -qa | grep pip
+python3-pip-wheel-9.0.3-22.el8.rocky.0.noarch
+python3-pip-9.0.3-22.el8.rocky.0.noarch
+platform-python-pip-9.0.3-22.el8.rocky.0.noarch
+pipewire-libs-0.3.6-1.el8.x86_64
+pipewire-0.3.6-1.el8.x86_64
+libpipeline-1.5.0-2.el8.x86_64
+
+
+[root@localhost ~]$ pip3 --version
+pip 9.0.3 from /usr/lib/python3.6/site-packages (python 3.6)
+```
+
+
+### 查看是否有更新的版本 python 和 pip 版本
+
+```bash
+[root@localhost ~]$ yum list | grep -Ei "^python" | tail -n5 | tr -s "[[:blank:]]" "\t"
+python39-tkinter.x86_64	3.9.13-2.module+el8.7.0+1092+55aa9635	appstream	
+python39-toml.noarch	0.10.1-5.module+el8.4.0+574+843c4898	appstream	
+python39-urllib3.noarch	1.25.10-4.module+el8.5.0+673+10283621	appstream	
+python39-wheel.noarch	1:0.35.1-4.module+el8.5.0+673+10283621	appstream	
+python39-wheel-wheel.noarch	1:0.35.1-4.module+el8.5.0+673+10283621	appstream	
+```
+
+### 升级
+根据 yum 仓库中可用的最新 python 版本安装，会将 python-pip 一起升级
+
+```bash
+[root@localhost ~]$ yum install -y python39
+Last metadata expiration check: 2:08:01 ago on Sun 23 Apr 2023 09:47:27 AM CST.
+Dependencies resolved.
+============================================================================================================================================
+ Package                                Architecture        Version                                            Repository              Size
+============================================================================================================================================
+Installing:
+ python39                               x86_64              3.9.13-2.module+el8.7.0+1092+55aa9635              appstream               32 k
+Installing dependencies:
+ python39-libs                          x86_64              3.9.13-2.module+el8.7.0+1092+55aa9635              appstream              8.2 M
+ python39-pip-wheel                     noarch              20.2.4-7.module+el8.7.0+1064+ad564229              appstream              1.1 M
+ python39-setuptools-wheel              noarch              50.3.2-4.module+el8.5.0+673+10283621               appstream              496 k
+Installing weak dependencies:
+ python39-pip                           noarch              20.2.4-7.module+el8.7.0+1064+ad564229              appstream              1.9 M
+ python39-setuptools                    noarch              50.3.2-4.module+el8.5.0+673+10283621               appstream              870 k
+Enabling module streams:
+ python39                                                   3.9                                                                            
+
+Transaction Summary
+```
+
+### 查看 python 新版本
+软件包的名字为 python39，因此 `rpm -q` 查询时输入 `python39` 才能找到
+```bash
+[root@localhost ~]$ rpm -q python39
+python39-3.9.13-2.module+el8.7.0+1092+55aa9635.x86_64
+```
+
+包版本为 3.9.13，可执行文件为 python3.9，因此用 `python3.9 --version` 查看版本
+```bash
+[root@localhost ~]$ python3 --version
+Python 3.6.8
+[root@localhost ~]$ python39 --version
+bash: python39: command not found...
+Similar command is: 'python3'
+[root@localhost ~]$ 
+[root@localhost ~]$ python3.9 --version
+Python 3.9.13
+```
+
+`rpm -qi python39` 查看包的说明信息
+```bash
+[root@localhost ~]$ rpm -qi python39
+Name        : python39
+Version     : 3.9.13
+Release     : 2.module+el8.7.0+1092+55aa9635
+Architecture: x86_64
+Install Date: Sun 23 Apr 2023 11:55:34 AM CST
+Group       : Unspecified
+Size        : 24848
+License     : Python
+Signature   : RSA/SHA256, Thu 17 Nov 2022 12:03:16 AM CST, Key ID 15af5dac6d745a60
+Source RPM  : python39-3.9.13-2.module+el8.7.0+1092+55aa9635.src.rpm
+Build Date  : Wed 16 Nov 2022 11:46:22 PM CST
+Build Host  : ord1-prod-x86build003.svc.aws.rockylinux.org
+Relocations : (not relocatable)
+Packager    : infrastructure@rockylinux.org
+Vendor      : Rocky
+URL         : https://www.python.org/
+Summary     : Version 3.9 of the Python interpreter
+Description :
+Python 3.9 is an accessible, high-level, dynamically typed, interpreted
+programming language, designed with an emphasis on code readability.
+It includes an extensive standard library, and has a vast ecosystem of
+third-party libraries.
+
+The python39 package provides the "python3.9" executable: the reference
+interpreter for the Python language, version 3.
+The majority of its standard library is provided in the python39-libs package,
+which should be installed automatically along with python39.
+The remaining parts of the Python standard library are broken out into the
+python39-tkinter and python39-test packages, which may need to be installed
+separately.
+
+Documentation for Python is provided in the python39-docs package.
+
+Packages containing additional libraries for Python are generally named with
+the "python39-" prefix.
+
+For the unversioned "python" executable, see manual page "unversioned-python".
+```
+
+```bash
+[root@localhost ~]$ rpm -q python39
+python39-3.9.13-2.module+el8.7.0+1092+55aa9635.x86_64
+
+[root@localhost ~]$ python3.9 --version
+Python 3.9.13
+```
+
+
+### 查看 pip 的新版本
+使用升级后的新版本安装，安装 python39 时看到同时安装了 python-pip，查看该包的信息
+
+```bash
+[root@localhost ~]$ rpm -q python39-pip
+python39-pip-20.2.4-7.module+el8.7.0+1064+ad564229.noarch
+```
+```bash
+[root@localhost ~]$ rpm -qi python39-pip
+Name        : python39-pip
+Version     : 20.2.4
+Release     : 7.module+el8.7.0+1064+ad564229
+Architecture: noarch
+Install Date: Sun 23 Apr 2023 11:55:35 AM CST
+Group       : Unspecified
+Size        : 8430295
+License     : MIT and Python and ASL 2.0 and BSD and ISC and LGPLv2 and MPLv2.0 and (ASL 2.0 or BSD)
+Signature   : RSA/SHA256, Wed 09 Nov 2022 01:54:01 AM CST, Key ID 15af5dac6d745a60
+Source RPM  : python3x-pip-20.2.4-7.module+el8.7.0+1064+ad564229.src.rpm
+Build Date  : Wed 09 Nov 2022 01:12:53 AM CST
+Build Host  : ord1-prod-x86build001.svc.aws.rockylinux.org
+Relocations : (not relocatable)
+Packager    : infrastructure@rockylinux.org
+Vendor      : Rocky
+URL         : https://pip.pypa.io/
+Summary     : A tool for installing and managing Python3 packages
+Description :
+pip is a package management system used to install and manage software packages
+written in Python. Many packages can be found in the Python Package Index
+(PyPI). pip is a recursive acronym that can stand for either "Pip Installs
+Packages" or "Pip Installs Python".
+```
+
+- 查看 `/usr/bin` 中可执行文件的名字 
+```bash
+[root@localhost ~]$ rpm -ql python39-pip | grep "/usr/bin"
+/usr/bin/pip-3
+/usr/bin/pip-3.9
+/usr/bin/pip3
+/usr/bin/pip3.9
+```
+
+## pip 安装 mycli
+
+- 直接安装失败
+```bash
+  WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fad8099e670>: Failed to establish a new connection: [Errno 101] Network is unreachable')': /packages/61/8c/4243cc0820dcb619edb30a997ef0a0697f7a80ef14341544de4dbac0fdc3/mycli-1.26.1-py2.py3-none-any.whl
+```
+
+- 使用国内资源
+> [doubanio](https://pypi.doubanio.com/simple)
+
+```bash
+pip3.9 install mycli -i https://pypi.doubanio.com/simple
+```
+
+```bash
+[root@localhost ~]$ mycli --version
+Version: 1.26.1
 ```
