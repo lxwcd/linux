@@ -10,6 +10,14 @@ Rocky 学习
 # 虚拟机中使用配置
 
 ## 快捷键打开终端
+- `Alt F1` 可显示出输入框，终端等图标
+![](img/2023-04-23-14-12-37.png)
+
+- 输入框中输入 `Keyboard" 添加一个命令 `gnome-terminal`，名字随便起，设置快捷键
+如设置快捷键和 Ubuntu 中相同 `Ctrl Alt T`
+![](img/2023-04-23-14-15-04.png)
+
+## 窗口控制
 
 
 # 修改密码
@@ -350,8 +358,8 @@ done
 ```
 
 - UEFI 启动
-
 未测试该情况，只需要将 grub.cfg 文件的路径修改一下，如 Ubuntu20.04 的路径为
+
 ```bash
 root@ubuntu2004 ~# ls /boot/efi/EFI/
 BOOT  ubuntu
@@ -408,6 +416,81 @@ NAME=eth0
 UUID=26fbfd70-8518-4b0d-a0bc-69669c59622a
 DEVICE=eth0
 ONBOOT=yes
+```
+
+#### 查看配置文件的位置
+
+- rpm 中查找 network 关键字，找到包名 NetworkManager
+```bash
+[root@localhost ~]$ rpm -qa | grep -i "network"
+NetworkManager-1.40.0-6.el8_7.x86_64
+NetworkManager-team-1.40.0-6.el8_7.x86_64
+NetworkManager-wwan-1.40.0-6.el8_7.x86_64
+NetworkManager-wifi-1.40.0-6.el8_7.x86_64
+libvirt-daemon-driver-network-8.0.0-10.4.module+el8.7.0+1181+a332c78d.x86_64
+NetworkManager-adsl-1.40.0-6.el8_7.x86_64
+dracut-network-049-218.git20221019.el8_7.x86_64
+NetworkManager-libnm-1.40.0-6.el8_7.x86_64
+libvirt-daemon-config-network-8.0.0-10.4.module+el8.7.0+1181+a332c78d.x86_64
+NetworkManager-config-server-1.40.0-6.el8_7.noarch
+NetworkManager-bluetooth-1.40.0-6.el8_7.x86_64
+glib-networking-2.56.1-1.1.el8.x86_64
+containernetworking-plugins-1.1.1-3.module+el8.7.0+1154+147ffa21.x86_64
+NetworkManager-tui-1.40.0-6.el8_7.x86_64
+```
+
+```bash
+[root@localhost ~]$ rpm -qi NetworkManager
+Name        : NetworkManager
+Epoch       : 1
+Version     : 1.40.0
+Release     : 6.el8_7
+Architecture: x86_64
+Install Date: Sat 22 Apr 2023 09:29:28 PM CST
+Group       : System Environment/Base
+Size        : 6303352
+License     : GPLv2+ and LGPLv2+
+Signature   : RSA/SHA256, Wed 05 Apr 2023 12:31:12 AM CST, Key ID 15af5dac6d745a60
+Source RPM  : NetworkManager-1.40.0-6.el8_7.src.rpm
+Build Date  : Wed 05 Apr 2023 12:22:52 AM CST
+Build Host  : ord1-prod-x86build003.svc.aws.rockylinux.org
+Relocations : (not relocatable)
+Packager    : infrastructure@rockylinux.org
+Vendor      : Rocky
+URL         : https://networkmanager.dev/
+Summary     : Network connection manager and user applications
+Description :
+NetworkManager is a system service that manages network interfaces and
+connections based on user or automatic configuration. It supports
+Ethernet, Bridge, Bond, VLAN, Team, InfiniBand, Wi-Fi, mobile broadband
+(WWAN), PPPoE and other devices, and supports a variety of different VPN
+services.
+```
+
+- 查询包中的文件
+配置文件在 `etc/` 目录下，因此根据关键字查找
+
+用 `rpm -qc` 找不到该文件，因为配置文件在一个目录中
+```bash
+[root@localhost ~]$ rpm -qc NetworkManager
+/etc/NetworkManager/NetworkManager.conf
+```
+
+查到下面最后一个目录为网卡配置文件所在目录 `/etc/sysconfig/network-scripts`
+```bash
+[root@localhost ~]$ rpm -ql NetworkManager | grep "/etc/"
+/etc/NetworkManager
+/etc/NetworkManager/NetworkManager.conf
+/etc/NetworkManager/VPN
+/etc/NetworkManager/conf.d
+/etc/NetworkManager/dispatcher.d
+/etc/NetworkManager/dispatcher.d/no-wait.d
+/etc/NetworkManager/dispatcher.d/pre-down.d
+/etc/NetworkManager/dispatcher.d/pre-up.d
+/etc/NetworkManager/dnsmasq-shared.d
+/etc/NetworkManager/dnsmasq.d
+/etc/NetworkManager/system-connections
+/etc/sysconfig/network-scripts
 ```
 
 ### 重启系统
@@ -1146,6 +1229,7 @@ Packages" or "Pip Installs Python".
 ## pip 安装 mycli
 
 - 直接安装失败
+
 ```bash
   WARNING: Retrying (Retry(total=3, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('<pip._vendor.urllib3.connection.HTTPSConnection object at 0x7fad8099e670>: Failed to establish a new connection: [Errno 101] Network is unreachable')': /packages/61/8c/4243cc0820dcb619edb30a997ef0a0697f7a80ef14341544de4dbac0fdc3/mycli-1.26.1-py2.py3-none-any.whl
 ```
@@ -1161,3 +1245,4 @@ pip3.9 install mycli -i https://pypi.doubanio.com/simple
 [root@localhost ~]$ mycli --version
 Version: 1.26.1
 ```
+
