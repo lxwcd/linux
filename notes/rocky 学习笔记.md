@@ -17,7 +17,6 @@ Rocky 学习
 如设置快捷键和 Ubuntu 中相同 `Ctrl Alt T`
 ![](img/2023-04-23-14-15-04.png)
 
-## 窗口控制
 
 
 # 修改密码
@@ -161,6 +160,93 @@ PS1="[\u@\h \W]\$ "
 - 注意该变量设置最好在 `~/.bashrc` 中，如果在 `/etc/profile` 中设置，可能被覆盖
 Ubuntu22.04 中 `~/.bashrc` 中会设置 `PS1`，因此覆盖之前的设置
 不同 bash 版本可能有差异，注意脚本调用顺序和规则
+
+
+## 创建自定义脚本使配置文件全局生效
+
+### 两种 shell 脚本执行顺序
+1. intercative login shell
+- xshell 远程登录的用户为此类型
+```bash
+# 有 - 为 login shell
+[root@rocky8-2 profile.d]$ echo $0
+-bash
+
+# 有 i 为 interactive shell
+[root@rocky8-2 profile.d]$ echo $-
+himBHs
+```
+
+- su - 登录的用户为此类型
+```bash
+[root@rocky8-2 profile.d]$ su - lx
+[lx@rocky8-2 ~]$ echo $0
+-bash
+[lx@rocky8-2 ~]$ echo $-
+himBHs
+```
+
+- 执行脚本顺序
+    - /etc/profile
+        - 调用 /etc/profile.d/*.sh 和 /etc/profile.d/sh.local 脚本文件
+        - 调用 /etc/bashrc
+    - ~/.bash_profile
+        - 调用 ~/.bashrc
+            - 调用 /etc/bashrc
+
+
+2. interactive non-login shell
+
+- 虚拟机图形界面登录的用户为此类型
+
+- su 登录的用户，即没有加 `-` 为此类型
+```bash
+[root@rocky8-2 profile.d]$ su lx
+[lx@rocky8-2 profile.d]$ echo $0
+bash
+[lx@rocky8-2 profile.d]$ echo $-
+himBHs
+```
+
+- 执行脚本顺序
+    - ~/.bashrc
+        - 调用 /etc/bashrc
+
+### 创建全局生效的自定义脚本
+
+- 两种 shell 登录最后都会执行 `/etc/bashrc` 脚本
+
+- `/etc/bashrc` 在最后会执行 `/etc/profile.d/*.sh` 
+
+- 在 `/etc/profile.d` 目录创建 `custom.sh` 文件做自定义设置
+```bash
+# custom.sh
+
+# set vi-style line editing interface
+set -o vi
+
+# set PS1 
+PS1="\e[36m[\u@\h \W]\$ \e[0m"
+```
+
+
+/etc/bashrc 中有个 BASHRCSOURCED 变量， . ~/.bashrc 时不会重复执行 /etc/bashrc
+
+```bash
+if [ -z "$BASHRCSOURCED" ]; then
+   BASHRCSOURCED="Y"
+
+```
+
+# 修改 line editing interface 为 vi 风格
+
+默认 shell 行编辑快捷键使用 emacs 风格快捷键，改为 vi 风格
+
+```bash
+[root@rocky8-2 profile.d]$ set -o | grep -Ei "^emacs|^vi"
+emacs          	on
+vi             	off
+```
 
 
 # 修改主机名
