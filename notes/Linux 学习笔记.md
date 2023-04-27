@@ -859,10 +859,60 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 - 重启
 
 
+# 查看日期和时间的格式
+- `man 3 strftime` 可查看日期和时间的格式
+
 # history 历史命令
 > [原来 history 可以这么强大](https://zhuanlan.zhihu.com/p/371739269)
 
 - 历史记录中序号后面有个 `*`
+- 命令行中输入的命令存在缓冲区中，正常退出 shell 后会将缓冲区中的历史记录写入到 `~/.bash_history` 中
+
+## history num 显示最后 num 条历史记录
+- `num` 必须大于零
+
+## history -w 将当前缓冲区的历史记录写入到历史记录文件中
+- `history --help | less` 查看说明
+  
+```bash
+-w        write the current history to the history file
+```
+
+## history -d num 删除缓冲区指定历史记录
+- 删除的是历史缓冲区的记录，不删除历史文件中的记录
+- `num` 为历史记录的编号，第一条删除后，原来的第二条变为第一条
+```bash
+[root@rocky8-2 ~]$ history | head -n5
+    1  tail -n3 ~lx/.bashrc >> ~/.bashrc
+    2  . ~/.bashrc 
+    3  tail -n3 ~lx/.bashrc >> /etc/skel/.bashrc 
+    4  passwd -d root
+    5  passwd -d lx
+[root@rocky8-2 ~]$ history -d 1
+[root@rocky8-2 ~]$ history | head -n5
+    1  . ~/.bashrc 
+    2  tail -n3 ~lx/.bashrc >> /etc/skel/.bashrc 
+    3  passwd -d root
+    4  passwd -d lx
+    5  clear
+```
+- 查看 `~/.bash_history` 文件，仍可看到第一条记录
+```bash
+tail -n3 ~lx/.bashrc >> ~/.bashrc
+. ~/.bashrc
+tail -n3 ~lx/.bashrc >> /etc/skel/.bashrc
+passwd -d root
+passwd -d lx
+clear
+```
+
+## history -c 清除历史缓冲区全部内容
+```bash
+-c        clear the history list by deleting all of the entries
+```
+
+## CTRL-r 搜索历史命令
+- CTRL-g 取消搜索
 
 
 ## 执行最后一次的历史命令
@@ -879,10 +929,24 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 
 ## 执行过去的某个历史命令
 - 输入 `history` 显示过去的历史命令，前面有个序号，输入 `!`再输入序号，即可执行该条历史记录
-
 - `!-n` 执行倒数第 n 个历史命令
+- `!!` 重复执行上条命令
 
-![](img/2023-03-06-11-08-16.png)
+```bash
+[root@rocky8-2 ~]$ history 5
+  373  history -w
+  374  history | head -n5
+  375  history 
+  376  clear
+  377  history 5
+[root@rocky8-2 ~]$ !374
+history | head -n5
+    1  tail -n3 ~lx/.bashrc >> ~/.bashrc
+    2  . ~/.bashrc 
+    3  tail -n3 ~lx/.bashrc >> /etc/skel/.bashrc 
+    4  passwd -d root
+    5  passwd -d lx
+```
 
 ## 查找最近历史记录
 - `!string` 后面输入命令的开头几个字符，可以执行满足条件的命令
@@ -895,28 +959,25 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 - 当前用户的历史记录默认保存在 `~/.bash_history` 文件中，可在该文件中搜索
 
 
-## history -n 显示最近的几条历史记录
-- 相当于 `history | tail -n` 
-
-![](img/2023-03-06-11-45-25.png)
-
-
-## 删除历史记录
-### history -c 清楚全部的历史记录
-
-### history -d 删除指定序号的历史记录
-
-![](img/2023-03-06-11-56-25.png)
-
-## 不让命令显示在历史记录中
-- 输入命令前输一个空格，该记录不在历史记录中（ubuntu 22.04 测试）
-
-
 ## 指定历史记录的格式和保存数目
 ### HISTTIMEFORMAT 指定历史记录的格式
+> [HISTTIMEFORMAT](https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html#index-HISTTIMEFORMAT)
+
 - `man bash` 后搜索 `HISTTIMEFORMAT` 可查看该变量的说明
 - `man 3 strftime` 可查看日期和时间的格式
-- 可指定该变量的格式写入到 `/etc/profile` 中，或者只设置当前用户的历史记录格式写到 `~/.bashrc` 文件中，如 `export HISTTIMEFORMAT="%F %T `whoami` "`
+- 初始该变量没有值，用 `set` 查看也没该变量，缓冲区中历史记录格式用默认格式
+```bash
+[root@rocky8-3 ~]# echo $HISTTIMEFORMAT
+
+[root@rocky8-3 ~]# set | grep -i HISTTIMEFORMAT
+[root@rocky8-3 ~]# 
+```
+- 可指定该变量的格式写入到 `/etc/profile.d/custom.sh` 中，或者只设置当前用户的历史记录格式写到 `~/.bashrc` 文件中，如 `export HISTTIMEFORMAT="%F %T `whoami` "`
+```bash
+export HISTTIMEFORMAT="[%F %T $(whoami)] "
+```
+- 怎么让历史记录显示颜色？
+
 
 ![](img/2023-03-06-12-20-00.png)
 ![](img/2023-03-06-12-26-18.png)
@@ -1522,7 +1583,9 @@ Ubuntu 22.04.1 测试两者区别，adduser 会交互式让输入密码，默认
 ![1](https://img-blog.csdnimg.cn/d2c8eec1c01d4ad39369836e0ba7b4e1.png)
 
 ### -u 修改用户 UID
-`-u` 选项修改 UID，和添加用户时使用规则相同，注意范围，以及修改的 UID 不能和已存在的相同，如果添加相同的 UID，需要加上 `-o` 选项。![1](https://img-blog.csdnimg.cn/e425dca499f542eb9be0e39a7262120a.png)
+`-u` 选项修改 UID，和添加用户时使用规则相同，注意范围，以及修改的 UID 不能和已存在的相同，如果添加相同的 UID，需要加上 `-o` 选项。
+
+![1](https://img-blog.csdnimg.cn/e425dca499f542eb9be0e39a7262120a.png)
 
 
 ### -l 修改用户登录名
@@ -2690,6 +2753,7 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 - 符号链接和源文件的权限不同
 - 修改源文件的权限，不影响符号链接的权限
 - 符号链接文件是一种新的文件类型，`ll` 可看见文件类型为 `l`，与源文件是两个文件
+- 如果创建符号链接失败，查看符号链接时源文件的路径处闪，创建时使用绝对路径创建
 
 
 ![1](https://img-blog.csdnimg.cn/e2aebcc33ee94bd591b585bafd8b43ff.png)
@@ -2769,7 +2833,18 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 
 ## ls 仅列出隐藏文件
 
-![](img/2023-04-07-11-08-37.png)
+```bash
+[lx@rocky8-2 ~]$ ls -A | grep -E "^[.].+$"
+.bash_history
+.bash_logout
+.bash_profile
+.bashrc
+.cache
+.config
+.esd_auth
+.ICEauthority
+.local
+```
 
 ## ls -d 仅列出目录，而不列出目录的内容
 

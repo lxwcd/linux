@@ -162,9 +162,9 @@ Ubuntu22.04 中 `~/.bashrc` 中会设置 `PS1`，因此覆盖之前的设置
 不同 bash 版本可能有差异，注意脚本调用顺序和规则
 
 
-## 创建自定义脚本使配置文件全局生效
+# 创建自定义脚本使配置文件全局生效
 
-### 两种 shell 脚本执行顺序
+## 两种 shell 脚本执行顺序
 1. intercative login shell
 - xshell 远程登录的用户为此类型
 ```bash
@@ -212,7 +212,7 @@ himBHs
     - ~/.bashrc
         - 调用 /etc/bashrc
 
-### 创建全局生效的自定义脚本
+## 创建全局生效的自定义脚本
 
 - 两种 shell 登录最后都会执行 `/etc/bashrc` 脚本
 
@@ -229,14 +229,25 @@ set -o vi
 PS1="\e[36m[\u@\h \W]\$ \e[0m"
 ```
 
+**注意**：
+`/etc/bashrc` 中通过定义 `BASHRCSOURCED` 变量防止该配置文件重复执行
+1. interactive login shell 登录
+如果使 login shell 登录，通过 /etc/profile 脚本通过 `.` 执行，该执行方式在当前 shell 环境
+后面执行 ~/.bashrc 时又会执行 /etc/profile 脚本，因此需要防止在当前 shell 环境重复执行
 
-/etc/bashrc 中有个 BASHRCSOURCED 变量， . ~/.bashrc 时不会重复执行 /etc/bashrc
+2. interactive non-login shell 登录
+执行 ~/.bashrc 时通过 `. /etc/bashrc` 方式在当前 shell 中执行一次
+如果再次 `. ~/.bashrc`，不会重复执行 `/etc/bashrc` 文件
 
+执行 `/etc/bashrc` 后可以 `echo $BASHRCSOURCED` 查看变量的值变成 `Y`
 ```bash
 if [ -z "$BASHRCSOURCED" ]; then
    BASHRCSOURCED="Y"
-
 ```
+
+因此，如果已经登录 shell 后再修改 `/etc/profile.d/custom.sh` 脚本，
+不能通过 `. ~/.bashrc` 让自定义脚本生效，因为不会重复执行 `/etc/bashrc`
+需要 `. /etc/profile.d/custom.sh` 使其在当前 shell 生效
 
 # 修改 line editing interface 为 vi 风格
 
@@ -247,6 +258,28 @@ if [ -z "$BASHRCSOURCED" ]; then
 emacs          	on
 vi             	off
 ```
+
+用 `set -o vi` 使其临时生效，或者写到配置文件中全局生效
+
+
+# 修改历史记录的格式
+> [HISTTIMEFORMAT](https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html#index-HISTTIMEFORMAT)
+
+- `man bash` 后搜索 `HISTTIMEFORMAT` 可查看该变量的说明
+- `man 3 strftime` 可查看日期和时间的格式
+- 初始该变量没有值，用 `set` 查看也没该变量，缓冲区中历史记录格式用默认格式
+```bash
+[root@rocky8-3 ~]# echo $HISTTIMEFORMAT
+
+[root@rocky8-3 ~]# set | grep -i HISTTIMEFORMAT
+[root@rocky8-3 ~]# 
+```
+- 可指定该变量的格式写入到 `/etc/profile.d/custom.sh` 中，或者只设置当前用户的历史记录格式写到 `~/.bashrc` 文件中，如 `export HISTTIMEFORMAT="%F %T `whoami` "`
+```bash
+export HISTTIMEFORMAT="[%F %T $(whoami)] "
+```
+
+- 怎么让历史记录显示颜色？
 
 
 # 修改主机名
@@ -296,8 +329,45 @@ rocky8-1
 [root@rocky8-1 ~]$ exit
 ```
 
-# 修改 bash 编辑模式为 vi-mode
+# 创建自定义 vim 配置文件
+- vim 版本为 `version 8.0.1763`
+- vimrc 文件如下
+```bash
+   system vimrc file: "/etc/vimrc"
+     user vimrc file: "$HOME/.vimrc"
+ 2nd user vimrc file: "~/.vim/vimrc"
+      user exrc file: "$HOME/.exrc"
+       defaults file: "$VIMRUNTIME/defaults.vim"
+  fall-back for $VIM: "/etc"
+ f-b for $VIMRUNTIME: "/usr/share/vim/vim80"
+```
 
+- 系统 vimrc 文件为 `/etc/vimrc`，初始执行的文件，后面执行的文件中有相同配置会覆盖此文件的设置
+- 执行完系统 vimrc 配置文件后，加载用户各自的配置文件
+默认没有该文件，为用户创建的自定义配置，有两种路径
+    - `$HOME/.vimrc`
+    - `~/.vim/vimrc`
+- 如果没有自定义的 vimrc 文件，则会执行 `$VIMRUNTIME/defaults.vim`，即使前面在 `/etc/vimrc` 中调用了 `/etc/vim/vimrc.local`，因此如果全局使用 `/etc/vim/vimrc.local` 文件，则需要禁用 `$VIMRUNTIME/defaults.vim` 文件，可以在 `$VIMRUNTIME/defaults.vim` 文件的最上面设置变量 `skip_defaults_vim` 变量，即 `let g:skip_defaults_vim = 1`
+```vim
+" $VIMRUNTIME/defaults.vim
+" prevent $VIMRUNTIME/defaults.vim from being loaded                                                                                      |a
+let g:skip_defaults_vim = 1    
+
+" Bail out if something that ran earlier, e.g. a system wide vimrc, does not                                                              |b
+" want Vim to use these default values.                                                                                                   |a
+if exists('skip_defaults_vim')                                                                                                            |s
+  finish                                                                                                                                  |e
+endif 
+```
+
+- 在 `/etc/vimrc` 文件最后加上下面内容，执行 `/etc/vim/vimrc.local` 文件
+创建 `/etc/vim/vimrc.local` 后文件中，将自定义的配置写入其中，可以让该配置全局生效，即所有用户使用  
+```vim
+" Source a global configuration file if available
+if filereadable("/etc/vim/vimrc.local")
+  source /etc/vim/vimrc.local
+endif
+```
 
 
 # 修改网卡名  
