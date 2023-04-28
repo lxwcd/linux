@@ -1117,6 +1117,20 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 > [Linux命令 dos2unix - 将DOS格式文本文件转换成Unix格式](https://www.w3cschool.cn/linuxc/linuxc-gvjq3lbf.html)
 
 
+
+//FIXME: 环境变量
+# 环境变量
+> [Environment variable](https://en.wikipedia.org/wiki/Environment_variable)
+
+
+- 不区分大小写
+- `env` 查看
+- 什么时候设置？
+- 环境变量的作用域？
+- 环境修改后影响范围？ 
+
+
+
 //LABEL: echo
 # echo
 > [echo command in Linux with Examples](https://www.geeksforgeeks.org/echo-command-in-linux-with-examples/)
@@ -7338,8 +7352,35 @@ root@rocky86 firmware $ dmesg | grep efi:
 
 ************************
 
+//LABEL: 域名
+
+# 解耦（decoupling）
+> [Coupling](https://en.wikipedia.org/wiki/Coupling_(computer_programming))
+> [The Importance Of Decoupling In Software Development](https://cloudcomputingtechnologies.com/the-importance-of-decoupling-in-software-development/)
+
+
+> [Decoupled](https://www.techopedia.com/definition/598/decoupled)
+> &nbsp;
+> In theory, this means that a change can be made to one service without the developer having to worry about how the change will impact other services — as long as the service's application programming interface (API) remains the same.
+
+
+
+
+# 域名作用
+- IP 转换为域名方便记忆
+- 解耦，业务不用依赖具体 IP，即使 IP 地址变化，也不受影响
+
+
 # 域名解析
+
+## 静态文件解析
+> [hosts(file)](https://en.wikipedia.org/wiki/Hosts_(file))
+
+- linux: /etc/hosts
+- windows11: %windir%/system32/drivers/etc/hosts
 - host 文件中列出域名与 IP 对应的关系
+
+## 
 - DNS 服务器解析域名
 
 # hosts 文件
