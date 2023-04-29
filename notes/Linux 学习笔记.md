@@ -6130,6 +6130,9 @@ linux> /bin/kill -9 -15213
 ```
 
 
+
+****************************************
+
 # 观察系统资源
 ## free 观察内存使用
 ```bash
@@ -6300,10 +6303,120 @@ udp6       0      0 :::46208                :::*                                
 udp6       0      0 :::5353                 :::*                                -                   
 ```
 
-
 ## dmesg 分析内核产生的消息
+> [8.1. What is the kernel ring buffer](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/9/html/managing_monitoring_and_updating_the_kernel/getting-started-with-kernel-logging_managing-monitoring-and-updating-the-kernel#what-is-the-kernel-ring-buffer_getting-started-with-kernel-logging)
+
+
 - 需要 root 权限才能查看
 - 系统开机和运行过程中内核产生的信息会记录到一个保护区段，可以通过 `dmesg` 查看
+- print or control the kernel ring buffer
+
+### dmesg 查看内核检测到的网卡信息
+- `ip link` 查看网卡名
+```bash
+[root@rocky8-2 ~]$ ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:5c:56:b0 brd ff:ff:ff:ff:ff:ff
+    altname enp3s0
+    altname ens160
+3: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:cb:9e:93 brd ff:ff:ff:ff:ff:ff
+```
+
+- `dmesg` 查看网卡信息，根据网卡名搜索
+可以看到网卡模块为 `vmxnet3`，是虚拟机上的虚拟网卡
+```bash
+[root@rocky8-2 ~]$ dmesg | grep -in eth0
+1380:[    4.158289] vmxnet3 0000:03:00.0 eth0: NIC Link is Up 10000 Mbps
+1473:[    9.374186] IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+1474:[    9.377756] vmxnet3 0000:03:00.0 eth0: intr type 3, mode 0, 3 vectors allocated
+1475:[    9.379277] vmxnet3 0000:03:00.0 eth0: NIC Link is Up 10000 Mbps
+```
+
+
+## lspci 查看内核检测到的硬件信息
+
+### lspci 查看网卡硬件信息
+- `ip link` 查看网卡名
+```bash
+[root@rocky8-2 ~]$ ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:5c:56:b0 brd ff:ff:ff:ff:ff:ff
+    altname enp3s0
+    altname ens160
+3: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:cb:9e:93 brd ff:ff:ff:ff:ff:ff
+```
+
+- `lspci` 查看网卡信息，根据网卡名搜索
+可以看到网卡模块为 `vmxnet3`，是虚拟机上的虚拟网卡
+```bash
+03:00.0 Ethernet controller: VMware VMXNET3 Ethernet Controller (rev 01)
+```
+
+## lsmod 查看内核中模块的状态
+
+### 查看网卡模块是否已成功加载 
+- 找到网卡模块名
+- 用 `lsmod` 查看
+```bash
+[root@rocky8-2 ~]$ lsmod  | grep -i vmxnet3
+vmxnet3                65536  0
+```
+
+## modinfo 查看内核中模块的信息
+- 找到网卡模块名
+- 用 `modinfo` 查看
+`filename` 中的目录是驱动程序所在位置，`4.18.0-425.19.2.el8_7.x86_64` 为内核版本
+不同内核斑斑使用的驱动程序不同
+```bash
+[root@rocky8-2 ~]$ modinfo vmxnet3
+filename:       /lib/modules/4.18.0-425.19.2.el8_7.x86_64/kernel/drivers/net/vmxnet3/vmxnet3.ko.xz
+version:        1.7.0.0-k
+license:        GPL v2
+description:    VMware vmxnet3 virtual NIC driver
+author:         VMware, Inc.
+rhelversion:    8.7
+srcversion:     31BA0DAC822BE8660B7A98B
+alias:          pci:v000015ADd000007B0sv*sd*bc*sc*i*
+depends:
+intree:         Y
+name:           vmxnet3
+vermagic:       4.18.0-425.19.2.el8_7.x86_64 SMP mod_unload modversions
+sig_id:         PKCS#7
+signer:         Rocky kernel signing key
+sig_key:        31:6B:5A:38:DC:7F:D6:69:81:FF:0E:A0:F3:A0:40:1F:9E:9D:02:27
+sig_hashalgo:   sha256
+signature:      8C:76:B2:7C:61:85:D4:B2:74:AD:F0:B0:F7:F6:58:3C:20:74:AB:2E:
+                6C:E8:C3:36:7B:FC:BE:2C:43:22:AC:EC:70:C1:E0:29:EB:42:6F:C5:
+                AE:B0:98:E4:47:6C:94:46:92:F3:6E:81:92:C6:94:90:57:34:A0:C2:
+                CE:0D:81:7D:07:15:B1:8A:39:45:64:8A:41:10:98:A4:B4:0C:42:AB:
+                D4:7F:24:65:0A:8C:91:96:1D:E9:0E:6D:A2:52:90:62:09:D5:E4:7E:
+                B3:B1:70:95:7A:EA:98:15:CF:88:77:53:0F:DF:CD:89:88:D8:8F:CE:
+                B8:E0:70:C3:11:6C:25:0F:FE:23:F4:52:94:05:E5:C9:20:0A:46:78:
+                71:96:14:78:6E:13:7B:28:DF:8B:30:27:80:45:26:4B:77:39:C7:9B:
+                D0:D1:69:67:08:4D:2B:1E:98:B0:A8:9A:6B:FD:4E:86:E2:73:3A:88:
+                5C:2E:6A:F5:B2:1D:5C:62:F4:28:E2:55:32:F7:1E:86:75:3A:0E:1B:
+                2E:98:AA:39:07:A5:9E:6F:62:AA:02:A5:18:C1:9D:37:42:9C:92:12:
+                0D:F8:F7:91:98:AA:3B:4D:37:3F:27:16:C0:13:6A:CC:A4:11:75:5D:
+                30:E6:68:FF:6D:A4:A8:52:B7:DB:33:81:63:B3:83:39:AF:48:AF:4A:
+                AF:D2:47:17:53:F7:BF:67:E6:E1:F9:51:5E:ED:00:6B:7E:54:61:28:
+                88:2B:DD:F2:E3:3C:CD:07:CE:93:B1:A6:B3:F3:87:50:75:8D:DF:7C:
+                0B:C4:C2:F6:7D:19:E7:F6:7A:FA:A0:47:DB:E5:1D:D6:3A:42:75:38:
+                4A:23:B0:5A:DC:50:5E:AB:45:1F:65:44:15:F2:84:E1:40:85:73:FD:
+                76:11:0E:C3:43:A7:23:EB:A7:26:76:A6:C5:7D:26:13:4F:F1:2A:8B:
+                85:5B:73:67:43:8F:4F:FB:63:27:8D:8C:F4:92:CC:EA:52:41:1B:4C:
+                86:F0:2B:7F
+```
+
+### 查看网卡模块的状态
+
+
+
 
 
 ## vmstat 查看虚拟内存的状态
@@ -6651,7 +6764,7 @@ search localdomain
 ## IP 封包协议相关数据 /etc/protocols
 
 
-
+*****************************************
 
 
 ## 网络相关启动指令
@@ -7383,7 +7496,9 @@ root@rocky86 firmware $ dmesg | grep efi:
 ## 
 - DNS 服务器解析域名
 
-# hosts 文件
+# `/etc/hosts` 文件
+> [How to reload /etc/hosts after editing in Linux?](https://linuxhint.com/reload-edited-etchosts-linux/)
+
 - `/etc/hosts` 
 - 主机中的文本文件，定义域名和 IP 地址的对应关系
 - DNS 解析时最先查看的文件，找到对应 IP 则直接请求 IP 地址，如 ping 命令会找该文件，但有些域名解析工具会忽略该文件
@@ -7396,7 +7511,10 @@ root@rocky86 firmware $ dmesg | grep efi:
 - 管理机构提供该文件的下载地址并定期更新
 - 但目前网络
 
-# /etc/resolve.conf
+# /etc/resolve.conf 查看 DNS 服务器的 IP
+- 如果设置 DHCP 服务，该文件会被自动修改，一般不用手动改
+
+
 
 # DNS 域名系统
 > [DNS Records Explained](https://www.youtube.com/watch?v=HnUDtycXSNE&list=LL&index=1&t=625s&ab_channel=PowerCertAnimatedVideos)
