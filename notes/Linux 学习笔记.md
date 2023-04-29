@@ -7140,6 +7140,284 @@ wlp1s0    IEEE 802.11  ESSID:"LAPTOP-VB238NKA 9364"
   用 `dhclient eth0` 可以让修改后的网卡名以 DHCP 协议获取 IP
 
 
+# 网络排错与查看命令
+## ping 测试两台主机的两点沟通
+- 发送 ICMP 数据包探测两个主机能否通信
+
+```bash
+[root@rocky8-2 ~]$ whatis ping
+ping (8)             - send ICMP ECHO_REQUEST to network hosts
+[root@rocky8-2 ~]$ ping --help
+ping: invalid option -- '-'
+Usage: ping [-aAbBdDfhLnOqrRUvV64] [-c count] [-i interval] [-I interface]
+            [-m mark] [-M pmtudisc_option] [-l preload] [-p pattern] [-Q tos]
+            [-s packetsize] [-S sndbuf] [-t ttl] [-T timestamp_option]
+            [-w deadline] [-W timeout] [hop1 ...] destination
+Usage: ping -6 [-aAbBdDfhLnOqrRUvV] [-c count] [-i interval] [-I interface]
+             [-l preload] [-m mark] [-M pmtudisc_option]
+             [-N nodeinfo_option] [-p pattern] [-Q tclass] [-s packetsize]
+             [-S sndbuf] [-t ttl] [-T timestamp_option] [-w deadline]
+             [-W timeout] destination
+```
+### ping -c NUM 指定执行 ping 的次数
+- count，指定执行次数，不指一直发送，需要 ctrl-c 终止
+- 最前面的 `64 bytes` 表示发送的 ICMP 数据包的大小为 64字节，默认值
+```bash
+[root@rocky8-2 ~]$ ping -c 5 www.baidu.com
+PING www.a.shifen.com (220.181.38.150) 56(84) bytes of data.
+64 bytes from 220.181.38.150 (220.181.38.150): icmp_seq=1 ttl=128 time=4.52 ms
+64 bytes from 220.181.38.150 (220.181.38.150): icmp_seq=2 ttl=128 time=4.44 ms
+64 bytes from 220.181.38.150 (220.181.38.150): icmp_seq=3 ttl=128 time=4.57 ms
+64 bytes from 220.181.38.150 (220.181.38.150): icmp_seq=4 ttl=128 time=3.92 ms
+64 bytes from 220.181.38.150 (220.181.38.150): icmp_seq=5 ttl=128 time=4.02 ms
+
+--- www.a.shifen.com ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4006ms
+rtt min/avg/max/mdev = 3.923/4.293/4.565/0.267 ms
+```
+
+### ping -t 指定 TTL 数值
+- 如果检测主机与本主机不在一个网络，则默认 255
+- 检测主机与本主机在一个网络，则默认 64
+
+```bash
+[root@rocky8-2 ~]$ ping -c5 10.0.0.83
+PING 10.0.0.83 (10.0.0.83) 56(84) bytes of data.
+64 bytes from 10.0.0.83: icmp_seq=1 ttl=64 time=0.498 ms
+64 bytes from 10.0.0.83: icmp_seq=2 ttl=64 time=0.317 ms
+64 bytes from 10.0.0.83: icmp_seq=3 ttl=64 time=0.415 ms
+64 bytes from 10.0.0.83: icmp_seq=4 ttl=64 time=0.748 ms
+64 bytes from 10.0.0.83: icmp_seq=5 ttl=64 time=0.467 ms
+
+--- 10.0.0.83 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 4085ms
+rtt min/avg/max/mdev = 0.317/0.489/0.748/0.143 ms
+```
+
+## ping -s 发送 ICMP 数据包的大小
+- 默认 56 bytes，还要加上 8 字节的 ICMP 头部，总共 64 字节
+- 注意 ICMP 数据包是在 IP 数据包中，还要加上 IP 数据包的包头，至少 20 字节
+
+```bash
+-s packetsize
+  Specifies the number of data bytes to be sent. 
+  The default is 56, which translates into 64 ICMP data bytes 
+  when combined with the 8 bytes of ICMP header data.
+```
+
+### ping -M 检测网络 MTU 数值的大小
+- do 传送 `DF（Don't Fragment）` 标识，禁止分片
+- dont 不传送 `DF` 标识，允许分片
+- 默认以太网 MTU 为 1500
+- 注意 ICMP 数据包是在 IP 数据包中，还要加上 IP 数据包的包头，至少 20 字节
+  ICMP 数据包的包头还有 8 字节
+  实际指定 ICMP 数据包的数据部分大小最大为 1500-20-8=1472
+- 本地网卡的 MTU 也影响检测，以太网接口默认设置 1500
+
+```bash
+[root@rocky8-2 ~]$ ping -c 2 -s 1470 -M do www.baidu.com
+PING www.baidu.com (220.181.38.149) 1470(1498) bytes of data.
+
+--- www.baidu.com ping statistics ---
+2 packets transmitted, 0 received, 100% packet loss, time 1060ms
+
+[root@rocky8-2 ~]$ ping -c 2 -s 1300 -M do www.baidu.com
+PING www.a.shifen.com (220.181.38.150) 1300(1328) bytes of data.
+1308 bytes from 220.181.38.150 (220.181.38.150): icmp_seq=1 ttl=128 time=6.14 ms
+1308 bytes from 220.181.38.150 (220.181.38.150): icmp_seq=2 ttl=128 time=6.75 ms
+
+--- www.a.shifen.com ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+rtt min/avg/max/mdev = 6.137/6.445/6.753/0.308 ms
+```
+
+```bash
+ -M pmtudisc_opt
+           Select Path MTU Discovery strategy.  
+           pmtudisc_option may be either do (prohibit fragmentation, even local one), 
+           want (do PMTU discovery, fragment locally when packet size is large), 
+           or dont (do not set DF flag).
+```
+
+
+
+### ping -W 等待相应的秒数
+- Time to wait for a response, in seconds.
+
+
+## traceroute 检测两主机在网络中的各节点
+- rocky8 默认未安装，需要手动安装 
+
+### -n 不进行域名解析，用 IP
+
+### -U 使用 UDP 的特定端口
+```bash
+Use UDP to particular destination port for tracerouting (instead of increasing the port per each probe). 
+Default port is 53 (dns).
+```
+
+### -I 使用 ICMP 的方式检测
+
+### -T 时使用 TCP 检测
+```bash
+Use TCP SYN for probes
+```
+
+### -w 指定等待响应的最大时间
+- 默认 5 秒
+
+### -p 指定检测的端口号
+```bash
+For UDP tracing, specifies the destination port base traceroute will use 
+(the destination port number will be incremented by each probe).
+
+For ICMP tracing, specifies the initial ICMP sequence value (incremented by each probe too).
+For TCP and others specifies just the (constant) destination port to connect.
+```
+
+### -i 指定发送数据包的接口
+```bash
+Specifies the interface through which traceroute should send packets. 
+By default, the interface is selected according to the routing table.
+```
+
+### -g 指定路由
+
+## 检查本机网络的连接
+- 如果网络服务已启动但无法连接，可以检查网络接口的监听端口是否已启动
+
+
+### netstat
+> [NETSTAT Command Explained](https://www.youtube.com/watch?v=8UZFpCQeXnM&ab_channel=PowerCertAnimatedVideos)
+
+- 比较通用，windows 中也可以使用
+- linux 中可以用 ss 代替，ss 信息更详细，更快
+
+#### -r 列出路由表信息
+- 和 route 相同
+- 加上 `-n` 参数，相当于 `route -n`，不进行域名解析
+
+```bash
+[root@rocky8-2 ~]$ netstat -r
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+default         _gateway        0.0.0.0         UG        0 0          0 eth0
+10.0.0.0        0.0.0.0         255.255.255.0   U         0 0          0 eth0
+192.168.122.0   0.0.0.0         255.255.255.0   U         0 0          0 virbr0
+[root@rocky8-2 ~]$
+[root@rocky8-2 ~]$ netstat -rn
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+0.0.0.0         10.0.0.2        0.0.0.0         UG        0 0          0 eth0
+10.0.0.0        0.0.0.0         255.255.255.0   U         0 0          0 eth0
+192.168.122.0   0.0.0.0         255.255.255.0   U         0 0          0 virbr0
+```
+
+#### -c 设置几秒后自动更新
+- 设置几秒后刷新，即持续检测
+```bash
+ -c, --continuous
+       This will cause netstat to print the selected information every second continuously.
+```
+
+### ss
+> [A Comparison Between ss vs netstat Commands](https://tecadmin.net/comparison-between-ss-vs-netstat-commands/)
+
+- 代替 netstat，比 netstat 更快
+```bash
+[root@rocky8-2 ~]$ time netstat -antp
+
+...
+
+real    0m0.031s
+user    0m0.006s
+sys     0m0.024s
+
+
+[root@rocky8-2 ~]$ time ss -antp
+
+...
+
+real    0m0.026s
+user    0m0.010s
+sys     0m0.016s
+```
+
+
+#### -n 不解析服务名称，用 IP 和 端口号代替
+- `--numeric`
+
+#### -r 解析主机名
+- `--resolve`
+
+#### -a 显示所有数据
+- Display both listening and non-listening (for TCP this means established connections) sockets.
+
+#### -l 尽力出已在监听的连接
+- `--listening`
+
+#### -t 列出 TCP 数据包的连接
+- `--tcp`
+
+#### -u 列出 UDP 数据包的连接
+- `--udp`
+
+#### -p 列出对应的进程
+- `--process`
+
+#### -m 显示连接内存的使用情况
+```bash
+-m, --memory
+  Show socket memory usage. The output format is:
+```
+
+#### -f 指定过滤类型
+- 如只看 IPv4 地址用 `ss -f inet`
+
+```bash
+-f FAMILY, --family=FAMILY
+  Display sockets of type FAMILY.  Currently the following families are supported:
+  unix, inet, inet6, link, netlink, vsock, xdp.
+```
+
+```bash
+[root@rocky8-2 ~]$ ss -ntlp | tr -s '[[:blank:]]' '\t'
+State   Recv-Q  Send-Q  Local   Address:Port    Peer    Address:PortProcess
+LISTEN  0       32      192.168.122.1:53        0.0.0.0:*       users:(("dnsmasq",pid=1934,fd=6))
+LISTEN  0       128     0.0.0.0:22      0.0.0.0:*       users:(("sshd",pid=1016,fd=3))
+LISTEN  0       5       127.0.0.1:631   0.0.0.0:*       users:(("cupsd",pid=1260,fd=7))
+LISTEN  0       128     127.0.0.1:6011  0.0.0.0:*       users:(("sshd",pid=9800,fd=13))
+LISTEN  0       128     0.0.0.0:111     0.0.0.0:*       users:(("rpcbind",pid=918,fd=4),("systemd",pid=1,fd=35))
+LISTEN  0       128     ::      :22     ::      :*      users:(("sshd",pid=1016,fd=4))
+LISTEN  0       5       ::1     :631    ::      :*      users:(("cupsd",pid=1260,fd=6))
+LISTEN  0       128     ::1     :6011   ::      :*      users:(("sshd",pid=9800,fd=12))
+LISTEN  0       70      *:33060 *:*     users:(("mysqld",pid=1336,fd=22))
+LISTEN  0       128     *:3306  *:*     users:(("mysqld",pid=1336,fd=24))
+LISTEN  0       128     ::      :111    ::      :*      users:(("rpcbind",pid=918,fd=6),("systemd",pid=1,fd=37))
+```
+```bash
+[root@rocky8-2 ~]$ ss -ntlp -f inet| tr -s '[[:blank:]]' '\t'
+State   Recv-Q  Send-Q  Local   Address:Port    Peer    Address:PortProcess
+LISTEN  0       32      192.168.122.1:53        0.0.0.0:*       users:(("dnsmasq",pid=1934,fd=6))
+LISTEN  0       128     0.0.0.0:22      0.0.0.0:*       users:(("sshd",pid=1016,fd=3))
+LISTEN  0       5       127.0.0.1:631   0.0.0.0:*       users:(("cupsd",pid=1260,fd=7))
+LISTEN  0       128     127.0.0.1:6011  0.0.0.0:*       users:(("sshd",pid=9800,fd=13))
+LISTEN  0       128     0.0.0.0:111     0.0.0.0:*       users:(("rpcbind",pid=918,fd=4),("systemd",pid=1,fd=35))
+```
+
+#### -A 指定过滤类型
+
+```bash
+-A QUERY, --query=QUERY, --socket=QUERY
+  List of socket tables to dump, separated by commas. 
+  The following identifiers are understood: all, inet, tcp,  udp,  raw,  
+  unix,  packet,  netlink,  unix_dgram, unix_stream, unix_seqpacket, packet_raw, 
+  packet_dgram, dccp, sctp, vsock_stream, vsock_dgram, 
+  xdp Any item in the list may optionally be prefixed by an exclama‐tion mark 
+  (!)  to exclude that socket table from being dumped.
+```
+
+
 
 ******************
 
