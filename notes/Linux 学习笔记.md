@@ -6795,7 +6795,7 @@ ping: www.baidu.com: Temporary failure in name resolution
 Host www.baidu.com not found: 2(SERVFAIL)
 ```
 
-7. 修复域名解析问题
+7. dhclient 修复域名解析问题
 - 查看域名解析配置文件
 ```bash
 [root@ubunut22:~]$ cat /etc/resolv.conf 
@@ -6823,7 +6823,6 @@ nameserver 127.0.0.53
 options edns0 trust-ad
 search .
 ```
-
 - 查看域名解析服务状态
 ```bash
 [root@ubunut22:~]$ resolvectl status 
@@ -6859,6 +6858,286 @@ Current Scopes: none
 4月 29 17:00:02 ubunut22 systemd-resolved[249176]: Using system hostname 'ubunut22'.
 4月 29 17:00:02 ubunut22 systemd[1]: Started Network Name Resolution.
 ```
+
+- ping 域名解析服务器地址可以通信
+```bash
+[root@ubunut22:~]$ ping 127.0.0.53
+PING 127.0.0.53 (127.0.0.53) 56(84) bytes of data.
+64 bytes from 127.0.0.53: icmp_seq=1 ttl=64 time=0.030 ms
+64 bytes from 127.0.0.53: icmp_seq=2 ttl=64 time=0.071 ms
+64 bytes from 127.0.0.53: icmp_seq=3 ttl=64 time=0.028 ms
+^C
+--- 127.0.0.53 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2029ms
+rtt min/avg/max/mdev = 0.028/0.043/0.071/0.019 ms
+```
+
+- dhclient 让网卡以 DHCP 协议获取 IP
+```bash
+[root@ubunut22:~]$ dhclient eth0
+[root@ubunut22:~]$ ping www.baidu.com
+PING www.baidu.com.localdomain (220.181.38.150) 56(84) bytes of data.
+64 bytes from 220.181.38.150: icmp_seq=1 ttl=128 time=5.15 ms
+64 bytes from 220.181.38.150: icmp_seq=2 ttl=128 time=4.12 ms
+^C
+--- www.baidu.com.localdomain ping statistics ---
+2 packets transmitted, 2 received, 0% packet loss, time 1001ms
+rtt min/avg/max/mdev = 4.122/4.637/5.152/0.515 ms
+[root@ubunut22:~]$ 
+[root@ubunut22:~]$ whatis dhclient
+dhclient (8)         - Dynamic Host Configuration Protocol Client
+```
+
+## address 网络层 IP 相关设置
+- `ip link help | less` 查看相关命令帮助
+- `man 8 ip-address` 查看详细帮助
+
+```bash
+[root@ubunut22:~]$ ip address help
+Usage: ip address {add|change|replace} IFADDR dev IFNAME [ LIFETIME ]
+                                                      [ CONFFLAG-LIST ]
+       ip address del IFADDR dev IFNAME [mngtmpaddr]
+       ip address {save|flush} [ dev IFNAME ] [ scope SCOPE-ID ]
+                            [ to PREFIX ] [ FLAG-LIST ] [ label LABEL ] [up]
+       ip address [ show [ dev IFNAME ] [ scope SCOPE-ID ] [ master DEVICE ]
+                         [ type TYPE ] [ to PREFIX ] [ FLAG-LIST ]
+                         [ label LABEL ] [up] [ vrf NAME ] ]
+       ip address {showdump|restore}
+IFADDR := PREFIX | ADDR peer PREFIX
+          [ broadcast ADDR ] [ anycast ADDR ]
+          [ label IFNAME ] [ scope SCOPE-ID ] [ metric METRIC ]
+SCOPE-ID := [ host | link | global | NUMBER ]
+FLAG-LIST := [ FLAG-LIST ] FLAG
+FLAG  := [ permanent | dynamic | secondary | primary |
+           [-]tentative | [-]deprecated | [-]dadfailed | temporary |
+           CONFFLAG-LIST ]
+CONFFLAG-LIST := [ CONFFLAG-LIST ] CONFFLAG
+CONFFLAG  := [ home | nodad | mngtmpaddr | noprefixroute | autojoin ]
+LIFETIME := [ valid_lft LFT ] [ preferred_lft LFT ]
+LFT := forever | SECONDS
+TYPE := { bareudp | bond | bond_slave | bridge | bridge_slave |
+          dummy | erspan | geneve | gre | gretap | ifb |
+          ip6erspan | ip6gre | ip6gretap | ip6tnl |
+          ipip | ipoib | ipvlan | ipvtap |
+          macsec | macvlan | macvtap |
+          netdevsim | nlmon | rmnet | sit | team | team_slave |
+          vcan | veth | vlan | vrf | vti | vxcan | vxlan | wwan |
+          xfrm }
+```
+
+
+
+
+### ip address show 显示全部网络接口的 IP 参数
+```bash
+[root@rocky8-2 ~]$ ip address show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:5c:56:b0 brd ff:ff:ff:ff:ff:ff
+    altname enp3s0
+    altname ens160
+    inet 10.0.0.82/24 brd 10.0.0.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::20c:29ff:fe5c:56b0/64 scope link noprefixroute
+       valid_lft forever preferred_lft forever
+3: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN group default qlen 1000
+    link/ether 52:54:00:cb:9e:93 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.122.1/24 brd 192.168.122.255 scope global virbr0
+       valid_lft forever preferred_lft forever
+```
+
+### ip address add 为一个网卡添加新的网络接口
+- 一个网卡添加新的网络接口，该网络接口设置新的 IP 地址
+- 注意添加多个 IP 最好加上 `label` 
+
+```bash
+ ip address add - add new protocol address.
+       dev IFNAME
+              the name of the device to add the address to.
+
+       local ADDRESS (default)
+              the address of the interface. The format of the address depends on the protocol. It is a dotted quad for IP and a sequence of hexadecimal halfwords separated by
+              colons for IPv6. The ADDRESS may be followed by a slash and a decimal number which encodes the network prefix length.
+
+       peer ADDRESS
+              the address of the remote endpoint for pointopoint interfaces.  Again, the ADDRESS may be followed by a slash and a decimal number, encoding the network prefix
+              length. If a peer address is specified, the local address cannot have a prefix length. The network prefix is associated with the peer rather than with the local
+              address.
+
+       broadcast ADDRESS
+              the broadcast address on the interface.
+
+              It is possible to use the special symbols '+' and '-' instead of the broadcast address. In this case, the broadcast address is derived by setting/resetting the
+              host bits of the interface prefix.
+
+       label LABEL
+              Each address may be tagged with a label string.  In order to preserve compatibility with Linux-2.0 net aliases, this string must coincide with the name of the
+              device or must be prefixed with the device name followed by colon.  The maximum allowed total length of label is 15 characters.
+```
+
+```bash
+[root@rocky8-3 ~]# ip address show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:98:2a:21 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.83/24 brd 10.0.0.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::20c:29ff:fe98:2a21/64 scope link
+       valid_lft forever preferred_lft forever
+```
+
+```bash
+[root@rocky8-3 ~]# ip address add 10.0.0.84/24 dev eth0 label eth0:1
+[root@rocky8-3 ~]#
+[root@rocky8-3 ~]# ip address show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:98:2a:21 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.83/24 brd 10.0.0.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet 10.0.0.84/24 scope global secondary eth0:1
+       valid_lft forever preferred_lft forever
+    inet6 fe80::20c:29ff:fe98:2a21/64 scope link
+       valid_lft forever preferred_lft forever
+```
+
+- 在其他虚拟机上用连接新加的网络接口测试
+在 rocky8-2 的虚拟机上连 rocky8-3，使用新增的 IP 地址
+```bash
+[root@rocky8-2 ~]$ ssh root@10.0.0.84
+The authenticity of host '10.0.0.84 (10.0.0.84)' can't be established.
+ECDSA key fingerprint is SHA256:6CoiK+p6z5XVYJ1JVgjMAmh7pR5WizUCPOG5qqt6Wa8.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.0.0.84' (ECDSA) to the list of known hosts.
+Activate the web console with: systemctl enable --now cockpit.socket
+
+Last login: Sat Apr 29 17:58:37 2023 from 10.0.0.1
+[root@rocky8-3 ~]# hostname -I
+10.0.0.83 10.0.0.84 192.168.122.1
+[root@rocky8-3 ~]#
+[root@rocky8-3 ~]# w
+ 18:10:38 up  2:15,  3 users,  load average: 0.00, 0.01, 0.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+lx       tty2     tty2             16:00    2:15m 35.27s  0.16s /usr/libexec/tracker-miner-fs
+root     pts/1    10.0.0.1         17:58    1:10   0.14s  0.14s -bash
+root     pts/2    10.0.0.82        18:10    0.00s  0.04s  0.01s w
+```
+
+### ip address del 删除网络接口
+```bash
+[root@rocky8-3 ~]# ip address show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:98:2a:21 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.83/24 brd 10.0.0.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet 10.0.0.84/24 scope global secondary eth0:1
+       valid_lft forever preferred_lft forever
+    inet6 fe80::20c:29ff:fe98:2a21/64 scope link
+       valid_lft forever preferred_lft forever
+```
+```bash
+[root@rocky8-3 ~]# ip address del 10.0.0.84/24 dev eth0
+```
+```bash
+[root@rocky8-3 ~]# ip address show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:98:2a:21 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.83/24 brd 10.0.0.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::20c:29ff:fe98:2a21/64 scope link
+       valid_lft forever preferred_lft forever
+```
+
+## ip route 路由相关设置
+- `man 8 ip-route` 查看帮助文档
+- `ip route help` 查看简单帮助
+
+
+
+### ip route show 查看当前路由信息
+- proto 指路由的路由协议，`kernel` 表示由内核判断自动设置
+- scope 指路由的范围 
+  - `SCOPE := [ host | link | global | NUMBER ]`
+  - scope `link` for direct unicast and broadcast routes
+  - scope 为 `link` 表示与本设备有关的直接连接
+
+```bash
+[root@rocky8-3 ~]# ip route show
+default via 10.0.0.2 dev eth0 proto static metric 100
+10.0.0.0/24 dev eth0 proto kernel scope link src 10.0.0.83 metric 100
+192.168.122.0/24 dev virbr0 proto kernel scope link src 192.168.122.1 linkdown
+[root@rocky8-3 ~]#
+[root@rocky8-3 ~]# route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         10.0.0.2        0.0.0.0         UG    100    0        0 eth0
+10.0.0.0        0.0.0.0         255.255.255.0   U     100    0        0 eth0
+192.168.122.0   0.0.0.0         255.255.255.0   U     0      0        0 virbr0
+```
+
+### ip route add 添加路由
+#### 为本机可以直接沟通的网络添加路由
+
+```bash
+
+```
+
+#### 添加可以与外部通信的路由
+
+
+#### 添加默认路由
+
+### ip route del 删除路由
+
+
+# 无线网络操作命令
+## iwlist
+```bash
+[18:44:29 root@ubuntu2004 ~]#iwlist
+Usage: iwlist [interface] scanning [essid NNN] [last]
+              [interface] frequency
+              [interface] channel
+              [interface] bitrate
+              [interface] rate
+              [interface] encryption
+              [interface] keys
+              [interface] power
+              [interface] txpower
+              [interface] retry
+              [interface] ap
+              [interface] accesspoints
+              [interface] peers
+              [interface] event
+              [interface] auth
+              [interface] wpakeys
+              [interface] genie
+              [interface] modulation
+[18:44:32 root@ubuntu2004 ~]#
+```
+
+## iwconfig
+```bash
+[18:44:32 root@ubuntu2004 ~]#iwconfig
+lo        no wireless extensions.
+
+wlp1s0    IEEE 802.11  ESSID:"LAPTOP-VB238NKA 9364"
+          Mode:Managed  Frequency:5.805 GHz  Access Point: 7E:B5:66:5F:41:AA
+          Bit Rate=866.7 Mb/s   Tx-Power=22 dBm
+          Retry short limit:7   RTS thr:off   Fragment thr:off
+          Encryption key:off
+          Power Management:on
+          Link Quality=70/70  Signal level=-38 dBm
+          Rx invalid nwid:0  Rx invalid crypt:0  Rx invalid frag:0
+          Tx excessive retries:1  Invalid misc:35   Missed beacon:0
+```
+
+# DHCP 客户端命令
+## dhclient 
+- 如临时修改网卡名，没有改配置文件时，域名无法解析，
+  用 `dhclient eth0` 可以让修改后的网卡名以 DHCP 协议获取 IP
 
 
 
