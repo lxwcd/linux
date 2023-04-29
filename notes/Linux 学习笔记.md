@@ -6369,6 +6369,8 @@ vmxnet3                65536  0
 ```
 
 ## modinfo 查看内核中模块的信息
+
+### 查看网卡模块的状态
 - 找到网卡模块名
 - 用 `modinfo` 查看
 `filename` 中的目录是驱动程序所在位置，`4.18.0-425.19.2.el8_7.x86_64` 为内核版本
@@ -6413,9 +6415,6 @@ signature:      8C:76:B2:7C:61:85:D4:B2:74:AD:F0:B0:F7:F6:58:3C:20:74:AB:2E:
                 86:F0:2B:7F
 ```
 
-### 查看网卡模块的状态
-
-
 
 
 
@@ -6453,6 +6452,412 @@ procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
 [11:36 lx@ubunut22 ~]$whatis vmstat
 vmstat (8)           - Report virtual memory statistics
 [11:36 lx@ubunut22 ~]$
+```
+
+
+# 查看网卡信息
+
+## ip 
+
+
+
+
+# route 查看操作路由
+```bash
+[root@rocky8-2 init.d]$ route --help
+Usage: route [-nNvee] [-FC] [<AF>]           List kernel routing tables
+       route [-v] [-FC] {add|del|flush} ...  Modify routing table for AF.
+
+       route {-h|--help} [<AF>]              Detailed usage syntax for specified AF.
+       route {-V|--version}                  Display version/author and exit.
+
+        -v, --verbose            be verbose
+        -n, --numeric            don't resolve names
+        -e, --extend             display other/more information
+        -F, --fib                display Forwarding Information Base (default)
+        -C, --cache              display routing cache instead of FIB
+
+  <AF>=Use -4, -6, '-A <af>' or '--<af>'; default: inet
+  List of possible address families (which support routing):
+    inet (DARPA Internet) inet6 (IPv6) ax25 (AMPR AX.25)
+    netrom (AMPR NET/ROM) ipx (Novell IPX) ddp (Appletalk DDP)
+    x25 (CCITT X.25)
+```
+
+## route -n 查看路由状态
+- `-n` 表示不解析名字，直接用 ip 或端口号
+
+```bash
+[root@rocky8-2 init.d]$ route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         10.0.0.2        0.0.0.0         UG    100    0        0 eth0
+10.0.0.0        0.0.0.0         255.255.255.0   U     100    0        0 eth0
+192.168.122.0   0.0.0.0         255.255.255.0   U     0      0        0 virbr0
+[root@rocky8-2 init.d]$
+[root@rocky8-2 init.d]$ route
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+default         _gateway        0.0.0.0         UG    100    0        0 eth0
+10.0.0.0        0.0.0.0         255.255.255.0   U     100    0        0 eth0
+192.168.122.0   0.0.0.0         255.255.255.0   U     0      0        0 virbr0
+```
+
+- Flags 说明
+```bash
+Flags  Possible flags include
+              U (route is up)
+              H (target is a host)
+              G (use gateway)
+              R (reinstate route for dynamic routing)
+              D (dynamically installed by daemon or redirect)
+              M (modified from routing daemon or redirect)
+              A (installed by addrconf)
+              C (cache entry)
+              !  (reject route)
+```
+
+## route add 增加路由
+
+## route del 删除路由
+
+
+# ip 网络参数综合操作
+```bash
+[root@rocky8-2 init.d]$ whatis ip
+ip (7)               - Linux IPv4 protocol implementation
+ip (8)               - show / manipulate routing, network devices, interfaces and tunnels
+```
+
+## 命令格式
+- `OPTIONS` 可选，选项
+- `OBJECT`，表示命令对象
+  - `link` 对象针对物理链路层的操作，如 MTU，MAC等
+  - `address` IP 层的操作
+  - `route` 路由相关设置
+- `COMMAND` 命令 可选
+
+
+```bash
+[root@rocky8-2 init.d]$ ip --help
+Usage: ip [ OPTIONS ] OBJECT { COMMAND | help }
+       ip [ -force ] -batch filename
+where  OBJECT := { address | addrlabel | amt | fou | help | ila | ioam | l2tp |
+                   link | macsec | maddress | monitor | mptcp | mroute | mrule |
+                   neighbor | neighbour | netconf | netns | nexthop | ntable |
+                   ntbl | route | rule | sr | tap | tcpmetrics |
+                   token | tunnel | tuntap | vrf | xfrm }
+       OPTIONS := { -V[ersion] | -s[tatistics] | -d[etails] | -r[esolve] |
+                    -h[uman-readable] | -iec | -j[son] | -p[retty] |
+                    -f[amily] { inet | inet6 | mpls | bridge | link } |
+                    -4 | -6 | -M | -B | -0 |
+                    -l[oops] { maximum-addr-flush-attempts } | -br[ief] |
+                    -o[neline] | -t[imestamp] | -ts[hort] | -b[atch] [filename] |
+                    -rc[vbuf] [size] | -n[etns] name | -N[umeric] | -a[ll] |
+                    -c[olor]}
+```
+
+## link 链路层接口设备相关
+`ip link help | less` 查看相关命令帮助
+### ip -s link show 查看全部网络接口信息
+- `-s` 选项可以显示详细的统计信息
+```bash
+[root@rocky8-2 ~]$ ip -s link show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    RX:  bytes packets errors dropped  missed   mcast
+          5012      32      0       0       0       0
+    TX:  bytes packets errors dropped carrier collsns
+          5012      32      0       0       0       0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:5c:56:b0 brd ff:ff:ff:ff:ff:ff
+    RX:  bytes packets errors dropped  missed   mcast
+        297522    2663      0       0       0     166
+    TX:  bytes packets errors dropped carrier collsns
+        239833    1969      0       0       0       0
+    altname enp3s0
+    altname ens160
+3: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:cb:9e:93 brd ff:ff:ff:ff:ff:ff
+    RX:  bytes packets errors dropped  missed   mcast
+             0       0      0       0       0       0
+    TX:  bytes packets errors dropped carrier collsns
+             0       0      0       0       0       0
+```
+```bash
+[root@rocky8-2 ~]$ ip link show
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:5c:56:b0 brd ff:ff:ff:ff:ff:ff
+    altname enp3s0
+    altname ens160
+3: virbr0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default qlen 1000
+    link/ether 52:54:00:cb:9e:93 brd ff:ff:ff:ff:ff:ff
+```
+
+- `lo` 为 `loopback` 环回测试网络接口
+- `eth0` 为网卡名称
+- `RX` 为网络由启动到目前为止接收的数据包信息
+- `TX` 为网络由启动到目前为止发送的数据包信息
+
+
+### ip link set DEVNAME up 启动网络接口
+- 临时生效
+- DEVNAME 为网络接口设备名，如 eth0
+
+### ip link set DEVNAME down 禁用网络接口
+- 临时生效
+- DEVNAME 为网络接口设备名，如 eth0
+- 如果远程做改操作，则网络接口无法重启，因为网络会断开
+
+### ip link set DEVNAME mtu NUM 设置 MTU 值
+- 临时生效
+- DEVNAME 为网络接口设备名，如 eth0
+- NUM 为 MTU 数值，如 1000
+
+
+### ip link set DEVNAME name 修改网卡名
+- 临时生效
+- DEVNAME 为网络接口设备名，如 eth0
+- 设置前先关闭网络接口
+- 需要 root 权限
+
+1. 初始网卡名为 ens33，网卡 IP 为 10.0.0.151
+```bash
+[lx@ubunut22:~]$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 00:0c:29:c7:51:cb brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+    inet 10.0.0.151/24 brd 10.0.0.255 scope global dynamic noprefixroute ens33
+       valid_lft 1099sec preferred_lft 1099sec
+    inet6 fe80::e2c5:7e1b:9fc5:8ba3/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+```
+2. 禁用网卡
+- 需要 root 权限
+- 禁用后 `ip link` 查看网卡状态没有 `UP`
+```bash
+[lx@ubunut22:~]$ ip link set ens33 down
+RTNETLINK answers: Operation not permitted
+[lx@ubunut22:~]$ su -
+[root@ubunut22:~]$ ip link set ens33 down
+[root@ubunut22:~]$ ip link 
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: ens33: <BROADCAST,MULTICAST> mtu 1500 qdisc fq_codel state DOWN mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:c7:51:cb brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+[root@ubunut22:~]$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: ens33: <BROADCAST,MULTICAST> mtu 1500 qdisc fq_codel state DOWN group default qlen 1000
+    link/ether 00:0c:29:c7:51:cb brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+```
+3. 修改网卡名为 `eth0`
+- 修改完后改网卡无 IP 地址
+```bash
+[root@ubunut22:~]$ ip link set ens33 name eth0
+[root@ubunut22:~]$ 
+[root@ubunut22:~]$ ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST> mtu 1500 qdisc fq_codel state DOWN mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:c7:51:cb brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+    altname ens33
+[root@ubunut22:~]$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST> mtu 1500 qdisc fq_codel state DOWN group default qlen 1000
+    link/ether 00:0c:29:c7:51:cb brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+    altname ens33
+```
+4. 启动网卡
+```bash
+[root@ubunut22:~]$ ip link set eth0 up
+[root@ubunut22:~]$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 00:0c:29:c7:51:cb brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+    altname ens33
+```
+5. 为新网卡名设置 IP 地址
+- 原来的网卡的 IP 地址为 `10.0.0.151`
+- 新的 IP 地址设置为 `10.0.0.21/24`，和原来的 IP 同网段
+- ping 同网段的其他虚拟机可以通信，ping 外部网络失败
+```bash
+[root@ubunut22:~]$ ip address add 10.0.0.21/24 dev eth0
+[root@ubunut22:~]$ ip addr show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 00:0c:29:c7:51:cb brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+    altname ens33
+    inet 10.0.0.21/24 scope global eth0
+       valid_lft forever preferred_lft forever
+[root@ubunut22:~]$ 
+[root@ubunut22:~]$ ping 10.0.0.82
+PING 10.0.0.82 (10.0.0.82) 56(84) bytes of data.
+64 bytes from 10.0.0.82: icmp_seq=1 ttl=64 time=0.901 ms
+64 bytes from 10.0.0.82: icmp_seq=2 ttl=64 time=0.460 ms
+64 bytes from 10.0.0.82: icmp_seq=3 ttl=64 time=0.810 ms
+^C
+--- 10.0.0.82 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2013ms
+rtt min/avg/max/mdev = 0.460/0.723/0.901/0.190 ms
+[root@ubunut22:~]$ ping www.baidu.com
+ping: www.baidu.com: Temporary failure in name resolution
+```
+6. 增加默认网关
+- 无法与外部网络通信，查询路由表发现无默认网关
+```bash
+[root@ubunut22:~]$ route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 eth0
+[root@ubunut22:~]$ 
+```
+
+- 增加默认网关后可以通过 IP 与外部网络通信，但域名无法解析
+1) 增加默认网关
+```bash
+[root@ubunut22:~]$ ip route add default via 10.0.0.2 dev eth0
+[root@ubunut22:~]$ ip route show
+default via 10.0.0.2 dev eth0 
+10.0.0.0/24 dev eth0 proto kernel scope link src 10.0.0.21 
+[root@ubunut22:~]$ 
+[root@ubunut22:~]$ ip a show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 00:0c:29:c7:51:cb brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+    altname ens33
+    inet 10.0.0.21/24 scope global eth0
+       valid_lft forever preferred_lft forever
+[root@ubunut22:~]$ 
+[root@ubunut22:~]$ route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         10.0.0.2        0.0.0.0         UG    0      0        0 eth0
+10.0.0.0        0.0.0.0         255.255.255.0   U     0      0        0 eth0
+```
+
+2) 通过外部网络 IP 地址测试网络是否连通
+先在其他主机查询 IP 地址
+```bash
+[17:04:15 root@ubuntu2004 ~]#host www.baidu.com
+www.baidu.com is an alias for www.a.shifen.com.
+www.a.shifen.com has address 220.181.38.149
+www.a.shifen.com has address 220.181.38.150
+Host www.a.shifen.com not found: 3(NXDOMAIN)
+Host www.a.shifen.com not found: 3(NXDOMAIN)
+```
+
+本机上测试，IP 可以通信，域名无法解析
+```bash
+[root@ubunut22:~]$ ping 220.181.38.150
+PING 220.181.38.150 (220.181.38.150) 56(84) bytes of data.
+64 bytes from 220.181.38.150: icmp_seq=1 ttl=128 time=4.61 ms
+64 bytes from 220.181.38.150: icmp_seq=2 ttl=128 time=4.95 ms
+64 bytes from 220.181.38.150: icmp_seq=3 ttl=128 time=5.41 ms
+^C
+--- 220.181.38.150 ping statistics ---
+3 packets transmitted, 3 received, 0% packet loss, time 2003ms
+rtt min/avg/max/mdev = 4.614/4.992/5.412/0.327 ms
+```
+
+```bash
+[root@ubunut22:~]$ ping www.baidu.com
+ping: www.baidu.com: Temporary failure in name resolution
+[root@ubunut22:~]$ 
+[root@ubunut22:~]$ host www.baidu.com
+Host www.baidu.com not found: 2(SERVFAIL)
+```
+
+7. 修复域名解析问题
+- 查看域名解析配置文件
+```bash
+[root@ubunut22:~]$ cat /etc/resolv.conf 
+# This is /run/systemd/resolve/stub-resolv.conf managed by man:systemd-resolved(8).
+# Do not edit.
+#
+# This file might be symlinked as /etc/resolv.conf. If you're looking at
+# /etc/resolv.conf and seeing this text, you have followed the symlink.
+#
+# This is a dynamic resolv.conf file for connecting local clients to the
+# internal DNS stub resolver of systemd-resolved. This file lists all
+# configured search domains.
+#
+# Run "resolvectl status" to see details about the uplink DNS servers
+# currently in use.
+#
+# Third party programs should typically not access this file directly, but only
+# through the symlink at /etc/resolv.conf. To manage man:resolv.conf(5) in a
+# different way, replace this symlink by a static file or a different symlink.
+#
+# See man:systemd-resolved.service(8) for details about the supported modes of
+# operation for /etc/resolv.conf.
+
+nameserver 127.0.0.53
+options edns0 trust-ad
+search .
+```
+
+- 查看域名解析服务状态
+```bash
+[root@ubunut22:~]$ resolvectl status 
+Global
+       Protocols: -LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+resolv.conf mode: stub
+
+Link 2 (eth0)
+Current Scopes: none
+     Protocols: -DefaultRoute +LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+```
+```bash
+[root@ubunut22:~]$ systemctl status systemd-resolved.service 
+● systemd-resolved.service - Network Name Resolution
+     Loaded: loaded (/lib/systemd/system/systemd-resolved.service; enabled; vendor preset: enabled)
+     Active: active (running) since Sat 2023-04-29 17:00:02 CST; 16min ago
+       Docs: man:systemd-resolved.service(8)
+             man:org.freedesktop.resolve1(5)
+             https://www.freedesktop.org/wiki/Software/systemd/writing-network-configuration-managers
+             https://www.freedesktop.org/wiki/Software/systemd/writing-resolver-clients
+   Main PID: 249176 (systemd-resolve)
+     Status: "Processing requests..."
+      Tasks: 1 (limit: 4573)
+     Memory: 5.6M
+        CPU: 96ms
+     CGroup: /system.slice/systemd-resolved.service
+             └─249176 /lib/systemd/systemd-resolved
+
+4月 29 17:00:01 ubunut22 systemd[1]: Starting Network Name Resolution...
+4月 29 17:00:02 ubunut22 systemd-resolved[249176]: Positive Trust Anchors:
+4月 29 17:00:02 ubunut22 systemd-resolved[249176]: . IN DS 20326 8 2 e06d44b80b8f1d39a95c0b0d7c65d0845>
+4月 29 17:00:02 ubunut22 systemd-resolved[249176]: Negative trust anchors: home.arpa 10.in-addr.arpa 1>
+4月 29 17:00:02 ubunut22 systemd-resolved[249176]: Using system hostname 'ubunut22'.
+4月 29 17:00:02 ubunut22 systemd[1]: Started Network Name Resolution.
 ```
 
 
