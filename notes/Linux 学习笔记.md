@@ -6521,6 +6521,24 @@ Flags  Possible flags include
 
 ## route del 删除路由
 
+## zeroconf route
+> [CentOS / RHEL: Remove Routes 169.254.0.0 / 255.255.0.0 From the System](https://www.cyberciti.biz/faq/fedora-centos-rhel-linux-disable-zeroconf-route-169-254-0-0/)
+
+
+- 在 centos7 上查看路由表时，可以看到一个地址为 `169.254.0.0` 的路由记录
+```bash
+[root@centos7 ~]$ route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         10.0.8.1        0.0.0.0         UG    0      0        0 eth0
+10.0.8.0        0.0.0.0         255.255.252.0   U     0      0        0 eth0
+169.254.0.0     0.0.0.0         255.255.0.0     U     1002   0        0 eth0
+```
+
+- 禁用 zeroconf
+编辑 `/etc/sysconfig/network` 文件，添加 `NOZEROCONF=yes`
+重启网络服务 `systemctl restart NetworkManager.service`，但仍不生效，重启后生效
+
 
 # ip 网络参数综合操作
 ```bash
@@ -7051,6 +7069,15 @@ root     pts/2    10.0.0.82        18:10    0.00s  0.04s  0.01s w
        valid_lft forever preferred_lft forever
 ```
 
+### ip address flush 清除网卡上全部 IP
+- `man ip-address` 查看帮助
+
+```bash
+ip address flush dev eth4 scope global
+    Removes all global IPv4 and IPv6 addresses from device eth4. 
+    Without 'scope global' it would remove all addresses including IPv6 link-local ones.
+```
+
 ## ip route 路由相关设置
 - `man 8 ip-route` 查看帮助文档
 - `ip route help` 查看简单帮助
@@ -7417,9 +7444,142 @@ LISTEN  0       128     0.0.0.0:111     0.0.0.0:*       users:(("rpcbind",pid=91
   (!)  to exclude that socket table from being dumped.
 ```
 
+## 检查主机名与 IP 的对应
+### host
+- 默认使用的 DNS 服务器为 /etc/resolv.conf 文件中定义的服务器
+- 可以用 `server` 选项指定其他的域名服务器
+
+```bash
+[root@rocky8-3 ~]$ whatis host
+host (1)             - DNS lookup utility
+[root@rocky8-3 ~]$
+[root@rocky8-3 ~]$ host --help
+host: illegal option -- -
+Usage: host [-aCdilrTvVw] [-c class] [-N ndots] [-t type] [-W time]
+            [-R number] [-m flag] hostname [server]
+       -a is equivalent to -v -t ANY
+       -c specifies query class for non-IN data
+       -C compares SOA records on authoritative nameservers
+       -d is equivalent to -v
+       -i IP6.INT reverse lookups
+       -l lists all hosts in a domain, using AXFR
+       -m set memory debugging flag (trace|record|usage)
+       -N changes the number of dots allowed before root lookup is done
+       -p specifies the port on the server to query
+       -r disables recursive processing
+       -R specifies number of retries for UDP packets
+       -s a SERVFAIL response should stop query
+       -t specifies the query type
+       -T enables TCP/IP mode
+       -U enables UDP mode
+       -v enables verbose output
+       -V print version number and exit
+       -w specifies to wait forever for a reply
+       -W specifies how long to wait for a reply
+       -4 use IPv4 query transport only
+       -6 use IPv6 query transport only
+```
+
+```bash
+[root@centos7 ~]# host www.github.com
+www.github.com is an alias for github.com.
+github.com has address 20.205.243.166
+github.com mail is handled by 1 aspmx.l.google.com.
+github.com mail is handled by 5 alt1.aspmx.l.google.com.
+github.com mail is handled by 5 alt2.aspmx.l.google.com.
+github.com mail is handled by 10 alt3.aspmx.l.google.com.
+github.com mail is handled by 10 alt4.aspmx.l.google.com.
+```
+
+```bash
+[root@centos7 ~]# host www.github.com 183.60.82.98
+Using domain server:
+Name: 183.60.82.98
+Address: 183.60.82.98#53
+Aliases:
+
+www.github.com is an alias for github.com.
+github.com has address 20.205.243.166
+github.com mail is handled by 1 aspmx.l.google.com.
+github.com mail is handled by 5 alt1.aspmx.l.google.com.
+github.com mail is handled by 5 alt2.aspmx.l.google.com.
+github.com mail is handled by 10 alt3.aspmx.l.google.com.
+github.com mail is handled by 10 alt4.aspmx.l.google.com.
+```
+
+### nslookup
+- 默认使用的 DNS 服务器为 /etc/resolv.conf 文件中定义的服务器
+
+```bash
+[root@rocky8-3 ~]$ nslookup www.github.com
+Server:         10.0.0.2
+Address:        10.0.0.2#53
+
+Non-authoritative answer:
+www.github.com  canonical name = github.com.
+Name:   github.com
+Address: 20.205.243.166
+```
+
+# 文字接口网页浏览
+
+## 文字浏览器 links
+- 需要手动安装
+- 可以用来看 html 的文档，如/usr/share/doc 中的帮助文档
+- 用方向键不太方便
+
+### -dump 将网页内容输出到标准输出
+- 可以重定向到文件中
+
+## 文字接口下载器 wget
+
+```bash
+[root@ubunut22:~]$ whatis wget
+wget (1)             - The non-interactive network downloader.
+```
+
+# 数据包捕获工具
+## tcpdump 文字接口数据包捕获
+
+### -D 显示全部可以捕获数据包的网络接口
+```bash
+[root@rocky8-3 ~]$ tcpdump -D
+1.eth0 [Up, Running]
+2.lo [Up, Running, Loopback]
+3.any (Pseudo-device that captures on all interfaces) [Up, Running]
+4.virbr0 [Up]
+5.bluetooth-monitor (Bluetooth Linux Monitor) [none]
+6.nflog (Linux netfilter log (NFLOG) interface) [none]
+7.nfqueue (Linux netfilter queue (NFQUEUE) interface) [none]
+8.bluetooth0 (Bluetooth adapter number 0) [none]
+9.usbmon0 (Raw USB traffic, all USB buses) [none]
+10.usbmon1 (Raw USB traffic, bus number 1)
+11.usbmon2 (Raw USB traffi- c, bus number 2)
+```
+
+### -c 指定捕获数据包的数量
+- 不指定则持续监听
+
+### -nn 以端口及IP显示而非主机名和服务名
+- Don't convert protocol and port numbers etc. to names either.
 
 
-******************
+
+## wireshark 图形接口数据包捕获
+
+## nc 任意启动 TCP/UDP 数据包端口连接
+
+
+# 网络连接不上原因排查
+> [6.1 无法联机原因分析](http://cn.linux.vbird.org/linux_server/0150detect_network_1.php)
+> [6.2 处理流程](http://cn.linux.vbird.org/linux_server/0150detect_network_2.php)
+
+# 主机监控工具
+
+## MRTG
+
+## logwatch
+
 
 # 端口号
 > [Port (computer networking)](https://en.wikipedia.org/wiki/Port_(computer_networking))
@@ -7519,6 +7679,191 @@ whois++         63/tcp          whoispp
 whois++         63/udp          whoispp
 ```
 
+# 监听（listening）
+> [7.3.1 什么是 port](http://cn.linux.vbird.org/linux_server/0210network-secure_3.php#portlimit_what)
+> &nbsp;
+> 监听（listening）是某个服务程序会一直常驻内存，因此该服务程序启动的 port 会一直存在
+
+
+# 端口查看工具
+
+## netstat 查看本机自己的端口
+
+## ss 查看本机自己的端口
+- netstat 的增强版，前面有介绍
+## nmap 检测网络其他主机
+
+
+# 必须存在的系统服务
+> [7.3.3 埠口与服务的启动/关闭及开机时状态设定](http://cn.linux.vbird.org/linux_server/0210network-secure_3.php#portlimit_start)
+
+
+# IP Alias 一个网卡绑定多个 IP
+> [IP aliasing](https://en.wikipedia.org/wiki/IP_aliasing)
+> [8.1.2 一个网卡绑多个 IP： IP Alias 的测试用途](http://cn.linux.vbird.org/linux_server/0230router_1.php#routing_ip_alias)
+
+
+- 一个物理网卡模拟多个虚拟网络接口，给虚拟网络接口设置 IP 
+
+## ip address add 临时添加 IP 
+- 添加完立即生效，可以用 `ip a` 查看
+- 用其他主机远程连接新的 IP 成功
+
+```bash
+[root@rocky8-2 ~]$ ip addr add 10.0.0.85/24 dev eth0 label eth0:1
+
+[root@rocky8-2 ~]$ ip addr show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:5c:56:b0 brd ff:ff:ff:ff:ff:ff
+    altname enp3s0
+    altname ens160
+    inet 10.0.0.82/24 brd 10.0.0.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet 10.0.0.85/24 scope global secondary eth0:1
+       valid_lft forever preferred_lft forever
+    inet6 fe80::20c:29ff:fe5c:56b0/64 scope link noprefixroute
+       valid_lft forever preferred_lft forever
+```
+
+- 删除该虚拟网络接口
+```bash
+[root@rocky8-2 ~]$ ip addr del 10.0.0.85/24 dev eth0
+[root@rocky8-2 ~]$ ip addr show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:5c:56:b0 brd ff:ff:ff:ff:ff:ff
+    altname enp3s0
+    altname ens160
+    inet 10.0.0.82/24 brd 10.0.0.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::20c:29ff:fe5c:56b0/64 scope link noprefixroute
+       valid_lft forever preferred_lft forever
+```
+
+## 配置文件永久添加
+> 网卡配置文件参数介绍：[nm-settings-ifcfg-rh](https://developer-old.gnome.org/NetworkManager/stable/nm-settings-ifcfg-rh.html)
+
+
+- 如网卡为 `eth0`，则该网卡的第一个虚拟接口为 `eth0:0`
+- 新建虚拟网络接口文件管理配置
+```bash
+[root@rocky8-2 network-scripts]$ cp ifcfg-eth0 ifcfg-eth0:1
+[root@rocky8-2 network-scripts]$ ls
+ifcfg-eth0  ifcfg-eth0:0
+```
+
+- 编辑新的网络接口文件
+修改 DEVICE 为新的名字 `eth0:0`，注意该格式
+```bash
+ TYPE=Ethernet
+  5 PROXY_METHOD=none
+  4 BROWSER_ONLY=no
+  3 BOOTPROTO=none
+  2 DEFROUTE=yes
+  1 DEVICE=eth0:1
+  1 IPADDR=10.0.0.85
+  2 PREFIX=24
+  3 IPV4_FAILURE_FATAL=no
+  4 IPV6INIT=yes
+  5 IPV6_AUTOCONF=yes
+  6 IPV6_DEFROUTE=yes
+  7 IPV6_FAILURE_FATAL=no
+  8 ONBOOT=yes
+```
+
+- 使该网卡配置文件生效
+`nmcli` 看到的只有 `eth0` 这个网卡，`eth0:0` 是 `eth0` 物理网卡上的虚拟接口
+```bash
+[root@rocky8-2 ~]$ nmcli connection reload 
+[root@rocky8-2 ~]$ nmcli connection up eth0
+Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/3)
+[root@rocky8-2 ~]$ nmcli connection 
+NAME    UUID                                  TYPE      DEVICE 
+eth0    abba618f-e345-4e76-92c9-c577966ccf92  ethernet  eth0   
+virbr0  46da25ee-5743-4e6a-a3a3-8a9ebda94088  bridge    virbr0 
+[root@rocky8-2 ~]$ ip addr show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:5c:56:b0 brd ff:ff:ff:ff:ff:ff
+    altname enp3s0
+    altname ens160
+    inet 10.0.0.82/24 brd 10.0.0.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet 10.0.0.85/24 brd 10.0.0.255 scope global secondary noprefixroute eth0:1
+       valid_lft forever preferred_lft forever
+    inet6 fe80::20c:29ff:fe5c:56b0/64 scope link noprefixroute 
+       valid_lft forever preferred_lft forever
+```
+
+- 使虚拟网络接口开机启动
+将启动虚拟网络接口启动的命令写到 `etc/rc.d/rc.local` 文件中
+```bash
+ip link set eth0:0 up
+```
+
+注意：
+1. 虚拟网络接口生效的前提是物理网卡启动生效
+2. 要删除虚拟网络接口可以直接删除 ifcfg 配置文件
+3. 还可以不新建配置文件，直接在一个文件中增加 IP
+```bash
+DEVICE=eth0
+NAME=eth0
+BOOTPROTO=none
+IPADDR=10.0.0.83
+PREFIX=24
+IPADDR1=10.0.0.85 
+PREFIX1=24
+GATEWAY=10.0.0.2
+UUID=5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03
+ONBOOT=yes
+DNS1=10.0.0.2
+```
+```bash
+[root@rocky8-3 network-scripts]$ nmcli connection down eth0
+Connection 'eth0' successfully deactivated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/5)
+[root@rocky8-3 network-scripts]$ nmcli connection reload 
+[root@rocky8-3 network-scripts]$ nmcli connection up eth0
+Connection successfully activated (D-Bus active path: /org/freedesktop/NetworkManager/ActiveConnection/6)
+[root@rocky8-3 network-scripts]$ nmcli connection 
+NAME    UUID                                  TYPE      DEVICE 
+eth0    5fb06bd0-0bb0-7ffb-45f1-d6edd65f3e03  ethernet  eth0   
+virbr0  7170f53d-6dee-4920-b3e0-1866f5705bcd  bridge    virbr0 
+[root@rocky8-3 network-scripts]$ ip addr show eth0
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
+    link/ether 00:0c:29:98:2a:21 brd ff:ff:ff:ff:ff:ff
+    inet 10.0.0.83/24 brd 10.0.0.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet 10.0.0.85/24 brd 10.0.0.255 scope global secondary noprefixroute eth0
+       valid_lft forever preferred_lft forever
+```
+
+# 路由器配置
+## 查看内核是否开启数据包转发
+- `/proc/sys/net/ipv4/ip_forward` 值为 1 表示开启
+```bash
+[root@rocky8-2 ipv4]$ pwd
+/proc/sys/net/ipv4
+[root@rocky8-2 ipv4]$ cat ip_forward
+1
+```
+
+- 修改 ip_forward 的值
+> [Linux IP forwarding – How to Disable/Enable using net.ipv4.ip_forward](https://linuxconfig.org/how-to-turn-on-off-ip-forwarding-in-linux)
+
+- 利用 `sysctl` 命令
+- 直接修改 `/proc/sys/net/ipv4/ip_forward` 的值在重启后失效
+- 应该修改 `/etc/sysctl.conf` 文件 `net.ipv4.if_forward = 1`
+- sysctl -p 使设置生效
+
+## 静态路由配置
+> [8.2.3 静态路由之路由器](http://cn.linux.vbird.org/linux_server/0230router_2.php#route_static)
+
+
+
+## 动态路由配置
+> [8.3 动态路由器架设：quagga (zebra + ripd)](http://cn.linux.vbird.org/linux_server/0230router_3.php)
+
+### 常见动态路由协议
+
+
 
 # 连上 Internet 的必要网络参数
 > [2.5.2 一组可以连上 Internet 的必要网络参数](http://cn.linux.vbird.org/linux_server/0110network_basic_5.php#prepare_con)
@@ -7540,6 +7885,8 @@ whois++         63/udp          whoispp
 > [4.1.3 Linux 网络相关配置文件案](http://cn.linux.vbird.org/linux_server/0130internet_connect_1.php#note_files)
 
 ## 网卡配置文件
+> 网卡配置文件参数介绍：[nm-settings-ifcfg-rh](https://developer-old.gnome.org/NetworkManager/stable/nm-settings-ifcfg-rh.html)
+
 ### rocky8.6
 > [11.2.4 About the /etc/sysconfig/network File](https://docs.oracle.com/en/operating-systems/oracle-linux/6/admin/about-etc-sysconfig.html)
 
