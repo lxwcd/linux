@@ -8934,98 +8934,269 @@ www.boce.com
 
 ****************************
 
-# 网络安全
-
-# 入侵检测系统 IDS
-- Instrusion Detection System
-- 旁路部署
-- 监听设备，类似监控摄像头，只能记录，不能阻止
-- 不影响网络通信，网络流量不经过 IDS
-- 清洗统计，找到入侵和攻击数据，发现后阻止吗？
-
-## 基于主机的 IDS
-
-## 基于网络
-
-# 入侵防御系统 IPS
-- Instrusion Prevention System
-- 串行方式接入系统
-- 发现网络攻击可以采取措施
-
-
-# 防水墙
-- 防止内部信息泄露的安全产品
-- 防止内部人员攻击
-
-
 # 防火墙
-- 隔离功能
-- 串行方式接入系统
-- 所有流入流出的数据都经过防火墙
-- 工作在网络模型的哪层？可能多层都有防火墙？如在核心层只上设防火墙
-
-DMZ 非军事化区
-
-
-## 防火墙的作用
-- 安全
-- 路由器无法安全隔离
+- 定义一些有序的规则，并管理进入到网络内的主机数据包的一种机制
+- 限制某些服务的访问来源
+  如限制 FTP 服务只能在主机内使用，不对 Internet 开放
+  如限制主机仅接受客户端的 WWW 请求，其他服务都关闭
+- 切割出被信任与不被信任的网段
+- 划分出可提供 Internet 的服务与必须受保护的服务
+- 分析出可接受与不可接受的数据包状态
 
 
+## 实现方式分类
+### 硬件防火墙
+- 厂商设计好的主机硬件
+- 硬件防火墙的操作系统主要用来提供数据包的数据过滤机制
+- 去掉不必要的功能，单纯作为防火墙使用
 
-## 分类
-### 保护范围划分
-#### 主机防火墙
-- 防火墙在一个主机中，保护该主机
-All-in-One
+### 软件防火墙
+- 保护系统网络安全的一套软件（或机制）
+- 如 Netfilter 与 TCP Wrapper 
 
 
-#### 网络防火墙
-- 保护一个网络
+## Linux 防火墙管理范围分类
+### 单一主机型
+- 数据包过滤型的 Netfilter
+- 依据服务软件程序作为分析的 TCP Wrapper
 
-##### 封包过滤式网络防火墙
+### 网路型
 > [2.4.4 网络防火墙与 OSI 七层协定](http://cn.linux.vbird.org/linux_server/0110network_basic_4.php#tcpip_transfer_firewall)
 
+- 数据包过滤型的 Netfilter
+- 利用代理服务器（Proxy Server）进行访问
 
-> 封包过滤式网络防火墙可以抵挡一些有问题的封包
-> 过滤特定 IP，端口，或特定的封包信息（SYN/ACK等）
+
+# 防火墙的使用限制
+- 不能有效阻挡病毒或木马程序
+- 不能阻止来自内部的攻击
 
 
-### 实现方式划分
-#### 硬件防火墙
-
-#### 软件防火墙
-
-### 网络协议划分
-
-#### 网络层防火墙
-- 根据包头的协议端口号等过滤
-- 不能过滤实际应用层数据
-- 包含 OSI 模型的下四层，又称包过滤防火墙
-
-53/tcp 53/udp ?
+# 防火墙的一般网路布线
+> [9.1.4 防火墙的一般网络布线示意](http://cn.linux.vbird.org/linux_server/0250simple_firewall_1.php#firewall_topo)
 
 
 
-#### 应用层防火墙
-- 部署在主链路上
-- 包含 OSI 模型 7 层
-- 比网络层防火墙更安全
-- 又称 proxy 代理网关
-- 消耗资源更多，增加防火墙的负载
+# TCP Wrapper（程序管理）
+> [第九章、防火墙与 NAT 服务器](http://cn.linux.vbird.org/linux_server/0250simple_firewall_2.php)
 
-带机量
+- 通过服务器程序的外挂（tcpd）来抵挡数据包的进入
+- 分析谁对某程序访问，然后通过规则分析该服务器程序能让谁连接
+- 主要分析服务器程序来管理，与启动的端口无关，置于程序名有关
+
+
+
+# Proxy（代理服务器）
+> [Proxy server](https://en.wikipedia.org/wiki/Proxy_server)
+
+- 网路服务，代理用户的需求，代服务器取得相关资料
+
+
+# Netfilter 数据包过滤机制
+> [netfilter](https://netfilter.org/documentation/)
+
+
+- 将数据包的头部信息提取处理进行分析
+- 一般处理的为 OSI 七层模型的 2、3、4 层
+- Linux 中使用**内核内建**了 Netfilter 这个机制
+- Netfilter 提供了 iptables 这个**软件**来作为防火墙数据包过滤的命令
+- 因为 Netfilter 是内核内建的功能，因此效率高，适合一般小型环境的设置
+
+
+> [Netfilter](https://en.wikipedia.org/wiki/Netfilter)
+> &nbsp;
+> Netfilter is a framework provided by the Linux kernel that allows various networking-related operations to be implemented in the form of customized handlers. 
+> Netfilter offers various functions and operations for packet filtering, network address translation, and port translation, which provide the functionality required for directing packets through a network and prohibiting packets from reaching sensitive locations within a network.
+> Netfilter represents a set of hooks inside the Linux kernel, allowing specific kernel modules to register callback functions with the kernel's networking stack. 
+> Those functions, usually applied to the traffic in the form of filtering and modification rules, are called for every packet that traverses the respective hook within the networking stack.
+
+- Netfilter Linux 内核提供的一个框架，允许各种网络相关的自定义操作
+- 模块化设计，好的扩展性
+
+
+## Netfilter 的 5 个 hooks
+> [What is meant by the term "hook" in programming?](https://stackoverflow.com/questions/467557/what-is-meant-by-the-term-hook-in-programming)
+> [In-depth understanding of netfilter and iptables](https://www.sobyte.net/post/2022-04/understanding-netfilter-and-iptables/)
+
+- PREROUTING
+- INPUT
+- FORWARD
+- OUTPUT
+- POSROUTING
+
+
+- 5 个勾子函数对用户开放，用户可以通过命令工具 iptables 向其写入规则
+
+
+## 查看内核中 netfilter 相关模块
+```bash
+[root@rocky8-3 ~]$ grep -in netfilter /boot/config-4.18.0-372.9.1.el8.x86_64
+1099:CONFIG_NETFILTER=y
+1100:CONFIG_NETFILTER_ADVANCED=y
+1101:CONFIG_BRIDGE_NETFILTER=m
+1104:# Core Netfilter Configuration
+1106:CONFIG_NETFILTER_INGRESS=y
+1107:CONFIG_NETFILTER_NETLINK=m
+```
+
+# iptables Linux 数据包过滤软件
+- 不同内核版本使用的防火墙软件不同
+- iptables 制定规则的顺序很重要
+- 当前面的规则满足就不会理会后面的规则
+
+- 使用 iptabls 设置防火墙时最好关闭本机的 firewalld 服务，因为两者都是制定防火墙规则，可能冲突
+
+
+## iptables 的表（table）和链（chain）
+> [Linux Firewall Tutorial: IPTables Tables, Chains, Rules Fundamentals](https://www.thegeekstuff.com/2011/01/iptables-fundamentals/)
+> [iptables](https://wiki.archlinux.org/title/iptables)
+> [iptables(8)](https://man.archlinux.org/man/iptables.8)
+
+
+- iptables 这个防火墙软件里有很多表（table）
+- 每个表都定义出自己的默认策略与规则
+- 每个表的用途都不同
+- iptables 由众多表（table）组成，每个表中有多个链（chain），而链（chain）中定义策略（policy）和规则（rule）
+- chain 中默认没有 rule，需要用户自己添加
+- chain 中有默认的 policy，通常为 ACCEPT
+
+- 表的优先级由高到低为：security, raw, mangle, nat, filter
+
+### Filter 表
+- 默认表
+- 与进入本机的数据包有关
+
+内置链：
+- INPUT
+与想进入本机的数据包有关
+- output
+与本机发送出去的数据包有关
+- FORWARD
+与 NAT 表相关
+
+
+### NAT 表
+- 网络地址转换（Network Address Translation）
+
+内置链：
+- PREROUTING
+路由判决前要进行的规则（DNAT/REDIRECT）
+- OUTPUT
+与本机发送出去的数据包有关
+- POSTROUTING
+路由判决后所要进行的规则（SNAT/MASQUERADE）
+
+### Mangle 表
+- 与特殊的数据包的路由标识有关
+- 修改数据标记位
+- This alters QOS bits in the TCP header
+
+内置链：
+- PREROUTING 
+- INPUT 
+- FORWARD 
+- OUTPUT 
+- POSTROUTING 
+
+### Raw 表
+> [iptables](https://wiki.archlinux.org/title/iptables)
+
+- 关闭启用的连接跟踪机制，加快穿越防火墙的速度
+- raw is used only for configuring packets so that they are exempt from connection tracking
+
+内置链：
+- OUTPUT 
+- POSTROUTING 
+
+### Security 表
+- security is used for [Mandatory Access Control](https://wiki.archlinux.org/title/Security#Mandatory_access_control) networking rules 
+- 由 SELinux 实现
+
+
+## 数据包过滤流程
+> [2.4 Traversing Chains](https://wiki.archlinux.org/title/iptables#Traversing_Chains)
+> [9.3.3 iptables 的表格 (table) 与链 (chain)](http://cn.linux.vbird.org/linux_server/0250simple_firewall_3.php#netfilter_chain)
+
+
+## iptables -L -n 查看本机的防火墙规则
+- 注意先关闭 firewalld 服务
+- 虚拟机中关闭了防火墙规则后仍有一些规则存在，是因为 KVM 启动的，可以卸载
+```bash
+sudo yum remove qemu-kvm
+```
+
+> iptables [-t tables] [-L] [-nv]
+
+- 注意不能写 `iptables -Ln`，可以写 `iptables -nL` 或 `iptables -L -n`
+- `-t` 指定查看的表，不写则列出全部表
+- `-n` 表示 `--numeric`，写 IP 地址或端口而非名字
+- `-v` 表示  `--verbose`，列出更详细的信息
+
+
+```bash
+[root@centos7 ~]$ iptables -L -n
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+```
+
+- target 表示进行的操作
+    - ACCEPT 放行
+    - REJECT 拒绝
+    - DROP 丢弃
+- prot 表示使用的协议（protocol）
+    - TCP
+    - UDP
+    - ICMP
+    - all 为全部协议
+- opt 额外选项说明
+- source 规则针对哪个来源 IP 进行限制
+- destination 规则针对哪个目标 IP 进行限制
+
+- 括号中的 policy 表示默认的策略，如果下面规则都没有满足，则用默认策略
+
+## iptables-save 查看完整的防火墙规则
+- `*` 开头的指表
+- `:` 开头的指链
+
+```bash
+[root@centos7 ~]$ iptables-save
+# Generated by iptables-save v1.4.21 on Mon May  1 17:59:32 2023
+*filter
+:INPUT ACCEPT [448025:72150829]
+:FORWARD ACCEPT [0:0]
+:OUTPUT ACCEPT [461626:72661106]
+COMMIT
+# Completed on Mon May  1 17:59:32 2023
+```
+
+## 清除防火墙规则
+
+> iptables [-t tables] [-FXZ]
+
+- `-F[chain]` 或 `--flush` Delete all rules in  chain or all chains
+- `-X[chain]` 或 `--delete-chain` 删除一个用户自定义的链
+- `-Z [chain [rulenum]]` Zero counters in chain or all chains
+
+
+## 定义默认 policy
+> iptables [-t table] -P chain target
+
+- `-t` 指定表，不指定默认 filter
+- `-P` 后面指定链
+- `target` 指定动作
+    - ACCEPT 接受包
+    - DROP 丢弃包，不会让 client 知道为何被丢弃
+
 
 
 *******************************
 
-# Linux 防火墙
-- Linux 内核提供一个默认防火墙
-
-内核配置，内核中的文件
-```bash
-[lx@Rocky8 ~]$ ll /boot/config-4.18.0-372.9.1.el8.x86_64 -rw-r--r--. 1 root root 195983 May 10  2022 /boot/config-4.18.0-372.9.1.el8.x86_64
-```
 
 
 ## 关闭系统默认防火墙策略
