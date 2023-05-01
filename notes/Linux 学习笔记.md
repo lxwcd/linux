@@ -9118,7 +9118,7 @@ www.boce.com
 > [9.3.3 iptables 的表格 (table) 与链 (chain)](http://cn.linux.vbird.org/linux_server/0250simple_firewall_3.php#netfilter_chain)
 
 
-## iptables -L -n 查看本机的防火墙规则
+## iptables -nvL 看本机的防火墙规则
 - 注意先关闭 firewalld 服务
 - 虚拟机中关闭了防火墙规则后仍有一些规则存在，是因为 KVM 启动的，可以卸载
 ```bash
@@ -9127,24 +9127,26 @@ sudo yum remove qemu-kvm
 
 > iptables [-t tables] [-L] [-nv]
 
+- `-L` 或 `--list` 列出链上的全部规则，不指定链则列出全部 
+- `-t` 或 `--table` 指定查看的表，不写则列出全部表
+- `-n` 或 `--numeric`，写 IP 地址或端口而非名字
+- `-v` 或 `--verbose`，列出更详细的信息
 - 注意不能写 `iptables -Ln`，可以写 `iptables -nL` 或 `iptables -L -n`
-- `-t` 指定查看的表，不写则列出全部表
-- `-n` 表示 `--numeric`，写 IP 地址或端口而非名字
-- `-v` 表示  `--verbose`，列出更详细的信息
 
 
 ```bash
-[root@centos7 ~]$ iptables -L -n
-Chain INPUT (policy ACCEPT)
-target     prot opt source               destination
-
-Chain FORWARD (policy ACCEPT)
-target     prot opt source               destination
-
-Chain OUTPUT (policy ACCEPT)
-target     prot opt source               destination
+[root@rocky8-3 ~]$ iptables -t filter vnL INPUT --line-numbers
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 DROP       tcp  --  eth0   *       0.0.0.0/0            0.0.0.0/0            tcp dpt:21
+2        0     0 ACCEPT     all  --  lo     *       0.0.0.0/0            0.0.0.0/0
+3    10089  510K ACCEPT     all  --  eth0   *       10.0.0.0/24          0.0.0.0/0
+4        7   577 REJECT     all  --  *      *       10.0.0.151           0.0.0.0/0            reject-with icmp-port-unreachable
 ```
 
+- num 规则编号
+- pkts 当前规则中，被命中的数据包数量
+- bytes 当前规则中，被命中的总流量大小
 - target 表示进行的操作
     - ACCEPT 放行
     - REJECT 拒绝
@@ -9159,6 +9161,12 @@ target     prot opt source               destination
 - destination 规则针对哪个目标 IP 进行限制
 
 - 括号中的 policy 表示默认的策略，如果下面规则都没有满足，则用默认策略
+
+
+## iptables -S 列出特定链上的所有规则
+- `iptables --list-rules [chain]`  
+- 不指定链则列出全部链的所有规则
+- 显示格式和 `iptables-save` 格式相同
 
 ## iptables-save 查看完整的防火墙规则
 - `*` 开头的指表
@@ -9175,13 +9183,44 @@ COMMIT
 # Completed on Mon May  1 17:59:32 2023
 ```
 
+
+## iptables -nvL --line-numbers 查看规则的编号
+
+
+
 ## 清除防火墙规则
 
-> iptables [-t tables] [-FXZ]
+> iptables [-t tables] [-F|X|Z|D]
 
 - `-F[chain]` 或 `--flush` Delete all rules in  chain or all chains
+清空指定的链，不指定链则清空全部链
+
 - `-X[chain]` 或 `--delete-chain` 删除一个用户自定义的链
+
 - `-Z [chain [rulenum]]` Zero counters in chain or all chains
+iptables 每条规则都有两个计数器：匹配到的报文的个数，以及匹配到的所有报文的大小之和
+即用 `-v` 后看到的 `pkts` 和 `bytes` 两列
+
+- `D` 可以删除某条链上的具体规则
+```bash
+ -D, --delete chain rule-specification
+ -D, --delete chain rulenum
+    Delete one or more rules from the selected chain.  
+    There are two versions of this command: the rule can be specified as a number in the chain 
+    (starting at 1 for the first rule) or a rule to match.
+```
+```bash
+[root@rocky8-3 ~]$ iptables -nvL INPUT --line-numbers
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 DROP       all  --  *      *       10.0.0.151           0.0.0.0/0
+[root@rocky8-3 ~]$
+[root@rocky8-3 ~]$ iptables -t filter -D INPUT 1
+[root@rocky8-3 ~]$
+[root@rocky8-3 ~]$ iptables -nvL INPUT --line-numbers
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+```
 
 
 ## 定义默认 policy
@@ -9192,6 +9231,208 @@ COMMIT
 - `target` 指定动作
     - ACCEPT 接受包
     - DROP 丢弃包，不会让 client 知道为何被丢弃
+
+## 制定规则
+- 规则要添加到链上，而链在表中，表不指定时默认为 filter
+- 添加在自定义链上的规则不会自动生效
+
+> iptables [-t table][-A|I|R chain] [-i|o interface-name] [-p protocol] 
+> [-s 源IP地址/网络] [-d 目标IP地址/网络] -j target
+
+
+### -A 在最后追加规则
+- 规则的顺序很重要
+
+- 如将 10.0.0.151 的数据包全部丢弃
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -A INPUT -s 10.0.0.151 -j DROP
+
+[root@rocky8-3 ~]$ iptables -S
+-P INPUT ACCEPT
+-P FORWARD ACCEPT
+-P OUTPUT ACCEPT
+-A INPUT -s 10.0.0.151/32 -j DROP
+
+[root@rocky8-3 ~]$ iptables -nvL INPUT --line-numbers
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 DROP       all  --  *      *       10.0.0.151           0.0.0.0/0
+```
+
+### -I 插入规则
+
+- 默认插入到第一条规则前
+- 可以指定编号，插入到该编号前
+
+```bash
+-I, --insert chain [rulenum] rule-specification
+    Insert  one or more rules in the selected chain as the given rule number.  
+    So, if the rule number is 1, the rule or rules are inserted at the head of the chain.
+    This is also the default if no rule number is specified.
+```
+
+插入一条规则，进入 lo 接口的数据包都接受
+- `0.0.0.0/0` 表示所有网络
+- 如主机有两张网卡，网卡 `eth1` 为信任设备，则可以将下面 `lo` 改为 `eth1` 让该网卡的数据进出都不受限制
+
+```bash
+[root@rocky8-3 ~]$ ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:98:2a:21 brd ff:ff:ff:ff:ff:ff
+[root@rocky8-3 ~]$
+[root@rocky8-3 ~]$ iptables -t filter -I INPUT 1 -i lo -j ACCEPT
+[root@rocky8-3 ~]$
+[root@rocky8-3 ~]$ iptables -nvL INPUT --line-numbers
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 ACCEPT     all  --  lo     *       0.0.0.0/0            0.0.0.0/0
+2        7   577 REJECT     all  --  *      *       10.0.0.151           0.0.0.0/0            reject-with icmp-port-unreachable
+```
+
+
+
+### -R 替换规则
+- 可以指定则编号，替换该编号对应的规则
+
+
+### -i|o 指定进出的网络接口
+- 可以使用通配符 `+`
+- 注意只能用在特定的链上
+- `-i` 只能在 PREROUTING, INPUT, FORWARD 用于数据流入的链上
+- `-o` 只能在 OUTPUT, FORWARD, POSTROUTING 用于数据流出的链上
+
+```bash
+[!] -i, --in-interface name
+    Name of an interface via which a packet was received 
+    (only for packets entering the INPUT, FORWARD and PREROUTING chains).  
+    When the "!" argument is used before the  interface  name, the sense is inverted.  
+    If the interface name ends in a "+", then any interface which begins with this name will match.  
+    If this option is omitted, any interface name will match.
+
+[!] -o, --out-interface name
+    Name of an interface via which a packet is going to be sent 
+    (for packets entering the FORWARD, OUTPUT and POSTROUTING chains).  
+    When the "!"  argument  is  used before  the  interface  name,  the  sense is inverted.  
+    If the interface name ends in a "+", then any interface which begins with this name will match.  
+    If this option is omitted, any interface name will match.
+```
+
+让一个网段的从 `eth1` 进入的数据包都能进入
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -I INPUT 2 -i eth0 -s 10.0.0.0/24 -j ACCEPT
+[root@rocky8-3 ~]$
+[root@rocky8-3 ~]$ iptables -nvL INPUT --line-numbers
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 ACCEPT     all  --  lo     *       0.0.0.0/0            0.0.0.0/0
+2      107  5960 ACCEPT     all  --  eth0   *       10.0.0.0/24          0.0.0.0/0
+3        7   577 REJECT     all  --  *      *       10.0.0.151           0.0.0.0/0            reject-with icmp-port-unreachable
+```
+
+
+### -p 指定协议
+- ` [!] -p, --protocol protocol`
+- 常用协议有 tcp, udp, icmp
+- 可以用 `all` 表示全部协议
+- 可以指明数字
+- 前面加 `!` 表示排除该协议
+- 可以从 `/etc/protocols` 文件中查看全部协议
+- 可以通过 `--sport` 或 `--dport` 指定端口号，可以是连续的端口号，如 `22:25`
+- 指定端口号必须先指定协议 tcp 或 udp
+- 如果协议为 tcp，还可以指定SYN标识，即 `--syn`，来筛选主动连到本机的连接 
+
+```bash
+    # /etc/protocols:
+  1 # $Id: protocols,v 1.12 2016/07/08 12:27 ovasik Exp $
+  2 #
+  3 # Internet (IP) protocols
+  4 #
+  5 #   from: @(#)protocols 5.1 (Berkeley) 4/17/89
+  6 #
+  7 # Updated for NetBSD based on RFC 1340, Assigned Numbers (July 1992).
+  8 # Last IANA update included dated 2011-05-03
+  9 #
+ 10 # See also http://www.iana.org/assignments/protocol-numbers
+ 11
+ 12 ip  0   IP      # internet protocol, pseudo protocol number
+ 13 hopopt  0   HOPOPT      # hop-by-hop options for ipv6
+ 14 icmp    1   ICMP        # internet control message protocol
+ 15 igmp    2   IGMP        # internet group management protocol
+ 16 ggp 3   GGP     # gateway-gateway protocol
+```
+
+
+将从网络接口 `eht1` 的端口 21 数据包阻挡
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -I INPUT 1 -i eth0 -p tcp --dport 21 -j DROP
+[root@rocky8-3 ~]$
+[root@rocky8-3 ~]$ iptables -t filter vnL INPUT --line-numbers
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 DROP       tcp  --  eth0   *       0.0.0.0/0            0.0.0.0/0            tcp dpt:21
+2        0     0 ACCEPT     all  --  lo     *       0.0.0.0/0            0.0.0.0/0
+3    10089  510K ACCEPT     all  --  eth0   *       10.0.0.0/24          0.0.0.0/0
+4        7   577 REJECT     all  --  *      *       10.0.0.151           0.0.0.0/0            reject-with icmp-port-unreachable
+```
+
+
+### -s|d 来源|目的 IP/网络
+- 指定的 IP 地址可以为多个不连续的地址，用 `,` 分隔
+- 可以指定网段，IP 地址后加 `/mask`
+- 不指定则表示不受限制
+- `-d` 表示连接本机的 ip，如一个网卡设置多个 ip，可以拒绝客户端访问某个 ip
+
+```bash
+ [!] -s, --source address[/mask][,...]
+    Source specification. 
+    Address can be either a network name, a hostname, a network IP address (with /mask), or a plain IP address.  
+    Hostnames  will  be  resolved once  only,  before  the  rule  is submitted to the kernel.  
+    Please note that specifying any name to be resolved with a remote query such as DNS is a really bad idea. 
+    The mask can be either an ipv4 network mask (for iptables) or a plain number, 
+    specifying the number of 1's at the left side of the network  mask.   
+    Thus, an  iptables mask of 24 is equivalent to 255.255.255.0.  
+    A "!" argument before the address specification inverts the sense of the address. 
+    The flag --src is an alias for this option.  Multiple addresses can be specified, 
+    but this will expand to multiple rules (when adding with -A), 
+    or will cause multiple rules to be deleted (with -D).
+
+[!] -d, --destination address[/mask][,...]
+    Destination specification.  See the description of the -s (source) flag for a detailed description of the syntax.  
+    The flag --dst is an alias for this option.
+```
+
+### -j 指明动作
+- ACCPET 
+接受
+- DROP 
+丢弃
+- REJECT
+拒绝
+- RETURN
+返回调用链
+- REDIRECT
+重定向端口
+- LOG
+记录日志
+rocky8 中记录到 `/var/log/message` 中
+- MARK
+做防火墙标记
+- DNAT
+目标地址转换
+- SNAT
+源地址转换
+- MASQUERADE
+地址伪装
+
+
+
+
+## iptables -N|E 添加|重命名 自定义链
+
+
+
 
 
 
