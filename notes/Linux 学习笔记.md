@@ -9448,6 +9448,7 @@ num   pkts bytes target     prot opt in     out     source               destina
 - LOG
 记录日志
 rocky8 中记录到 `/var/log/message` 中
+`--log-prefix` 可以指明日志记录的前缀
 - MARK
 做防火墙标记
 - DNAT
@@ -9803,6 +9804,143 @@ From 10.0.0.83 icmp_seq=11 Destination Port Unreachable
 From 10.0.0.83 icmp_seq=12 Destination Port Unreachable
 64 bytes from 10.0.0.83: icmp_seq=13 ttl=64 time=0.860 ms
 ```
+
+#### state
+- 根据数据包的状态进行限制
+- 如对已经建立的连接放行，对新的连接拒绝或丢弃
+- 这里的连接并非限制 tcp 的连接，不是 tcp 连接的状态，而是通用的连接状态
+
+- `--state STATE`
+状态有：INVALID, ESTABLISHED, NEW, RELATED or UNTRACKED  
+- NEW 为新的连接，第一次连接，建立后连接追踪库中会为其创建条目，后面就可识别该连接是否新连接
+- ESTABLISHED 连接追踪库为其创建的条目失效前的通信状态，连接追踪库中记录的条目有限制
+- RELATED 新发起的但与已有连相关联的连接，如有些连接建立后会开启一些额外的连接
+- INVALID 无效的连接
+- UNTRACKED 为进行追踪的连接，如 raw 表中关闭追踪
+
+
+
+如对已经建立的连接放行，对新的连接拒绝或丢弃
+需要先将已建立的连接放行，再对新的连接拒绝
+直接只写对新的连接拒绝，则已建立的连接也会被拒绝
+```bash
+[root@rocky8-3 ~]$ iptables -t filter t filter -A INPUT -m state --state  ESTABLISHED -j ACCEPT
+[root@rocky8-3 ~]$ iptables iptables -t filter -A INPUT -m state --state RELATED -j ACCEPT
+[root@rocky8-3 ~]$
+[root@rocky8-3 ~]$ iptables -t filter -A INPUT -m state --state NEW -j REJECT
+```
+
+##### 连接追踪需要加载的模块
+- 需要加载 nf_conntrack 模块才会启用连接追踪
+- `lsmod` 可以查看内核加载的模块
+```bash
+[root@rocky8-3 netfilter]$ lsmod | grep nf_
+nf_conncount           16384  1 xt_connlimit
+nf_conntrack          172032  4 xt_conntrack,xt_state,nf_conncount,xt_connlimit
+nf_defrag_ipv6         20480  1 nf_conntrack
+nf_defrag_ipv4         16384  1 nf_conntrack
+nf_reject_ipv4         16384  1 ipt_REJECT
+nf_tables             180224  3 nft_compat,nft_counter,nft_limit
+nfnetlink              16384  2 nft_compat,nf_tables
+libcrc32c              16384  3 nf_conntrack,nf_tables,xfs
+```
+
+##### 查看连接追踪的信息库
+启用连接追踪后，会自动生成此模块
+```bash
+[root@rocky8-3 ~]$ cat /proc/net/nf_conntrack
+ipv4  2 tcp 6 299 ESTABLISHED src=10.0.0.83 dst=10.0.0.1 sport=22 dport=58353 \
+src=10.0.0.1 dst=10.0.0.83 sport=58353 dport=22 [ASSURED] mark=0 zone=0 use=2
+```
+
+##### 查看连接追踪的最大记录条目
+```bash
+[root@rocky8-3 ~]$ cat /proc/sys/net/netfilter/nf_conntrack_max
+65536
+```
+
+##### 查看当前已追踪连接数目
+```bash
+[root@rocky8-3 ~]$ cat /proc/sys/net/netfilter/nf_conntrack_count
+1
+```
+
+##### 查看不同协议的连接追踪时长
+- 到达指定的时长后清理记录
+```bash
+[root@rocky8-3 ~]$ cd /proc/sys/net/netfilter/
+[root@rocky8-3 netfilter]$ ls
+nf_conntrack_acct                   nf_conntrack_helper                          nf_conntrack_tcp_timeout_close_wait
+nf_conntrack_buckets                nf_conntrack_icmp_timeout                    nf_conntrack_tcp_timeout_established
+nf_conntrack_checksum               nf_conntrack_icmpv6_timeout                  nf_conntrack_tcp_timeout_fin_wait
+nf_conntrack_count                  nf_conntrack_log_invalid                     nf_conntrack_tcp_timeout_last_ack
+nf_conntrack_dccp_loose             nf_conntrack_max                             nf_conntrack_tcp_timeout_max_retrans
+nf_conntrack_dccp_timeout_closereq  nf_conntrack_sctp_timeout_closed             nf_conntrack_tcp_timeout_syn_recv
+nf_conntrack_dccp_timeout_closing   nf_conntrack_sctp_timeout_cookie_echoed      nf_conntrack_tcp_timeout_syn_sent
+nf_conntrack_dccp_timeout_open      nf_conntrack_sctp_timeout_cookie_wait        nf_conntrack_tcp_timeout_time_wait
+nf_conntrack_dccp_timeout_partopen  nf_conntrack_sctp_timeout_established        nf_conntrack_tcp_timeout_unacknowledged
+nf_conntrack_dccp_timeout_request   nf_conntrack_sctp_timeout_heartbeat_acked    nf_conntrack_timestamp
+nf_conntrack_dccp_timeout_respond   nf_conntrack_sctp_timeout_heartbeat_sent     nf_conntrack_udp_timeout
+nf_conntrack_dccp_timeout_timewait  nf_conntrack_sctp_timeout_shutdown_ack_sent  nf_conntrack_udp_timeout_stream
+nf_conntrack_events                 nf_conntrack_sctp_timeout_shutdown_recd      nf_flowtable_tcp_timeout
+nf_conntrack_expect_max             nf_conntrack_sctp_timeout_shutdown_sent      nf_flowtable_udp_timeout
+nf_conntrack_frag6_high_thresh      nf_conntrack_tcp_be_liberal                  nf_log
+nf_conntrack_frag6_low_thresh       nf_conntrack_tcp_loose                       nf_log_all_netns
+nf_conntrack_frag6_timeout          nf_conntrack_tcp_max_retrans
+nf_conntrack_generic_timeout        nf_conntrack_tcp_timeout_close
+```
+
+
+##### 连接过多解决
+1. 如果修改连接追踪的最大记录数为 1
+```bash
+[root@rocky8-3 netfilter]$ echo 1 > /proc/sys/net/netfilter/nf_conntrack_max
+```
+2. 观察日志 `/var/log/message` 可以看到错误提示
+```bash
+[root@rocky8-3 netfilter]$ tac /var/log/messages | head -n 1
+May  2 16:20:11 rocky8-3 kernel: nf_conntrack: nf_conntrack: table full, dropping packet
+```
+
+解决：
+
+1. 增大连接数
+不能无限制增加
+`echo 65536 > /proc/sys/net/netfilter/nf_conntrack_max` 的方式修改只能临时生效
+
+- 修改 `/etc/sysctl.conf` 文件使设置永久生效
+    - `net.nf_conntrack_max = 65536`
+    - `net.netfilter.nf_conntrack_max = 65536`
+- sysctl -p 使其生效
+
+
+2. 减小连接记录清理的时间间隔
+不方便，不同协议的时长不同
+
+[ek]
+## 永久保存规则
+1. iptables-save 重定向到一个文件中
+```bash
+[root@rocky8-3 netfilter]$ man iptables-save > rule
+```
+
+2. iptables-restore 恢复文件中的规则
+```bash
+[root@rocky8-3 ~]$ iptables-restore < rule
+```
+
+3. 开机自动加载规则文件
+将恢复规则的命令写到 `/etc/rc.d/rc.local` 文件中
+
+
+
+## 规则最优化设置
+- 同类规则，范围小的在前面
+- 不同类的规则，范围大的放在前面，效率更高
+- 安全放行已经建立的连接，最好放第一条
+- 特殊限制的放行规则前拒绝
+
+
 
 
 
