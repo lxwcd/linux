@@ -7183,6 +7183,40 @@ wlp1s0    IEEE 802.11  ESSID:"LAPTOP-VB238NKA 9364"
   用 `dhclient eth0` 可以让修改后的网卡名以 DHCP 协议获取 IP
 
 
+# 查看本机访问公网使使用的 IP 
+
+
+## 网站查询
+> [Determine Your Private and Public IP Addresses from the Command Line](https://www.linuxtrainingacademy.com/determine-public-ip-address-command-line-curl/)
+
+
+```bash
+[root@rocky8-3 ~]$ curl http://ip.sb
+122.110.90.1
+```
+```bash
+[root@rocky8-3 ~]$ curl cip.cc
+IP      : 122.110.90.1
+地址    : 中国  北京
+运营商  : 电信
+
+数据二  : 北京市 | 电信
+
+数据三  : 中国北京北京市 | 电信
+
+URL     : http://www.cip.cc/122.110.90.1
+```
+
+## dig 命令
+> [How To Find My Public IP Address From Linux CLI](https://www.cyberciti.biz/faq/how-to-find-my-public-ip-address-from-command-line-on-a-linux/)
+
+
+```bash
+[root@rocky8-3 ~]$ dig +short myip.opendns.com @resolver1.opendns.com
+115.171.61.7
+```
+
+
 # 网络排错与查看命令
 ## ping 测试两台主机的两点沟通
 - 发送 ICMP 数据包探测两个主机能否通信
@@ -7287,6 +7321,11 @@ rtt min/avg/max/mdev = 6.137/6.445/6.753/0.308 ms
 ### ping -W 等待相应的秒数
 - Time to wait for a response, in seconds.
 
+## mtr 网络诊断工具
+```bash
+[root@rocky8-3 ~]$ whatis mtr
+mtr (8)              - a network diagnostic tool
+```
 
 ## traceroute 检测两主机在网络中的各节点
 - rocky8 默认未安装，需要手动安装 
@@ -8949,7 +8988,7 @@ www.boce.com
 
 
 ****************************
-
+//LABEL: 防火墙
 # 防火墙
 - 定义一些有序的规则，并管理进入到网络内的主机数据包的一种机制
 - 限制某些服务的访问来源
@@ -8976,7 +9015,7 @@ www.boce.com
 - 数据包过滤型的 Netfilter
 - 依据服务软件程序作为分析的 TCP Wrapper
 
-### 网路型
+### 网络型
 > [2.4.4 网络防火墙与 OSI 七层协定](http://cn.linux.vbird.org/linux_server/0110network_basic_4.php#tcpip_transfer_firewall)
 
 - 数据包过滤型的 Netfilter
@@ -9223,6 +9262,7 @@ COMMIT
 
 - `-F[chain]` 或 `--flush` Delete all rules in  chain or all chains
 清空指定的链，不指定链则清空全部链
+不删除自定义链，会删除自定义链的规则
 
 - `-X[chain]` 或 `--delete-chain` 删除一个用户自定义的链
 
@@ -9462,6 +9502,172 @@ rocky8 中记录到 `/var/log/message` 中
 
 
 ## iptables -N|E 添加|重命名 自定义链
+- 定义自定义链，可以将多个规则写到一个自定义链中
+- 可以将规则分组，便于重复调用
+- 类似自定义接口函数使用
+
+- 自定义链必须关联到内置的 5 链上才能使用
+- 自定义的操作和内置链相同
+- `iptables -F` 不会删除自定义链，会删除自定义链中的规则
+
+### -N 添加自定义链
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -N cus_chain
+[root@rocky8-3 ~]$
+[root@rocky8-3 ~]$ iptables -vnL
+Chain INPUT (policy ACCEPT 22678 packets, 2003K bytes)
+pkts bytes target prot opt in out source destination
+
+Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)
+pkts bytes target prot opt in out source destination
+
+Chain OUTPUT (policy ACCEPT 41329 packets, 4283K bytes)
+pkts bytes target prot opt in out source destination
+
+Chain cus_chain (0 references)
+pkts bytes target prot opt in out source destination
+```
+
+- 将自定义链与内置链关联
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -A CUS_CHAIN -s 10.0.0.1 -j ACCEPT
+[root@rocky8-3 ~]$
+[root@rocky8-3 ~]$ iptables -t filter -A INPUT -s 10.0.0.0/24 -j CUS_CHAIN
+[root@rocky8-3 ~]$
+[root@rocky8-3 ~]$ iptables -vnL
+Chain INPUT (policy ACCEPT 24767 packets, 2112K bytes)
+pkts bytes target prot opt in out source destination
+111  6168 CUS_CHAIN  all  --  * * 10.0.0.0/24 0.0.0.0/0
+
+Chain FORWARD (policy ACCEPT 0 packets, 0 bytes)
+pkts bytes target prot opt in out source destination
+
+Chain OUTPUT (policy ACCEPT 44996 packets, 4665K bytes)
+pkts bytes target prot opt in out source destination
+
+Chain CUS_CHAIN (1 references)
+pkts bytes target prot opt in out source destination
+111  6168 ACCEPT     all  --  *      *       10.0.0.1             0.0.0.0/0
+```
+
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -A CUS_CHAIN -s 10.0.0.151 -j REJECT
+[root@rocky8-3 ~]$ iptables -t filter -A INPUT -j REJECT
+```
+
+
+
+### -E 见自定义链重命令
+- 先写旧名字，再写新名字
+
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -E cus_chain CUS_CHAIN
+[root@rocky8-3 ~]$ iptables -L
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain CUS_CHAIN (0 references)
+target     prot opt source               destination
+```
+
+
+### -X 删除自定义链
+- 只有自定义链中无规则且没有其他链关联才能删除该链
+
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -X CUS_CHAIN
+iptables v1.8.4 (nf_tables):  CHAIN_USER_DEL failed (Device or resource busy): chain CUS_CHAIN
+[root@rocky8-3 ~]$ iptables -L
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+CUS_CHAIN  all  --  10.0.0.0/24          anywhere
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain CUS_CHAIN (1 references)
+target     prot opt source               destination
+ACCEPT     all  --  10.0.0.1             anywhere
+```
+
+- `-F` 删除自定义链的规则
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -F CUS_CHAIN
+[root@rocky8-3 ~]$ iptables -L
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+CUS_CHAIN  all  --  10.0.0.0/24          anywhere
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain CUS_CHAIN (1 references)
+target     prot opt source               destination
+```
+
+- 自定义链无规则，但与 INPUT 链关联不能删除
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -X CUS_CHAIN
+iptables v1.8.4 (nf_tables):  CHAIN_USER_DEL failed (Device or resource busy): chain CUS_CHAIN
+[root@rocky8-3 ~]$ iptables -L
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+CUS_CHAIN  all  --  10.0.0.0/24          anywhere
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain CUS_CHAIN (1 references)
+target     prot opt source               destination
+```
+
+- 删除 INPUT 链中自定义链的规则后能删除自定义链
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -D INPUT 1
+[root@rocky8-3 ~]$ iptables -L
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain CUS_CHAIN (0 references)
+target     prot opt source               destination
+[root@rocky8-3 ~]$
+[root@rocky8-3 ~]$ iptables -t filter -X CUS_CHAIN
+[root@rocky8-3 ~]$ iptables -L
+Chain INPUT (policy ACCEPT)
+target     prot opt source               destination
+
+Chain FORWARD (policy ACCEPT)
+target     prot opt source               destination
+
+Chain OUTPUT (policy ACCEPT)
+target     prot opt source               destination
+```
+
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -X CUS_CHAIN
+```
+
 
 
 ## 白名单与黑名单
@@ -9930,7 +10136,35 @@ May  2 16:20:11 rocky8-3 kernel: nf_conntrack: nf_conntrack: table full, droppin
 ```
 
 3. 开机自动加载规则文件
-将恢复规则的命令写到 `/etc/rc.d/rc.local` 文件中
+- 将恢复规则的命令写到 `/etc/rc.d/rc.local` 文件中
+- 或者安装  `iptables-service` 工具
+该工具会加载 `/etc/sysconfig/iptables` 文件中的规则
+自定义规则后可以写到这个文件中
+然后通过 `systemctl` 命令开启该服务
+```bash
+[root@rocky8-3 ~]$ rpm -ql iptables-services
+/etc/sysconfig/ip6tables
+/etc/sysconfig/iptables
+/usr/lib/systemd/system/ip6tables.service
+/usr/lib/systemd/system/iptables.service
+/usr/libexec/initscripts/legacy-actions/ip6tables
+/usr/libexec/initscripts/legacy-actions/ip6tables/panic
+/usr/libexec/initscripts/legacy-actions/ip6tables/save
+/usr/libexec/initscripts/legacy-actions/iptables
+/usr/libexec/initscripts/legacy-actions/iptables/panic
+/usr/libexec/initscripts/legacy-actions/iptables/save
+/usr/libexec/iptables
+/usr/libexec/iptables/ip6tables.init
+/usr/libexec/iptables/iptables.init
+```
+
+默认未开启
+```bash
+[root@rocky8-3 ~]$ systemctl status iptables.service
+● iptables.service - IPv4 firewall with iptables
+   Loaded: loaded (/usr/lib/systemd/system/iptables.service; disabled; vendor preset: disabled)
+   Active: inactive (dead)
+```
 
 
 
@@ -9939,6 +10173,10 @@ May  2 16:20:11 rocky8-3 kernel: nf_conntrack: nf_conntrack: table full, droppin
 - 不同类的规则，范围大的放在前面，效率更高
 - 安全放行已经建立的连接，最好放第一条
 - 特殊限制的放行规则前拒绝
+
+
+//TODO: NAT 
+## NAT 表
 
 
 
