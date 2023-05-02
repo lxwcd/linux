@@ -1077,8 +1077,12 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 
 ![1](https://img-blog.csdnimg.cn/fa41083e511c445d9ba80cf2cf6e68b2.png)
 
+
+
 ## 应用
 
+//FIXME: 时区转换
+### CST 和 UTC 时区时间转换
 ### Use date with Other Commands
 ![1](https://img-blog.csdnimg.cn/15c1d1aaed4e4820abed78946b1cb403.png)
 <br/>
@@ -4798,9 +4802,6 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 ![](img/2023-03-19-16-22-38.png)
 ![](img/2023-03-19-16-21-08.png)
 
-# xeyes
-> [xeyes](https://www.lanqiao.cn/courses/1/learning/?id=59)
-
 
 
 # 好玩工具
@@ -4808,6 +4809,21 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 
 ## cmatrix
 
+## xeyes
+> [xeyes](https://www.lanqiao.cn/courses/1/learning/?id=59)
+
+
+# 压测工具
+
+## ab
+
+- ubuntu22.04 安装
+```bash
+[root@ubunut22:~]$ ab
+Command 'ab' not found, but can be installed with:
+apt install apache2-utils
+[root@ubunut22:~]$ apt install -y apache2-utils
+```
 
 *********************************
 //LABEL: 软件管理
@@ -9045,6 +9061,19 @@ www.boce.com
 - 当前面的规则满足就不会理会后面的规则
 
 - 使用 iptabls 设置防火墙时最好关闭本机的 firewalld 服务，因为两者都是制定防火墙规则，可能冲突
+- 需要 root 设置规则
+- 设置规则时注意不要让自己无法连接上（远程）
+例如虚拟机中使用 NAT 模式，则 windows 中有一个 VMnet8 的虚拟交换机，其地址为 10.0.0.1
+设置白名单规则，拒绝 10.0.0.0/24 网段的处了 10.0.0.82 以外的主机时要先允许 10.0.0.1，否则远程无法连接
+```bash
+[root@rocky8-3 ~]$ iptables -vnL INPUT --line-numbers
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1      168 13928 ACCEPT     all  --  *      *       10.0.0.1             0.0.0.0/0
+2        0     0 ACCEPT     all  --  lo     *       0.0.0.0/0            0.0.0.0/0
+3       12   810 ACCEPT     all  --  *      *       10.0.0.82            0.0.0.0/0
+4      331 47058 REJECT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable
+```
 
 
 ## iptables 的表（table）和链（chain）
@@ -9200,6 +9229,7 @@ COMMIT
 - `-Z [chain [rulenum]]` Zero counters in chain or all chains
 iptables 每条规则都有两个计数器：匹配到的报文的个数，以及匹配到的所有报文的大小之和
 即用 `-v` 后看到的 `pkts` 和 `bytes` 两列
+但清除后查看会发现可能还是有数据，是清除后重新生成的数据，明显比原来少
 
 - `D` 可以删除某条链上的具体规则
 ```bash
@@ -9383,6 +9413,7 @@ num   pkts bytes target     prot opt in     out     source               destina
 - 可以指定网段，IP 地址后加 `/mask`
 - 不指定则表示不受限制
 - `-d` 表示连接本机的 ip，如一个网卡设置多个 ip，可以拒绝客户端访问某个 ip
+- 如果只有一个 ip，可以不用写目标地址，因为到 INPUT 链时已经经过路由判决了
 
 ```bash
  [!] -s, --source address[/mask][,...]
@@ -9432,6 +9463,346 @@ rocky8 中记录到 `/var/log/message` 中
 ## iptables -N|E 添加|重命名 自定义链
 
 
+## 白名单与黑名单
+- 白名单
+只指定允许的，其他都不允许
+- 设置规则时注意不要让自己无法连接上（远程）
+例如虚拟机中使用 NAT 模式，则 windows 中有一个 VMnet8 的虚拟交换机，其地址为 10.0.0.1
+设置白名单规则，拒绝 10.0.0.0/24 网段的处了 10.0.0.82 以外的主机时要先允许 10.0.0.1，否则远程无法连接
+```bash
+[root@rocky8-3 ~]$ iptables -vnL INPUT --line-numbers
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1      168 13928 ACCEPT     all  --  *      *       10.0.0.1             0.0.0.0/0
+2        0     0 ACCEPT     all  --  lo     *       0.0.0.0/0            0.0.0.0/0
+3       12   810 ACCEPT     all  --  *      *       10.0.0.82            0.0.0.0/0
+4      331 47058 REJECT     all  --  *      *       0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable
+```
+- 黑名单
+只指定不允许的，其他都接受
+
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -A INPUT -s 10.0.0.151 -j REJECT
+[root@rocky8-3 ~]$ iptables -t filter -A INPUT -j ACCEPT
+[root@rocky8-3 ~]$ iptables -vnL INPUT --line-numbers
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 REJECT     all  --  *      *       10.0.0.151           0.0.0.0/0            reject-with icmp-port-unreachable
+2       94  5296 ACCEPT     all  --  *      *       0.0.0.0/0            0.0.0.0/0
+```
+
+## iptables 扩展模块
+- 查看扩展模块
+`libxt_.*so` 的文件为其模块，`so` 为共享对象
+```bash
+[root@rocky8-3 ~]$ rpm -ql iptables | grep -i .so
+```
+
+- 查看帮助
+```bash
+[root@rocky8-3 ~]$ man iptables-extensions
+```
+```bash
+iptables-extensions(8) iptables 1.8.4 iptables-extensions(8)
+
+NAME
+    iptables-extensions — list of extensions in the standard iptables distribution
+SYNOPSIS
+    ip6tables [-m name [module-options...]]  [-j target-name [target-options...]
+    iptables [-m name [module-options...]]  [-j target-name [target-options...]
+```
+
+### 隐式扩展
+- 不需要手动指明模块，自动加载的一些常用模块
+- 如用 `-p` 指定协议时，可以指定 `tcp` 协议，即自动调用该模块
+```bash
+[root@rocky8-3 ~]$ rpm -ql iptables | grep -i tcp.so
+/usr/lib64/xtables/libxt_tcp.so
+```
+
+#### tcp 协议模块
+- 不用指明模块，只用 `-p tcp` 即可
+- 源端口，即客户端用什么端口连接到本机的，`-sport`
+可以写端口号或服务的名字
+可以写端口号范围，如果起始端口号省略，则为 0
+```bash
+[!] --source-port,--sport port[:port]
+        Source port or port range specification. 
+        This can either be a service name or a port number. 
+        An inclusive range can also be specified, using the format first:last.  
+        If the first port is omitted, "0" is assumed; 
+        if the last is omitted, "65535" is assumed.  
+        The flag --sport is a convenient alias for this option.
+```
+- 目的端口，即连接到本机的什么端口，`-dport`，其他格式规则和源端口相同
+```bash
+[!] --destination-port,--dport port[:port]
+    Destination port or port range specification.  The flag --dport is a convenient alias for this option.
+```
+- tcp 标记位
+`--tcp-flags`
+`mask` 为要检查的标记位，多个标记位可以用逗号 `,` 分隔
+`comp` 表示必须设置的标记位，多个标记用逗号 `,` 分隔
+标记位有: SYN ACK FIN RST URG PSH ALL NONE  
+```bash
+[!] --tcp-flags mask comp
+    Match  when the TCP flags are as specified.  
+    The first argument mask is the flags which we should examine, 
+    written as a comma-separated list, 
+    and the second argument comp is a comma-separated list of flags which must be set.  
+    Flags are: SYN ACK FIN RST URG PSH ALL NONE.  
+    Hence the command iptables -A FORWARD -p tcp --tcp-flags SYN,ACK,FIN,RST SYN
+    will only match packets with the SYN flag set, and the ACK, FIN and RST flags unset.
+```
+- tcp 第一次握手，即客户端发送连接请求的第一个报文，`SYN` 标志位为 1，其余标志位为 0
+简单写法为 `--syn`
+注意不会阻止已经连接的数据包通信，也不会阻止服务端发送连接请求
+只会阻止客户端新的连接
+```bash
+[!] --syn
+    Only match TCP packets with the SYN bit set and the ACK,RST and FIN bits cleared.  
+    Such packets are used to request TCP connection initiation;  
+    --tcp-flags SYN,RST,ACK,FIN SYN.  
+    If the "!" flag precedes the "--syn", the sense of the option is inverted.
+```
+
+- tcp 二次握手
+```bash
+--tcp-flags SYN,RST,ACK,FIN SYN,ACK 
+```
+
+- TCP option 字段
+```bash
+[!] --tcp-option number
+        Match if TCP option set.
+```
+
+例如允许 http 服务但拒绝 ssh 服务
+先从 `/etc/services` 中查看 http 和 ssh 的端口和协议
+```bash
+[root@rocky8-3 ~]$ iptables -vnL INPUT --line-numbers
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+num   pkts bytes target     prot opt in     out     source               destination
+1        0     0 ACCEPT     tcp  --  *      *       10.0.0.151           0.0.0.0/0            tcp dpt:80
+2        0     0 REJECT     tcp  --  *      *       10.0.0.151           0.0.0.0/0            tcp dpt:22 reject-with icmp-port-unreachable
+```
+1. 先在本机安装 nginx 和 ssh-server，可查看 httpd 和 sshd 服务已启动，处于监听状态
+httpd 为 80 端口，sshd 监听 22 端口
+```bash
+rpm -qa | grep nginx
+sudo yum install -y nginx
+```
+```bash
+[root@rocky8-3 ~]$ ss -tnlp | tr -s "[[:blank:]]" "\t"
+State   Recv-Q  Send-Q  Local   Address:Port    Peer    Address:PortProcess
+LISTEN  0       128     0.0.0.0:5355    0.0.0.0:*       users:(("systemd-resolve",pid=1016,fd=13))
+LISTEN  0       128     0.0.0.0:22      0.0.0.0:*       users:(("sshd",pid=1096,fd=4))
+LISTEN  0       5       127.0.0.1:631   0.0.0.0:*       users:(("cupsd",pid=1299,fd=10))
+LISTEN  0       128     127.0.0.1:6010  0.0.0.0:*       users:(("sshd",pid=5485,fd=15))
+LISTEN  0       70      *:33060 *:*     users:(("mysqld",pid=1488,fd=22))
+LISTEN  0       128     *:3306  *:*     users:(("mysqld",pid=1488,fd=34))
+LISTEN  0       128     ::      :5355   ::      :*      users:(("systemd-resolve",pid=1016,fd=15))
+LISTEN  0       128     *:80    *:*     users:(("httpd",pid=1373,fd=4),("httpd",pid=1365,fd=4),("httpd",pid=1355,fd=4),("httpd",pid=1185,fd=4))
+LISTEN  0       128     ::      :22     ::      :*      users:(("sshd",pid=1096,fd=6))
+LISTEN  0       5       ::1     :631    ::      :*      users:(("cupsd",pid=1299,fd=9))
+LISTEN  0       128     ::1     :6010   ::      :*      users:(("sshd",pid=5485,fd=14))
+```
+
+2. 限制的客户端测试
+- curl 测试能否连接服务器的 80 端口
+```bash
+[root@ubunut22:~]$ curl 10.0.0.83 | head -n 5
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0<!doctype html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+100  7620  100  7620    0     0   709k      0 --:--:-- --:--:-- --:--:--  744k
+```
+- ssh 测试能否连接服务器 22 端口
+```bash
+[root@ubunut22:~]$ ssh root@10.0.0.83
+ssh: connect to host 10.0.0.83 port 22: Connection refused
+```
+
+
+#### udp 扩展模块
+- 同 tcp 一样使用匹配源端口和目标端口
+
+#### icmp 扩展模块
+- `-p icmp`，针对 IPv4
+- `--icmp-type 0/0` 为 icmp 应答
+- `--icmp-type 8/0` 为 icmp 请求
+```bash
+icmp (IPv4-specific)
+This extension can be used if `--protocol icmp' is specified. 
+It provides the following option:
+[!] --icmp-type {type[/code]|typename}
+This allows specification of the ICMP type, which can be a numeric ICMP type, 
+type/code pair, or one of the ICMP type names shown by the command iptables -p icmp -h
+```
+
+### 显示扩展模块
+- 显示扩展使用需要 `-m` 指定模块名
+- 模块名可以不用写前面的 `libxt_`，如 `-m multiport`
+
+#### multiport
+- 指定端口时可以使用不连续的端口，默认只能用区间写连续的端口
+- `[!] --sports`
+- `[!] --dports`
+- `[!] --ports` 
+Match if either the source or destination ports are equal to one of the given ports.
+
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -A INPUT -s 10.0.0.151 -p tcp -m multiport --dports 22:25,80 -j REJECT
+```
+
+
+#### iprange
+- 指定 ip 范围而非一整个网段，更灵活
+- 默认也可以指定多个 ip，用逗号分隔，要一个一个写
+```bash
+iprange
+    This matches on a given arbitrary range of IP addresses.
+    [!] --src-range from[-to]
+        Match source IP in the specified range.
+
+    [!] --dst-range from[-to]
+        Match destination IP in the specified range.
+```
+
+
+#### mac
+- 指明来源 mac 地址
+- 无指定目的 mac 的选项
+- 只能特定链设置
+
+```bash
+[!] --mac-source address
+    Match  source  MAC  address.  
+    It must be of the form XX:XX:XX:XX:XX:XX.  
+    Note that this only makes sense for packets coming from an Ethernet device and entering
+    the PREROUTING, FORWARD or INPUT chains.
+```
+
+#### string
+- 对应用层数据做字符串模式匹配
+- 如屏蔽某些敏感词
+- `--algo` 可以指定算法，用 `kmp`，用 `bm` 可能有问题
+- `--from` 指定筛选时开始的位置，默认 0，即从头开始查找
+- `--to` 指定结束的偏移位置
+
+```bash
+string
+    This modules matches a given string by using some pattern matching strategy. 
+    It requires a linux kernel >= 2.6.14.
+
+    --algo {bm|kmp}
+            Select the pattern matching strategy. (bm = Boyer-Moore, kmp = Knuth-Pratt-Morris)
+
+    --from offset
+            Set the offset from which it starts looking for any matching. If not passed, default is 0.
+
+    --to offset
+            Set  the  offset  up to which should be scanned. 
+            That is, byte offset-1 (counting from 0) is the last one that is scanned.  
+            If not passed, default is the packet size.
+
+    [!] --string pattern
+            Matches the given pattern.
+
+    [!] --hex-string pattern
+            Matches the given pattern in hex notation.
+
+    --icase
+            Ignore case when searching.
+```
+
+例如设置出去规则，出去网页内容中带有 `death` 关键字则禁止
+注意这里的链为 `OUTPUT` 非 `INPUT `
+指定端口为源端口，因为此时是数据包出去的链，源是本机，目的端口是客户端
+```bash
+[root@rocky8-3 ~]$ iptables -t filter -A OUTPUT -s 10.0.0.151 -p tcp --sport 80 -m string --algo kmp --from 62 --string "death" -j REJECT
+```
+
+#### time
+- 筛选报文到达的时间
+- 时间默认是 UTC 时间，需要转换
+- Centos8 有问题，centos7 可以用
+
+
+#### connlimit 
+- 对客户端的 IP 做并发连接数限制
+
+```bash
+--connlimit-upto n
+    Match if the number of existing connections is below or equal n.
+    --connlimit-above n
+    Match if the number of existing connections is above n.
+```
+
+限制并发数不能超过 10
+```bash
+[root@rocky8-3 html]$ iptables -t filter -A INPUT -m connlimit --connlimit-above 10 -j REJECT
+```
+
+客户端用 ab 工具测试
+
+
+```bash
+[root@ubunut22:~]$ ab -n 100000 -c 100 http://10.0.0.83/
+This is ApacheBench, Version 2.3 <$Revision: 1879490 $>
+Copyright 1996 Adam Twiss, Zeus Technology Ltd, http://www.zeustech.net/
+Licensed to The Apache Software Foundation, http://www.apache.org/
+
+Benchmarking 10.0.0.83 (be patient)
+apr_socket_recv: Connection refused (111)
+Total of 1 requests completed
+```
+
+
+#### limit 
+- 可以指定某段时间内的最大连接数
+- `--limit-burst number` 前多个包不限制，默认 5
+- `--limit rate[/second|/minute|/hour|/day]` 限制速率，默认 3/hour
+  
+
+例如限制 icmp 连接请求，前 2 个连接不限制，之后 10/min
+默认 ping 每秒发送一个连接请求
+因此，大于 2 个连接的请求每 6 秒才能连接一个
+
+```bash
+[root@rocky8-3 html]$ iptables -t filter -A INPUT -s 10.0.0.151 -p icmp --icmp-type 8 -m limit --limit 10/minute --limit-burst 2 -j ACCEPT
+[root@rocky8-3 html]$
+[root@rocky8-3 html]$ iptables -t filter -A INPUT -p icmp -j REJECT
+[root@rocky8-3 html]$
+[root@rocky8-3 html]$ iptables -t filter vnL INPUT
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination
+    0     0 ACCEPT     icmp --  *      *       10.0.0.151           0.0.0.0/0            icmptype 8 limit: avg 10/min burst 2
+    7   588 REJECT     icmp --  *      *       0.0.0.0/0            0.0.0.0/0            reject-with icmp-port-unreachable
+```
+
+客户端查看，前连个不限制，后面 6 个包只用一个被接受
+```bash
+[root@ubunut22:~]$ ping 10.0.0.83
+PING 10.0.0.83 (10.0.0.83) 56(84) bytes of data.
+64 bytes from 10.0.0.83: icmp_seq=1 ttl=64 time=0.733 ms
+64 bytes from 10.0.0.83: icmp_seq=2 ttl=64 time=0.539 ms
+From 10.0.0.83 icmp_seq=3 Destination Port Unreachable
+From 10.0.0.83 icmp_seq=4 Destination Port Unreachable
+From 10.0.0.83 icmp_seq=5 Destination Port Unreachable
+From 10.0.0.83 icmp_seq=6 Destination Port Unreachable
+64 bytes from 10.0.0.83: icmp_seq=7 ttl=64 time=0.537 ms
+From 10.0.0.83 icmp_seq=8 Destination Port Unreachable
+From 10.0.0.83 icmp_seq=9 Destination Port Unreachable
+From 10.0.0.83 icmp_seq=10 Destination Port Unreachable
+From 10.0.0.83 icmp_seq=11 Destination Port Unreachable
+From 10.0.0.83 icmp_seq=12 Destination Port Unreachable
+64 bytes from 10.0.0.83: icmp_seq=13 ttl=64 time=0.860 ms
+```
 
 
 
@@ -9440,7 +9811,13 @@ rocky8 中记录到 `/var/log/message` 中
 
 
 
-## 关闭系统默认防火墙策略
+## 关闭系统默认防火墙策略/usr/lib64/xtables/libxt_tcp.so
+/usr/lib64/xtables/libxt_tcpmss.so
+/usr/lib64/xtables/libxt_time.so
+/usr/lib64/xtables/libxt_tos.so
+/usr/lib64/xtables/libxt_u32.so
+/usr/lib64/xtables/libxt_udp.so
+k
 - 关闭后为了以后自定义防火墙策略
 
 ```bash
