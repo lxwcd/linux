@@ -4776,8 +4776,66 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 
 
 
+**************************
+//LABEL: 系统服务
+# 系统服务（daemon）
+> [第五部分：Linux 系统管理员](http://cn.linux.vbird.org/linux_basic/linux_basic.php#part5)
+
+## daemon 和 service
+- 常驻在内存中的进程可以提供一些系统或网络功能，即为服务（service）
+- 系统为了某些功能必须提供一些服务（service）
+- service 的提供需要程序运行
+- 完成 service 的程序即为 daemon
+  如完成周期性计划任务 service 的程序为 crond 这个 daemon
+- daemon 即为一个程序执行后的进程
+- rocky8 中通常会在服务的名称后加一个 `d`
+  如计划任务命令建立的 at 和 cron 两个服务的程序名为 atd 和 crond
+
+## 早期的 init 服务
+- 服务启动脚本在 `/etc/init.d/` 目录
+- `/etc/init.d/daemon [start|restart|stop|status]` 启动|重启|关闭|查看状态
+- init 是内核的第一个进程，内核启动后主动调用
+
+### 服务启动的分类
+#### 独立启动（stand alone）
+- 常驻内存
+- 提供本机或用户的服务
+- 响应快
+
+
+#### 超级守护进程（super daemon）
+- xinetd 和 inetd 两个总管程序提供 socket 对应或端口对应的管理
+- 需要时唤醒，要求结束时服务结束
+- 唤醒可能造成延迟
+
+
+#### 服务的依赖性问题
+- 服务可能有依赖性
+- 有些服务可能依赖其他服务
+- init 在管理员手动处理这些有依赖关系的服务时，不能协助唤醒依赖服务
+
+#### 运行级别
+- init 启动后可以根据用户自定义的运行级别（runlevel）来唤醒不同的服务
+- 不同的服务会进入不同的操作界面
+- 共 7 个运行级别
+    - 0
+    - 1
+    单人维护模式
+    - 2
+    - 3
+    纯命令模式
+    - 4
+    - 5
+    图形界面，需要安装的操作系统支持图形界面
+    - 6
+
+
+
+
 
 **************************
+
+
 
 
 # 重启网络
@@ -6376,6 +6434,13 @@ udp6       0      0 :::5353                 :::*                                
 
 ## lsmod 查看内核中模块的状态
 
+
+## modprobe 加载或移除模块
+
+```bash
+[root@rocky8-3 eth0]$ whatis modprobe
+modprobe (8)         - Add and remove modules from the Linux Kernel
+```
 ### 查看网卡模块是否已成功加载 
 - 找到网卡模块名
 - 用 `lsmod` 查看
@@ -9484,7 +9549,10 @@ num   pkts bytes target     prot opt in     out     source               destina
 - RETURN
 返回调用链
 - REDIRECT
-重定向端口
+重定向端口，NAT 转换时同时修改端口
+因为客户端的端口是动态随机分配的，可能会重复，因此转换时将端口重定向为不重复的新的值
+只能用于 nat 表的 PREROUTING 和 POSTROUTING 链
+NAPT（Network Address and Port Translation）
 - LOG
 记录日志
 rocky8 中记录到 `/var/log/message` 中
@@ -9496,7 +9564,7 @@ rocky8 中记录到 `/var/log/message` 中
 - SNAT
 源地址转换
 - MASQUERADE
-地址伪装
+地址伪装，例如 nat 表中需要对 ip 进行伪装转换
 
 
 
@@ -10131,6 +10199,10 @@ May  2 16:20:11 rocky8-3 kernel: nf_conntrack: nf_conntrack: table full, droppin
 
 3. 开机自动加载规则文件
 - 将恢复规则的命令写到 `/etc/rc.d/rc.local` 文件中
+写脚本方式更灵活，可以单独写脚本，然后在开机启动文件中调用脚本
+如写 iptables.allow 和 iptables.deny 脚本分别设置规则
+脚本要加可执行权限，脚本的路径写全，或路径加入 PATH 环境变量
+
 - 或者安装  `iptables-service` 工具
 该工具会加载 `/etc/sysconfig/iptables` 文件中的规则
 自定义规则后可以写到这个文件中
@@ -10161,6 +10233,8 @@ May  2 16:20:11 rocky8-3 kernel: nf_conntrack: nf_conntrack: table full, droppin
 ```
 
 
+## IPv4 的内核管理功能 /proc/sys/net/ipv4/*
+> [9.3.5 IPv4 的核心管理功能： /proc/sys/net/ipv4/*](http://cn.linux.vbird.org/linux_server/0250simple_firewall_3.php#netfilter_kernel)
 
 ## 规则最优化设置
 - 同类规则，范围小的在前面
