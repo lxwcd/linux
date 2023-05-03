@@ -5106,6 +5106,332 @@ cockpit-wsinstance-https-factory.socket static
   graphical.target          loaded    active   active Graphical Interface
 ```
 
+#### 常见环境
+- graphical.target 加载图形界面，包含 multi-user.target
+- multi-user.target 纯命令行模式
+- rescue.target 无法使用 root 登录时使用
+- emergency.target 紧急处理系统的错误，需要使用 root 登录
+- shutdown.target 关机
+- getty.target 设置 tty 个数等
+
+```bash
+[root@rocky8-3 system]$ systemctl list-units --type=target | grep graphical
+graphical.target       loaded active active Graphical Interface
+
+[root@rocky8-3 system]$ systemctl list-units --type=target | grep multi-user
+multi-user.target      loaded active active Multi-User System
+
+[root@rocky8-3 system]$ systemctl list-units --type=target --all | grep shutdown
+  shutdown.target           loaded    inactive dead   Shutdown
+
+[root@rocky8-3 system]$ systemctl list-units --type=target --all | grep rescue
+  rescue.target             loaded    inactive dead   Rescue Mode
+
+[root@rocky8-3 system]$ systemctl list-units --type=target --all | grep emergency
+  emergency.target          loaded    inactive dead   Emergency Mode
+
+[root@rocky8-3 system]$ systemctl list-units --type=target --all | grep getty
+  getty-pre.target          loaded    inactive dead   Login Prompts (Pre)
+  getty.target              loaded    active   active Login Prompts
+```
+
+#### systemctl get-default 查看当前系统环境
+```bash
+[root@rocky8-3 system]$ systemctl get-default
+graphical.target
+```
+
+#### systemctl set-default 设置当前系统默认环境
+- 设置后当前仍是图形环境，不能立刻切换到命令行环境
+```bash
+[root@rocky8-3 system]$ systemctl get-default
+graphical.target
+[root@rocky8-3 system]$
+[root@rocky8-3 system]$ systemctl set-default multi-user.target
+Removed /etc/systemd/system/default.target.
+Created symlink /etc/systemd/system/default.target → /usr/lib/systemd/system/multi-user.target.
+[root@rocky8-3 system]$
+[root@rocky8-3 system]$ systemctl get-default
+multi-user.target
+```
+
+#### systemctl isolate 切换操作环境
+- 无需重启即可改变操作环境
+
+```bash
+[root@rocky8-3 system]$ systemctl get-default
+graphical.target
+[root@rocky8-3 system]$
+[root@rocky8-3 system]$ systemctl isolate multi-user.target
+[root@rocky8-3 system]$
+[root@rocky8-3 system]$ systemctl isolate graphical.target
+```
+
+#### 命令切换环境
+- systemctl poweroff
+- systemctl reboot
+- systemctl suspend 挂起模式
+系统的状态数据保存到内存
+关闭大部分的系统硬件，但并不实际关机
+唤醒后系统数据从内存中恢复，重新驱动被大部分关闭的硬件
+- systemctl hibernate 休眠模式
+系统状态保存到硬盘，保存完后关闭计算机
+用户唤醒系统时，系统正常运行，将硬盘中的系统状态恢复
+唤醒的性能与硬盘的速度有关
+- systemctl rescue 救援模式
+- systemctl emergency 紧急恢复模式
+
+### systemctl list-dependencies 分析各服务之间的依赖性
+#### 查看某个服务所依赖的服务
+- `systemctl list-dependencies` 显示的 default.target 为当前默认的环境
+即用 `systemctl get-default` 看到的当前的，这里为 `graphical.target`
+列出的部分内容为 default.target 所依赖的服务
+
+```bash
+[root@rocky8-3 system]$ systemctl list-dependencies | less
+
+default.target
+● ├─accounts-daemon.service
+● ├─gdm.service
+● ├─nvmefc-boot-connections.service
+● ├─rtkit-daemon.service
+● ├─systemd-update-utmp-runlevel.service
+● ├─udisks2.service
+● └─multi-user.target
+●   ├─atd.service
+●   ├─auditd.service
+●   ├─avahi-daemon.service
+●   ├─crond.service
+●   ├─dbus.service
+●   ├─httpd.service
+●   ├─irqbalance.service
+●   ├─kdump.service
+●   ├─libstoragemgmt.service
+●   ├─mcelog.service
+●   ├─mdmonitor.service
+```
+
+```bash
+[root@rocky8-3 system]$ systemctl list-dependencies graphical.target | less
+
+graphical.target
+● ├─accounts-daemon.service
+● ├─gdm.service
+● ├─nvmefc-boot-connections.service
+● ├─rtkit-daemon.service
+● ├─systemd-update-utmp-runlevel.service
+● ├─udisks2.service
+● └─multi-user.target
+●   ├─atd.service
+```
+
+```bash
+[root@rocky8-3 system]$ systemctl list-dependencies sshd.service | less
+
+sshd.service
+● ├─system.slice
+● ├─sshd-keygen.target
+● │ ├─sshd-keygen@ecdsa.service
+● │ ├─sshd-keygen@ed25519.service
+● │ └─sshd-keygen@rsa.service
+● └─sysinit.target
+●   ├─dev-hugepages.mount
+●   ├─dev-mqueue.mount
+●   ├─dracut-shutdown.service
+```
+
+#### 查看某个服务被什么服务依赖
+- 加上 `--reverse` 选项
+
+```bash
+[root@rocky8-3 system]$ systemctl list-dependencies graphical.target --reverse
+graphical.target
+[root@rocky8-3 system]$ systemctl list-dependencies multi-user.target --reverse
+multi-user.target
+● └─graphical.target
+[root@rocky8-3 system]$ systemctl list-dependencies sshd.service --reverse
+sshd.service
+● └─multi-user.target
+●   └─graphical.target
+```
+
+### systemctl list-socket 查看 socket 文件位置
+
+```bash
+[root@rocky8-3 system]$ systemctl list-sockets | head -n5
+LISTEN                            UNIT                            ACTIVATES
+/run/avahi-daemon/socket          avahi-daemon.socket             avahi-daemon.service
+/run/dbus/system_bus_socket       dbus.socket                     dbus.service
+/run/dmeventd-client              dm-event.socket                 dm-event.service
+/run/dmeventd-server              dm-event.socket                 dm-event.service
+```
+
+### 关闭不必要的网络服务
+- 网络服务可以理解为会产生一个网络监听端口的进程，可以用 `ss` 查看
+`[root@rocky8-3 system]$ ss -tunlp` 查看
+
+```bash
+[root@rocky8-3 system]$ ss -tunlp | tr -s "[[:blank:]]" "\t"
+Netid   State   Recv-Q  Send-Q  Local   Address:Port    Peer    Address:PortProcess
+udp     UNCONN  0       0       0.0.0.0:5353    0.0.0.0:*       users:(("avahi-daemon",pid=1049,fd=15))
+udp     UNCONN  0       0       0.0.0.0:5355    0.0.0.0:*       users:(("systemd-resolve",pid=1011,fd=12))
+udp     UNCONN  0       0       0.0.0.0:33478   0.0.0.0:*       users:(("avahi-daemon",pid=1049,fd=17))
+udp     UNCONN  0       0       127.0.0.53%lo:53        0.0.0.0:*       users:(("systemd-resolve",pid=1011,fd=17))
+udp     UNCONN  0       0       ::      :5353   ::      :*      users:(("avahi-daemon",pid=1049,fd=16))
+udp     UNCONN  0       0       ::      :5355   ::      :*      users:(("systemd-resolve",pid=1011,fd=14))
+udp     UNCONN  0       0       ::      :35064  ::      :*      users:(("avahi-daemon",pid=1049,fd=18))
+tcp     LISTEN  0       128     0.0.0.0:5355    0.0.0.0:*       users:(("systemd-resolve",pid=1011,fd=13))
+tcp     LISTEN  0       128     0.0.0.0:22      0.0.0.0:*       users:(("sshd",pid=1074,fd=4))
+tcp     LISTEN  0       128     127.0.0.1:6010  0.0.0.0:*       users:(("sshd",pid=2508,fd=15))
+tcp     LISTEN  0       128     *:3306  *:*     users:(("mysqld",pid=1273,fd=34))
+tcp     LISTEN  0       128     ::      :5355   ::      :*      users:(("systemd-resolve",pid=1011,fd=15))
+tcp     LISTEN  0       128     *:80    *:*     users:(("httpd",pid=1402,fd=4),("httpd",pid=1397,fd=4),("httpd",pid=1390,fd=4),("httpd",pid=1234,fd=4))
+tcp     LISTEN  0       128     ::      :22     ::      :*      users:(("sshd",pid=1074,fd=6))
+tcp     LISTEN  0       128     ::1     :6010   ::      :*      users:(("sshd",pid=2508,fd=14))
+tcp     LISTEN  0       70      *:33060 *:*     users:(("mysqld",pid=1273,fd=22))
+```
+
+- 在 systemctl 中查看 avahi-daemon 
+```bash
+[root@rocky8-3 system]$ systemctl list-units --all | grep avahi
+avahi-daemon.service loaded active running Avahi mDNS/DNS-SD Stack 
+avahi-daemon.socket loaded active running Avahi mDNS/DNS-SD Stack Activation Socket                                           
+```
+
+- 查看该服务的说明
+如果该功能不需要，可以关掉
+```bash
+[root@rocky8-3 system]$ man avahi
+avahi-daemon       avahi-daemon.conf  avahi.hosts        avahi.service
+[root@rocky8-3 system]$ man avahi-daemon
+```
+
+### 与 systemd 的 daemon 运行过程相关的目录
+
+#### /usr/lib/systemd/system
+- 启动脚本配置文件
+- 最好不要修改，到 /etc/systemd/system 中修改
+
+
+#### /run/systemd/system
+- 系统执行过程产生的服务脚本
+- 优先级比 /usr/lib/systemd/system 高
+
+
+#### /etc/systemd/system
+- 管理员根据需要建立的执行脚本
+- 类似 `/etc/rc5.d/SXX` 之类的文件
+- 优先级比 /run/systemd/system 高
+
+- 有些子目录后缀为 `.wants` 表示启动该服务后，最好再加上该目录内的服务
+```bash
+[root@rocky8-3 system]$ ll multi-user.target.wants/
+total 0
+lrwxrwxrwx. 1 root root 35 Feb 21 15:24  atd.service -> /usr/lib/systemd/system/atd.service
+lrwxrwxrwx. 1 root root 38 Feb 21 15:19  auditd.service -> /usr/lib/systemd/system/auditd.service
+lrwxrwxrwx. 1 root root 44 Feb 21 15:22  avahi-daemon.service -> /usr/lib/systemd/system/avahi-daemon.service
+lrwxrwxrwx. 1 root root 37 Feb 21 15:19  crond.service -> /usr/lib/systemd/system/crond.service
+lrwxrwxrwx  1 root root 37 Apr 24 10:34  httpd.service -> /usr/lib/systemd/system/httpd.service
+lrwxrwxrwx. 1 root root 42 Feb 21 15:24  irqbalance.service -> /usr/lib/systemd/system/irqbalance.service
+lrwxrwxrwx. 1 root root 37 Feb 21 15:22  kdump.service -> /usr/lib/systemd/system/kdump.service
+lrwxrwxrwx. 1 root root 46 Feb 21 15:22  libstoragemgmt.service -> /usr/lib/systemd/system/libstoragemgmt.service
+lrwxrwxrwx. 1 root root 38 Feb 21 15:24  mcelog.service -> /usr/lib/systemd/system/mcelog.service
+lrwxrwxrwx. 1 root root 41 Feb 21 15:22  mdmonitor.service -> /usr/lib/systemd/system/mdmonitor.service
+lrwxrwxrwx. 1 root root 44 Feb 21 15:19  ModemManager.service -> /usr/lib/systemd/system/ModemManager.service
+lrwxrwxrwx. 1 root root 38 Apr 22 21:22  mysqld.service -> /usr/lib/systemd/system/mysqld.service
+lrwxrwxrwx. 1 root root 46 Feb 21 15:19  NetworkManager.service -> /usr/lib/systemd/system/NetworkManager.service
+lrwxrwxrwx. 1 root root 40 Feb 21 15:19  remote-fs.target -> /usr/lib/systemd/system/remote-fs.target
+lrwxrwxrwx. 1 root root 39 Feb 21 15:19  rsyslog.service -> /usr/lib/systemd/system/rsyslog.service
+lrwxrwxrwx. 1 root root 49 Feb 21 15:24 'run-vmblock\x2dfuse.mount' -> '/usr/lib/systemd/system/run-vmblock\x2dfuse.mount'
+lrwxrwxrwx. 1 root root 38 Feb 21 15:24  smartd.service -> /usr/lib/systemd/system/smartd.service
+lrwxrwxrwx. 1 root root 36 Feb 21 15:24  sshd.service -> /usr/lib/systemd/system/sshd.service
+lrwxrwxrwx. 1 root root 36 Feb 21 15:22  sssd.service -> /usr/lib/systemd/system/sssd.service
+lrwxrwxrwx  1 root root 48 Apr 30 10:46  systemd-resolved.service -> /usr/lib/systemd/system/systemd-resolved.service
+lrwxrwxrwx. 1 root root 37 Feb 21 15:24  tuned.service -> /usr/lib/systemd/system/tuned.service
+lrwxrwxrwx. 1 root root 35 Feb 21 15:24  vdo.service -> /usr/lib/systemd/system/vdo.service
+lrwxrwxrwx. 1 root root 40 Feb 21 15:23  vmtoolsd.service -> /usr/lib/systemd/system/vmtoolsd.service
+```
+
+- 有些子目录后缀为 `.requires`，目录内为依赖服务的链接，表示启动该服务前需要事先启动的依赖服务
+```bash
+[root@rocky8-3 system]$ ll vmtoolsd.service.requires/
+total 0
+lrwxrwxrwx. 1 root root 39 Feb 21 15:23 vgauthd.service -> /usr/lib/systemd/system/vgauthd.service
+```
+
+#### /etc/sysconfig/*
+- 几乎所有服务将初始化的一些选项设置写入到该目录
+- 如网卡配置的文件在该目录中 network-scripts 目录中
+
+
+#### /var/lib
+- 一些会产生数据的服务将其产生的数据写到该目录
+- 例如数据库管理系统 MariaDB 的数据库默认在该目录的 /var/lib/mysql 中
+
+
+#### /run/
+- 放置很多 daemon 的缓存
+- 包括 lock 文件和 PID 文件
+  
+
+### systemctl 自定义配置 service 文件
+1. service 文件初始默认在 `/usr/lib/systemd/system/` 目录中
+如想修改 mysqld.service，在该目录中查看 service 文件，部分内容如下：
+
+```bash
+  1 # It's not recommended to modify this file in-place, because it will be
+  2 # overwritten during package upgrades.  If you want to customize, the
+  3 # best way is to use systemctl edit:
+  4 #
+  5 # $ systemctl edit mysqld.service
+  6 #
+  7 # this will create file
+  8 #
+  9 #  /etc/systemd/system/mysqld.service.d/override.conf
+ 10 #
+ 11 # which be parsed after the file mysqld.service itself is parsed.
+ 12 #
+ 13 # For example, if you want to increase mysql's open-files-limit to 20000
+ 14 # add following when editing with command above:
+ 15 #
+ 16 #   [Service]
+ 17 #   LimitNOFILE=20000
+ 18 #
+ 19 # Or if you require to execute pre and post scripts in the unit file as root, set
+ 20 #       PermissionsStartOnly=true
+ 21 #
+ 22 # For more info about custom unit files, see systemd.unit(5) or
+ 23 # http://fedoraproject.org/wiki/Systemd#How_do_I_customize_a_unit_file.2F_add_a_custom_unit_file.3F
+ 24 #
+ 25 # Don't forget to reload systemd daemon after you change unit configuration:
+ 26 # root> systemctl --system daemon-reload
+ 27
+ 28 [Unit]
+ 29 Description=MySQL 8.0 database server
+ 30 After=syslog.target
+ 31 After=network.target
+```
+
+从官方说明文档可以看到，最好不在该文件中修改
+如果想修改 service 文件，可以执行 `systemctl edit mysqld.service` 
+该命令会生成 `/etc/systemd/system/mysqld.service.d/override.conf` 文件
+前面提到过 `/etc/systemd/system/` 目录，该目录中存放管理员建的文件，优先级更高
+该目录下的自定义配置会覆盖默认配置生效
+`override.conf` 可以根据需要改名，后缀为 `.conf`
+在 `mysqld.service.d` 目录中的自定义文件都会被调用
+用命令方式生成目录和文件则默认打开 nano 来编辑自定义文件
+
+2. 根据官方提示让配置文件生效
+```
+ # Don't forget to reload systemd daemon after you change unit configuration:
+ 25 # root> systemctl --system daemon-reload
+```
+
+
+
+
+
+
 **************************
 
 
