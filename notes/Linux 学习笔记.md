@@ -5574,19 +5574,92 @@ Additional units to install or uninstall when this service is installed or unins
 > A space-separated list of additional names this service shall be installed under. 
 > The names listed here must have the same suffix (i.e. type) as the service filename.
 
+
 **************************
 
+//LABEL: 日志文件
+# 日志文件
+- 通常只有 root 能读
+- /var/log 目录下
+
+## /var/log/boot.log
+- 本次开机启动时相关流程
 
 
+```bash
+[root@rocky8-3 system]$ ll /var/log/boot.log
+-rw-------. 1 root root 0 May  3 10:45 /var/log/boot.log
+```
 
-# 重启网络
+## /var/log/cron 
+- 查看与 crontab 计划任务日志
 
-- ubuntu 20.04
-![](img/2023-03-17-14-38-13.png)
+## /var/lastlog
+所有账最后一次登录相关信息
+lastlog 命令利用该文件的信息显示结果
+不是普通文件
 
-- ubuntu 22.04
-没有 `/etc/init.d/network` 文件 ？
+```bash
+[root@rocky8-3 log]$ file lastlog
+lastlog: data
+[root@rocky8-3 log]$ ll lastlog
+-rw-rw-r--. 1 root utmp 292584 May  3 12:52 lastlog
+```
 
+## /var/log/maillog
+记录邮件往来信息
+
+## /var/log/messages
+记录系统发生的错误信息或重要信息
+重要的日志文件
+可以用 `tail -f /var/log/messages` 来动态持续追踪日志
+
+
+## /var/log/secure
+基本上牵涉到需要输入账号密码的软件，登录时都被记录到此文件中
+登录错误或成功都记录，如用 ssh 远程登录时记录登录的日志
+
+## /var/log/wtmp
+记录正确登录系统的用户的账户信息
+last 命令通过此文件显示
+
+```bash
+[root@rocky8-3 log]$ whatis last
+last (1)             - show a listing of last logged in users
+[root@rocky8-3 log]$ file lastlog
+lastlog: data
+[root@rocky8-3 log]$ ll lastlog
+-rw-rw-r--. 1 root utmp 292584 May  3 12:52 lastlog
+[root@rocky8-3 log]$ last | head -n5
+lx       tty2         tty2             Wed May  3 12:36    gone - no logout
+root     pts/0        10.0.0.1         Wed May  3 09:10   still logged in
+reboot   system boot  4.18.0-372.9.1.e Wed May  3 09:05   still running
+root     pts/0        10.0.0.1         Tue May  2 15:20 - 21:33  (06:13)
+root     pts/2        10.0.0.82        Tue May  2 11:45 - 11:45  (00:00)
+```
+
+## /var/log/btmp
+记录登录失败的用户信息
+lastb 命令显示结果
+
+## 其他网络服务
+不同的服务会在该目录下用服务建立目录存放日志
+
+```bash
+[root@rocky8-3 log]$ ls mysql/
+mysqld.log              mysqld.log-20230430.gz  mysqld.log-20230502.gz
+mysqld.log-20230429.gz  mysqld.log-20230501.gz  mysqld.log-20230503.gz
+[root@rocky8-3 log]$ ls httpd/
+access_log  access_log-20230423  access_log-20230430  error_log  error_log-20230423  error_log-20230430
+```
+
+## 日志文件产生方式
+
+### 软件开发商自定义写入的文件
+- 如 WWW 软件 apache 通过这种方式处理
+
+### Linux 发行版提供的日志文件管理服务统一管理
+- 将信息给日志文件管理服务后，它自动将各种信息放到相关的日志文件中
 
 
 # dd
