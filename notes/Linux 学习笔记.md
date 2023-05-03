@@ -5660,6 +5660,51 @@ access_log  access_log-20230423  access_log-20230430  error_log  error_log-20230
 
 ### Linux 发行版提供的日志文件管理服务统一管理
 - 将信息给日志文件管理服务后，它自动将各种信息放到相关的日志文件中
+- 如 rsyslog.service 
+```bash
+[root@rocky8-3 log]$ systemctl list-units --all | grep rsyslog
+rsyslog.service loaded active running System Logging Service                                                              
+```
+
+## 日志文件所需的功能
+### systemd-journald.service 记录信息
+- systemd 提供
+
+```bash
+[root@rocky8-3 log]$ systemctl list-units --all | grep journald
+systemd-journald.service loaded active running Journal Service 
+systemd-journald-audit.socket loaded inactive dead Journal Audit Socket                                                                
+systemd-journald-dev-log.socket loaded active running Journal Socket (/dev/log)                                                           
+systemd-journald.socket loaded active running Journal Socket                                                                      
+```
+
+### rsyslog.service 收集登录系统与网络服务的信息
+- 查看该服务是否启动
+```bash
+[root@rocky8-3 log]$ systemctl list-units --all | grep rsyslog
+rsyslog.service loaded active running System Logging Service                                                              
+```
+```bash
+[root@rocky8-3 log]$ ps aux | grep rsyslog
+root        1229  0.0  0.2 284104  4236 ?        Ssl  09:05   0:01 /usr/sbin/rsyslogd -n
+root      182438  0.0  0.0 221936  1204 pts/0    S+   17:44   0:00 grep --color=auto rsyslog
+```
+
+#### /etc/rsyslog.conf 配置文件
+该文件规定 rsyslog 服务记录日志信息的一些设置：
+- 什么服务
+- 什么等级信息
+- 需要被记录在哪里
+
+
+### logrotate 日志轮循工具
+如果日志一直记录会变得很大，可以通过 logrotate（日志文件轮循）工具处理日志容量与更新问题
+将旧的日志文件更名，建立一个空的日志文件
+旧的日志文件保留一段时间没问题后，让系统自动删除
+
+
+
+
 
 
 # dd
