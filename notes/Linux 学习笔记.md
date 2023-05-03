@@ -4981,7 +4981,130 @@ lrwxrwxrwx. 1 root root   41 Feb 21 15:19 dbus-org.bluez.service -> /usr/lib/sys
 
 ### systemctl 管理服务
 - systemctl 命令来管理 systemd 服务
-- 
+- `systemctl [OPTIONS...] {COMMAND}`
+#### systemctl start 立即启动服务
+
+#### systemctl stop 立即关闭服务
+
+#### systemctl restart 立即重启服务
+
+#### systemctl reload 重新加载配置文件
+- 不关闭服务
+
+#### systemctl enable 设置下次开机启动
+- `systemctl enable --now` 可以设置现在立即生效且以后开机启动
+
+#### systemctl disable 设置下次开机不启动
+- `systemctl diabale --now` 可以设置现在立即生效且以后开机不启动
+
+#### systemctl status 查看服务的状态
+- Active
+    - active (running)
+    正在运行
+    - active (exited)
+    仅执行一次就退出
+    - active (waiting)
+    需要等待其他时间发生才能继续运行
+    - inactive (dead)
+    没有运行
+
+```bash
+[root@rocky8-3 system]$ systemctl status firewalld.service
+● firewalld.service - firewalld - dynamic firewall daemon
+   Loaded: loaded (/usr/lib/systemd/system/firewalld.service; disabled; vendor preset: enabled)
+   Active: inactive (dead)
+     Docs: man:firewalld(1)
+```
+```bash
+[root@rocky8-3 system]$ systemctl status httpd
+● httpd.service - The Apache HTTP Server
+   Loaded: loaded (/usr/lib/systemd/system/httpd.service; enabled; vendor preset: disabled)
+  Drop-In: /usr/lib/systemd/system/httpd.service.d
+           └─php-fpm.conf
+   Active: active (running) since Wed 2023-05-03 09:05:41 CST; 2h 8min ago
+     Docs: man:httpd.service(8)
+ Main PID: 1234 (httpd)
+   Status: "Running, listening on: port 80"
+    Tasks: 213 (limit: 11047)
+   Memory: 41.8M
+   CGroup: /system.slice/httpd.service
+           ├─1234 /usr/sbin/httpd -DFOREGROUND
+           ├─1381 /usr/sbin/httpd -DFOREGROUND
+           ├─1390 /usr/sbin/httpd -DFOREGROUND
+           ├─1397 /usr/sbin/httpd -DFOREGROUND
+           └─1402 /usr/sbin/httpd -DFOREGROUND
+
+May 03 09:05:38 rocky8-3 systemd[1]: Starting The Apache HTTP Server...
+May 03 09:05:41 rocky8-3 httpd[1234]: AH00558: httpd: Could not reliably determine the server's fully qualified >
+May 03 09:05:41 rocky8-3 systemd[1]: Started The Apache HTTP Server.
+May 03 09:05:41 rocky8-3 httpd[1234]: Server configured, listening on: port 80
+```
+
+- daemon 默认状态
+    - enabled
+    开机启动
+    - disabled
+    开机不启动
+    - static
+    不能自动启动，但可能别其他 enabled 的服务唤醒
+    如依赖属性的服务
+    - mask
+    无论如何都不能启动，已被强制注销（非删除）
+    可通过 systemctl unmask 改为默认状态
+
+
+#### systemctl mask 注销服务
+
+#### systemctl is-active 查看是否正在运行
+
+#### systemctl is-enable 查看是否默认开机启动
+
+### systemctl 查看系统上的所有服务
+
+#### systemctl list-units 显示全部启动的 units
+- 加上 `--all` 将没启动的也显示
+
+#### systemctl list-unit-files 文件列表说明
+- 依据 `/usr/lib/systemd/system` 中的文件，对其列出说明
+- `--type=TYPE` 指定 type 类型
+
+```bash
+[root@rocky8-3 system]$ systemctl list-unit-files | head -n 5
+UNIT FILE                                  STATE
+proc-sys-fs-binfmt_misc.automount          static
+-.mount                                    generated
+boot.mount                                 generated
+dev-hugepages.mount                        static
+```
+```bash
+[root@rocky8-3 system]$ systemctl list-unit-files --type=socket | head -n5
+UNIT FILE                               STATE
+avahi-daemon.socket                     enabled
+cni-dhcp.socket                         disabled
+cockpit-wsinstance-http.socket          static
+cockpit-wsinstance-https-factory.socket static
+[root@rocky8-3 system]$
+[root@rocky8-3 system]$ systemctl list-unit-files --type socket | head -n5
+UNIT FILE                               STATE
+avahi-daemon.socket                     enabled
+cni-dhcp.socket                         disabled
+cockpit-wsinstance-http.socket          static
+cockpit-wsinstance-https-factory.socket static
+```
+
+### systemctl 管理不同的环境（target unit）
+```bash
+[root@rocky8-3 system]$ systemctl list-units --type=target --all | head -n5
+  UNIT                      LOAD      ACTIVE   SUB    DESCRIPTION
+  basic.target              loaded    active   active Basic System
+  bluetooth.target          loaded    active   active Bluetooth
+  cryptsetup.target         loaded    active   active Local Encrypted Volumes
+  emergency.target          loaded    inactive dead   Emergency Mode
+[root@rocky8-3 system]$ systemctl list-units --type=target --all | grep shutdown
+  shutdown.target           loaded    inactive dead   Shutdown
+[root@rocky8-3 system]$ systemctl list-units --type=target --all | grep graphic
+  graphical.target          loaded    active   active Graphical Interface
+```
 
 **************************
 
