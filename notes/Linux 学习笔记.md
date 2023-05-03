@@ -5979,6 +5979,48 @@ May 03 09:05:48 rocky8-2 systemd[1]: Started Job spooling tools.
 ```
 
 
+### at 运行相关文件
+- `man at` 查看
+```bash
+FILES
+    /var/spool/at
+    /var/spool/at/spool
+    /proc/loadavg
+    /var/run/utmp
+    /etc/at.allow
+    /etc/at.deny
+```
+
+- 可以将要执行的计划任务以文本的方式写入 `/var/spool/at` 目录中
+该目录只有 root 有权限操作
+```bash
+[root@rocky8-2 sysctl.d]$ cd /var/spool/at
+[root@rocky8-2 at]$ ll -d .
+drwx------. 3 root root 31 Apr 22 21:36 .
+[root@rocky8-2 at]$ ls
+spool
+```
+
+- 更安全的方式，写白名单和黑名单
+
+### at 的运行过程
+1. 从 `/etc/at.allow` 查看白名单用户，位于此文件中的用户才能使用 at，其他用户不能使用
+2. 如果白名单文件不存在，则从 `/etc/at.deny` 文件中查看黑名单用户
+3. 两个文件都不存在，则只有 root 能执行 at 命令
+4. 如果一个用户同时在白名单和黑名单中，则先看白名单，存在则可以使用 at
+
+注意优先级，有了白名单，黑名单就没有意义
+系统通常带一个空的黑名单，默认没有白名单，因此初始所有人都可以使用 at
+如果不想某个账号使用 at，则将其写入黑名单，一个账号占一行
+
+
+### at 命令语法
+
+```bash
+
+```
+
+
 ## crontab 执行例行性计划任务
 - 例行性任务，会循环一直执行
 - 需要开启服务 crond
