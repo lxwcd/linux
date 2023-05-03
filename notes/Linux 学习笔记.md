@@ -4804,7 +4804,10 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 
 
 #### 超级守护进程（super daemon）
-- xinetd 和 inetd 两个总管程序提供 socket 对应或端口对应的管理
+> [xinetd](https://en.wikipedia.org/wiki/Xinetd)
+> [inetd](https://en.wikipedia.org/wiki/Inetd)
+
+- xinetd (Extended Internet Service Daemon) 和 inetd (internet service daemon) 两个总管程序提供 socket 对应或端口对应的管理
 - 需要时唤醒，要求结束时服务结束
 - 唤醒可能造成延迟
 
@@ -4828,10 +4831,157 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
     - 5
     图形界面，需要安装的操作系统支持图形界面
     - 6
+```bash
+[root@ubunut22:~]$ init --help
+init [OPTIONS...] COMMAND
+
+Send control commands to the init daemon.
+
+Commands:
+  0              Power-off the machine
+  6              Reboot the machine
+  2, 3, 4, 5     Start runlevelX.target unit
+  1, s, S        Enter rescue mode
+  q, Q           Reload init daemon configuration
+  u, U           Reexecute init daemon
+
+Options:
+     --help      Show this help
+     --no-wall   Don't send wall message before halt/power-off/reboot
+
+See the telinit(8) man page for details.
+```
+#### 运行级别对应的启动脚本
+> [What does the "rc" stand for in /etc/rc.d?](https://unix.stackexchange.com/questions/111611/what-does-the-rc-stand-for-in-etc-rc-d)
+
+`rc` 可以理解为 `run commands`
+
+```bash
+[09:17:13 root@ubuntu2004 ~]#cd /etc/rc
+rc0.d/ rc1.d/ rc2.d/ rc3.d/ rc4.d/ rc5.d/ rc6.d/ rcS.d/
+```
+例如在图形界面通过 `init 3` 可以进入命令行模式，则运行脚本在 `/etc/rc3.d` 目录中
+目录中每个文件代表要启动的服务，开头的 `S` 表示启动该服务，数字表示启动顺序
+最后的名字为服务名字
+```bash
+[09:17:13 root@ubuntu2004 ~]#cd /etc/rc3.d/
+[09:20:32 root@ubuntu2004 /etc/rc3.d]#ls
+K01speech-dispatcher            S02unattended-upgrades  S03nscd          S04cron           S06gdm3
+README                          S02uuidd                S03rsync         S04firewalld      S06saned
+S01console-setup.sh             S03acpid                S03sphinxsearch  S04lightdm        S07grub-common
+S02apport                       S03anacron              S03ssh           S04postfix        S07ondemand
+S02binfmt-support               S03dbus                 S03thermald      S04spice-vdagent  S07plymouth
+S02lvm2-lvmpolld                S03hddtemp              S03whoopsie      S05openvpn        S07rc.local
+S02pulseaudio-enable-autospawn  S03irqbalance           S04avahi-daemon  S06cups
+S02rsyslog                      S03mysql                S04bluetooth     S06cups-browsed
+```
+
+每个启动脚本连接到 `/etc/init.d/` 目录下对应的 daemon 可执行文件
+```bash
+[09:37:57 root@ubuntu2004 /etc/rc3.d]#ll S02rsyslog
+lrwxrwxrwx 1 root root 17 Oct  8  2020 S02rsyslog -> ../init.d/rsyslog*
+[09:38:21 root@ubuntu2004 /etc/rc3.d]#
+[09:38:24 root@ubuntu2004 /etc/rc3.d]#file S02rsyslog
+S02rsyslog: symbolic link to ../init.d/rsyslog
+```
+
+根据启动的顺序能保证依序执行所有需要的服务，同时解决依赖问题
+
+#### chkconfig 制定运行级别默认要启动的服务
+
+#### 切换运行级别
+- `init num` 切换运行级别，`num` 为级别数字
 
 
+## systemd 服务
+- centos7 开始使用 `systemd` 这个启动服务管理机制
+- 可以并行处理服务，加速开机流程
+旧的 init 启动脚本时按顺序一项一项启动，但有些服务没有依赖关系
+当前操作系统几乎都支持多内核架构，因此可以同时启动服务
+
+- 一经要求就响应的 on-demand 启动方式
+systemd 只有一个 systemd 服务搭配 systemctl 命令处理，无需额外支持
+systemd 常驻内存
+
+- 服务依赖性自我检查
+如果启动某个服务时需要依赖另一个服务，systemd 会自动启动依赖服务
+
+- 根据 daemon 功能分类
+systemd 定义所有的服务为一个服务单位（unit）
+将该 unit 归类到不同的服务类型（type）中
+如 service、 socket、 target、 path、 snapshot、 timer 等多个类型（type）
+方便管理
+
+- 多个 daemons 集合成一个群组
+多个功能集合成一个 target 项目
+
+- 向下兼容旧的 init 服务脚本
+    - 但有些功能并非完全对应
+    - 运行级别仅有 1、3、5 对应
+    - systemctl 不可以自定义参数，没有 /etc/init.d/daemon 灵活
+    - 如果某个服务是管理员手动启动，而非通过 systemctl 启动，
+    则 systemd 将无法检查到该服务
+    - systemd 启动过程中无法通过标准输入传递信息，因此自己编写
+    systemd 的启动设置时要取消交互机制
+
+### systemd 配置文件目录
+
+#### /usr/lib/systemd/system/ 启动脚本
+类似 `/etc/init.d/` 目录中的文件
+存放服务最主要的启动脚本
+
+```bash
+[root@rocky8-3 system]$ cd /usr/lib/systemd/system; ls | head -n5
+accounts-daemon.service
+alsa-restore.service
+alsa-state.service
+anaconda-direct.service
+anaconda-fips.service
+```
+
+#### /run/systemd/system/ 程序执行过程中产生的服务脚本
+脚本优先级比 `/usr/lib/systemd/system` 高
+
+#### /etc/systemd/system 管理员根据需要创建的执行脚本
+- 类似如 `/etc/rc5.d/SXX` 的功能
+- 优先级比 `/run/lib/systemd/system` 高
+- 该目录中很多文件是链接文件，源文件在 `/run/lib/systemd/system` 目录中
+```bash
+[root@rocky8-3 system]$ ll | head -n5
+total 4
+drwxr-xr-x. 2 root root   31 Feb 21 15:24 basic.target.wants
+drwxr-xr-x. 2 root root   31 Feb 21 15:19 bluetooth.target.wants
+lrwxrwxrwx. 1 root root   37 Feb 21 15:19 ctrl-alt-del.target -> /usr/lib/systemd/system/reboot.target
+lrwxrwxrwx. 1 root root   41 Feb 21 15:19 dbus-org.bluez.service -> /usr/lib/systemd/system/bluetooth.service
+```
+
+### systemd 的 unit 类型
+- `/run/lib/systemd/system` 中文件不同的后缀对应不同的类型（type）
+
+#### .service 一般服务类型
+- 主要是系统服务
+- 包括服务器本身所需要的本地服务以及网络服务等
+- 最常见的类型
+
+#### .socket 内部程序数据交换的 socket 服务
+- 主要是 IPC（Inter-process communication）的传输信息 socket 文件功能
+- 通常用于监控信息传递的 socket 文件中
+
+#### .target 执行环境类型
+- 一堆服务的集合
+
+#### .mount 文件系统挂载相关的服务
+
+#### .automount 文件挂载相关的服务
 
 
+#### .path 检测特定文件或目录类型
+- 某些服务需要检测某些特定的目录来提供队列服务
+- 如打印服务，通过检测打印队列目录来启动打印功能
+
+### systemctl 管理服务
+- systemctl 命令来管理 systemd 服务
+- 
 
 **************************
 
