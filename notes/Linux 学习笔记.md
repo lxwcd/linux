@@ -4853,6 +4853,8 @@ See the telinit(8) man page for details.
 ```
 #### 运行级别对应的启动脚本
 > [What does the "rc" stand for in /etc/rc.d?](https://unix.stackexchange.com/questions/111611/what-does-the-rc-stand-for-in-etc-rc-d)
+> [Chapter 7. The rc.d System](https://www.netbsd.org/docs/guide/en/chap-rc.html)
+
 
 `rc` 可以理解为 `run commands`
 
