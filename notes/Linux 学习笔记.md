@@ -5944,8 +5944,66 @@ net.ipv4.ip_nonlocal_bind = 0
 ```
 
 
+**********************
+
+# 计划任务（crontab）
+- 一次性任务
+- 例行性任务
+
+## Linux 常见的例行性任务
+- 日志文件轮循 logrotate
+- 日志文件分析 logwatch
+- 建立 locate 数据库
+- manpage 查询数据库的建立
+- RPM 软件日志文件的建立
+- 删除缓存
+- 与网络服务有关的分析操作
 
 
+
+## at 执行突发性的计划任务
+- 执行一次就结束
+- 执行 `at` 需要有 `atd` 这个服务
+```bash
+[root@rocky8-2 sysctl.d]$ systemctl status atd.service
+● atd.service - Job spooling tools
+   Loaded: loaded (/usr/lib/systemd/system/atd.service; enabled; vendor preset: enabled)
+   Active: active (running) since Wed 2023-05-03 09:05:48 CST; 11h ago
+ Main PID: 1377 (atd)
+    Tasks: 1 (limit: 11045)
+   Memory: 400.0K
+   CGroup: /system.slice/atd.service
+           └─1377 /usr/sbin/atd -f
+
+May 03 09:05:48 rocky8-2 systemd[1]: Started Job spooling tools.
+```
+
+
+## crontab 执行例行性计划任务
+- 例行性任务，会循环一直执行
+- 需要开启服务 crond
+```bash
+[root@rocky8-2 sysctl.d]$ systemctl status crond.service
+● crond.service - Command Scheduler
+   Loaded: loaded (/usr/lib/systemd/system/crond.service; enabled; vendor preset: enabled)
+   Active: active (running) since Wed 2023-05-03 09:05:48 CST; 11h ago
+ Main PID: 1382 (crond)
+    Tasks: 1 (limit: 11045)
+   Memory: 5.9M
+   CGroup: /system.slice/crond.service
+           └─1382 /usr/sbin/crond -n
+
+May 03 09:05:49 rocky8-2 crond[1382]: (CRON) INFO (running with inotify support)
+May 03 10:01:01 rocky8-2 CROND[3784]: (root) CMD (run-parts /etc/cron.hourly)
+May 03 10:01:01 rocky8-2 anacron[3793]: Anacron started on 2023-05-03
+May 03 10:01:01 rocky8-2 anacron[3793]: Will run job `cron.daily' in 33 min.
+May 03 10:01:01 rocky8-2 anacron[3793]: Jobs will be executed sequentially
+May 03 10:34:01 rocky8-2 anacron[3793]: Job `cron.daily' started
+May 03 10:34:01 rocky8-2 run-parts[4085]: (/etc/cron.daily) finished logrotate
+May 03 10:34:01 rocky8-2 anacron[3793]: Job `cron.daily' terminated
+May 03 10:34:01 rocky8-2 anacron[3793]: Normal exit (1 job run)
+May 03 21:01:01 rocky8-2 CROND[6658]: (root) CMD (run-parts /etc/cron.hourly)
+```
 
 
 # dd
