@@ -5181,6 +5181,24 @@ graphical.target
 - systemctl rescue 救援模式
 - systemctl emergency 紧急恢复模式
 
+### systemctl show 显示默认设置
+
+```bash
+[root@rocky8-3 system]$ systemctl show getty.target | head -n10
+Id=getty.target
+Names=getty.target
+Wants=getty@tty1.service
+WantedBy=multi-user.target
+Conflicts=shutdown.target
+Before=multi-user.target shutdown.target
+After=getty@tty1.service
+Documentation=man:systemd.special(7) man:systemd-getty-generator(8) http://0pointer.de/blog/projects/serial-console.html
+Description=Login Prompts
+LoadState=loaded
+```
+
+
+
 ### systemctl list-dependencies 分析各服务之间的依赖性
 #### 查看某个服务所依赖的服务
 - `systemctl list-dependencies` 显示的 default.target 为当前默认的环境
