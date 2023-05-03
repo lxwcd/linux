@@ -5427,10 +5427,134 @@ lrwxrwxrwx. 1 root root 39 Feb 21 15:23 vgauthd.service -> /usr/lib/systemd/syst
  25 # root> systemctl --system daemon-reload
 ```
 
+### systemctl 配置文件的设置项目
+> [Common service parameters](https://docs.fedoraproject.org/en-US/quick-docs/understanding-and-administering-systemd/index.html#common-service-parameters)
+
+以 `/usr/lib/systemd/system/sshd.service` 为例：
+```bash
+ 1 [Unit]
+  2 Description=OpenSSH server daemon
+  3 Documentation=man:sshd(8) man:sshd_config(5)
+  4 After=network.target sshd-keygen.target
+  5 Wants=sshd-keygen.target
+  6
+  7 [Service]
+  8 Type=notify
+  9 EnvironmentFile=-/etc/crypto-policies/back-ends/opensshserver.config
+ 10 EnvironmentFile=-/etc/sysconfig/sshd
+ 11 ExecStart=/usr/sbin/sshd -D $OPTIONS $CRYPTO_POLICY
+ 12 ExecReload=/bin/kill -HUP $MAINPID
+ 13 KillMode=process
+ 14 Restart=on-failure
+ 15 RestartSec=42s
+ 16
+ 17 [Install]
+ 18 WantedBy=multi-user.target
+```
+
+1. [Unit] 
+- Description
+用 `systemctl list-units --all` 时看到的说明，对该服务的介绍
+
+```bash
+[root@rocky8-3 system]$ systemctl list-units --all | grep sshd.service
+sshd.service loaded active running OpenSSH server daemon                                                               
+```
+
+- Documentation
+介绍如何查看该服务的帮助文档，说名
+
+- After
+表示此服务在哪些服务启动后才启动
+但并非强制要求一定要在这些服务启动后启动
+
+- Before
+与 After 相反，在哪些服务启动前最好先启动此服务
+非强制要求
+
+- Requires
+依赖服务设置
+必须在这些服务启动后才能启动此服务
+
+- Wants
+与 Requires 相反，在此服务启动启动后最好再启动这些服务
+非强制要求
+
+- Conflicts
+冲突的服务
+如果此服务与列出的这些服务均启动，则会有冲突
+
+2. [Service]
+> [Service Parameters](https://docs.fedoraproject.org/en-US/quick-docs/understanding-and-administering-systemd/index.html#_service_parameters)
+
+- Type
+daemon 的启动方式，默认 simple
+
+- EnvironmentFile
+环境配置文件
+
+- ExecStart
+实际执行此 daemon 的命令或脚本程序
+
+- ExecStop 
+关闭此服务的命令
+与 systemctl stop 相关的命令
+
+- ExecReload
+与 systemctl reload 相关的命令
+
+- Restart
+设置服务进程终止后是否重启该服务
+
+```
+Configures whether to restart the service when the service’s process exits, is killed, or reaches a timeout:
+
+no - The service will not be restarted. This is the default.
+
+on-success - Restart only when the service process exits cleanly (exit code 0).
+
+on-failure - Restart only when the service process does not exit cleanly (node-zero exit code).
+
+on-abnormal - Restart if the process terminates with a signal or when a timeout occurs.
+
+on-abort - Restart if the process exits due to an uncaught signal not specified as a clean exit status.
+
+always - Always restart.
+```
+
+- RemainAfterExit
+当 daemon 所有的进程都终止后，是否重新尝试启动服务
+
+- TimeoutSec
+当服务因为某些原因无法正常启动或关闭时，等待多久强制结束
+
+- KillMode
+> [KillMode](https://manpages.ubuntu.com/manpages/bionic/man5/systemd.kill.5.html)
+
+设置服务终止时终止哪些进程
+    - process
+    daemon 终止时只终止主要的进程
+    ExecStop 设置的命令
+    - control-group
+    daemon 终止时将 daemon 终止时产生的 control-group 的进程都关闭
+    - none
+    不会终止任何进程
+
+- RestartSec
+此服务关闭后，如果需要重启，sleep 多久，默认 100ms
 
 
+3. [Install]
+- WantedBy
+指此服务依附于哪个 target unit
 
+- Also
+Additional units to install or uninstall when this service is installed or uninstalled.
 
+- Alias
+别名
+> A space-separated list of additional names this service shall be installed under. 
+> The names listed here must have the same suffix (i.e. type) as the service filename.
 
 **************************
 
