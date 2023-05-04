@@ -6015,13 +6015,102 @@ spool
 
 
 ### at 命令语法
+> [仅运行一次的工作排程](http://cn.linux.vbird.org/linux_basic/0430cron_2.php)
+
+- `-m` 即使没有输出也给用户发送邮件
+- `-M` 从不法邮件
+- `-l` 相当于 `atq` 列出该使用者的 at 计划，如果是 root，则列出全部用户的 at 计划
+- `-d` 相当于 `atrm` 后面接 job number，删除该任务计划
+- `-v` 显示更详细的信息，将任务计划的时间显示出来
+- `-c` 后面接 job number，将具体某个任务计划内容输出到标准输出
+该内容中指明了 shell 类型等很多变量参数
+- `-f` 后面接文件，从指定文件中读取任务而非从标准输入读取
+- `-t` 指定时间
+```bash
+-t time run the job at time, given in the format [[CC]YY]MMDDhhmm[.ss]
+```
+
+- 时间格式
+  - HH:MM YYYY-MM-DD 绝对时间
+  不指定后面的年月日则默认在当天执行
+  如果时间超过当前时间，不指定年月日，则在第二天执行
+
+  - HH:MM[am|pm] + number [minutes|hours|days|weeks] 相对时间
+  如 04pm + 3 days 表示三天后的下午 4 点
+  - now + number [minutes|hours|days|weeks] 相对时间
+  now + 3 minutes 表示 3 分钟后执行
+
+### 创建 at 任务的方式
+- at 的执行与终端环境无关，如
+如果命令为 `echo "hello"` 这种，不会在屏幕输出，而是发送邮件到 mailbox 中
+如果想在屏幕输出，则用 `echo 1 > /dev/tty1` 这种，指定终端
+
+- at 后台执行任务，独立出当前 shell 环境，可以脱机继续执行任务
+如远程连接服务器执行某个任务，时间还没到但当前客户端宕机，此时服务器依旧能执行该任务
+#### 交互式创建
+- 进入 at shell 的环境让用户执行任务命令
+- 路径最好使用绝对路径而非相对路径，避免出问题
+- ctrl-d 退出输出
 
 ```bash
+[root@rocky8-3 ~]$ at now + 2 minutes
+warning: commands will be executed using /bin/sh
+at> echo "test at" > at_job1.txt
+at> <EOT>
+job 2 at Thu May  4 10:40:00 2023
+[root@rocky8-3 ~]$
+[root@rocky8-3 ~]$ at -l
+2       Thu May  4 10:40:00 2023 a root
+[root@rocky8-3 ~]$ atq
+2       Thu May  4 10:40:00 2023 a root
+```
 
+#### 重定向
+
+```bash
+[root@rocky8-3 ~]$ echo "test" | at now +1 minutes
+warning: commands will be executed using /bin/sh
+job 5 at Thu May  4 11:08:00 2023
+[root@rocky8-3 ~]$ atq
+5       Thu May  4 11:08:00 2023 a root
+```
+
+#### 从文件中读取任务执行
+- `-f` 指定文件
+- `-t` 指定时间
+
+```bash
+[root@rocky8-3 ~]$ cat at_job.txt
+for i in {1..5}; do
+    echo ${i} > ~/at_job_${i}.txt
+done
+[root@rocky8-3 ~]$
+[root@rocky8-3 ~]$ at -f at_job.txt -t 202305041121
+warning: commands will be executed using /bin/sh
+job 7 at Thu May  4 11:21:00 2023
+[root@rocky8-3 ~]$ atq
+7       Thu May  4 11:21:00 2023 a root
+```
+- `at -c 7` 可以查看具体执行命令，其中定义了很多环境变量，指定了 shell 类型为 `/bin/sh`
+
+
+## batch 系统空闲时执行后台任务
+- batch 是利用 at 来执行命令，增加一些控制参数
+- CPU 任务负载小于 0.8 才执行工作任务
+任务负载不是 CPU 的使用率，是单一时间点 CPU 负责的任务数量
+- batch 不支持参数
+```bash
+batch executes commands when system load levels permit; 
+      in other words, when the load average drops below 0.8, 
+      or the value specified in the invocation of atd.
 ```
 
 
+
 ## crontab 执行例行性计划任务
+> [循环运行的例行性工作排程](http://cn.linux.vbird.org/linux_basic/0430cron_3.php)
+
+
 - 例行性任务，会循环一直执行
 - 需要开启服务 crond
 ```bash
@@ -6047,6 +6136,8 @@ May 03 10:34:01 rocky8-2 anacron[3793]: Normal exit (1 job run)
 May 03 21:01:01 rocky8-2 CROND[6658]: (root) CMD (run-parts /etc/cron.hourly)
 ```
 
+### 设置用户
+- 同 at 相同，为了安全，可以能使用限制 crontab 的用户账号
 
 # dd
 > [https://www.lanqiao.cn/courses/1/learning/?id=62&compatibility=true](https://www.lanqiao.cn/courses/1/learning/?id=62&compatibility=true)
