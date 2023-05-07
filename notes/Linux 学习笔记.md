@@ -6111,6 +6111,7 @@ batch executes commands when system load levels permit;
 > [循环运行的例行性工作排程](http://cn.linux.vbird.org/linux_basic/0430cron_3.php)
 
 
+
 - 例行性任务，会循环一直执行
 - 需要开启服务 crond
 ```bash
@@ -10183,6 +10184,9 @@ root@rocky86 firmware $ dmesg | grep efi:
 
 
 
+
+
+
 ************************
 
 //LABEL: 域名
@@ -10342,6 +10346,71 @@ named.conf zone . 为什么删掉
 
 www.boce.com
 
+
+
+************************************
+//TODO：加密与安全
+
+# ssh 服务
+
+## ssh 连接中公钥交换原理
+- 客户端第一次连接服务端时会显示服务端的指纹，指明了生成指纹所使用的公钥文件
+以及加密算法，不同的客户端连接服务器时使用的算法可能不同
+
+如服务端为 ubuntu20.04，其 `/etc/ssh` 目录中有几种不同算法的公钥：
+```bash
+[18:59:15 root@ubuntu2004 /etc/ssh]#ls
+moduli        sshd_config         ssh_host_ecdsa_key.pub    ssh_host_rsa_key
+ssh_config    sshd_config.d       ssh_host_ed25519_key      ssh_host_rsa_key.pub
+ssh_config.d  ssh_host_ecdsa_key  ssh_host_ed25519_key.pub  ssh_import_id
+```
+- `rsa` 和  `ecdsa` 分别对应不同的密钥交换算法
+
+
+客户端第一次连接，如 rocky8 连接，会提示指纹信息：
+```bash
+[root@rocky8-3 .ssh]$ ssh 192.168.137.17
+The authenticity of host '192.168.137.17 (192.168.137.17)' can't be established.
+ECDSA key fingerprint is SHA256:iBJIDP0FkveLmB549s75m3T7qfYU4nuNUKLeJqwRj2M.
+Are you sure you want to continue connecting (yes/no/[fingerprint])?
+```
+从提示可以看出使用的公钥为 `ssh_host_ecdsa_key.pub`，对该公钥进行数字前面的单项哈希算法为 `SHA256`
+
+而客户端 ubuntu22.04 来连接服务器时，提示为：
+```bash
+[root@ubunut22:~]$ ssh  192.168.137.17
+The authenticity of host '192.168.137.17 (192.168.137.17)' can't be established.
+ED25519 key fingerprint is SHA256:gLez30G4gynTfEWJe7kvn3I0w5x8a18+/wvDQorzCEk.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])?
+```
+从提示可以看出使用的公钥为 `ssh_host_ed25519_key.pub`，对该公钥进行数字前面的单项哈希算法为 `SHA256`
+因此两者的指纹不同
+
+- 验证指纹是否正确
+此时客户端需要确认指纹是否正确从而确认服务端的是相连接的服务端而非其他中间人
+服务端可以在自己主机上查看生成的指纹，从而进行比对（单项哈希算法生成的指纹不可逆的）
+
+1）服务端可以通过连自己查看指纹，但这里默认的公钥文件为 `ssh_host_ecdsa_key.pub`
+```bash
+[19:23:41 root@ubuntu2004 /etc/ssh]#ssh 127.0.0.1
+The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
+ECDSA key fingerprint is SHA256:iB[19:34:49 root@ubuntu2004 /etc/ssh]#ls
+moduli        sshd_config         ssh_host_ecdsa_key.pub    ssh_host_rsa_key
+ssh_config    sshd_config.d       ssh_host_ed25519_key      ssh_host_rsa_key.pub
+ssh_config.d  ssh_host_ecdsa_key  ssh_host_ed25519_key.pub  ssh_import_id
+```
+
+2）通过 ssh-keygen 生成指纹进行比对
+`ssh-keygen -l [-v] [-E fingerprint_hash] [-f input_keyfile]`
+`-l` 表示显示公钥文件的指纹
+`-E` 显示用于数字签名的单向哈希算法，可选的有 `sha256` 和 `md5`，默认为 `sha256`
+`-f` 指定公钥文件
+
+```bash
+[19:37:06 root@ubuntu2004 /etc/ssh]#ssh-keygen -l -E "sha256" -f ssh_host_ed25519_key.pub
+256 SHA256:gLez30G4gynTfEWJe7kvn3I0w5x8a18+/wvDQorzCEk root@cdqz-KPL-W0X (ED25519)
+```
 
 ****************************
 //LABEL: 防火墙
