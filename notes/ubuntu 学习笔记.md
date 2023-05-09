@@ -39,8 +39,58 @@ en_US.UTF-8
 ```bash
 [root@ubunut22:~]$ localectl set-locale LANG=en_US.UTF-8
 ```
+- 修改完后重启
 
 ## 检查系统时间
+- 查看系统的时区是否正确
+1) `date` 查看时区，如中国应为 CST
+```bash
+[root@ubuntu22 ~]#date
+Tue May  9 07:26:48 PM CST 2023
+```
+
+2) 或者 `timedatectl` 查看
+RTC 为 real time clock，为硬件时钟
+Local time 为设置的时区所在的软件时钟
+UTC 为 universal time clock，为格林威治标准时间，以及地球旋转计算的时间
+
+```bash
+[root@ubuntu22 ~]#timedatectl status
+               Local time: Tue 2023-05-09 19:37:45 CST
+           Universal time: Tue 2023-05-09 11:37:45 UTC
+                 RTC time: Tue 2023-05-09 11:37:45
+                Time zone: Asia/Shanghai (CST, +0800)
+System clock synchronized: yes
+              NTP service: active
+          RTC in local TZ: no
+```
+
+- 检查时间是否正确
+`hwclock` 检查硬件时钟
+`date` 查看软件时间
+或者用 `timedatectl status` 查看
+
+
+- 如果硬件时间和软件时间不相同，则用 hwclock 来设置
+```bash
+Usage:
+ hwclock [function] [option...]
+
+Time clocks utility.
+
+Functions:
+ -r, --show           display the RTC time
+     --get            display drift corrected RTC time
+     --set            set the RTC according to --date
+ -s, --hctosys        set the system time from the RTC
+ -w, --systohc        set the RTC from the system time
+```
+
+- date 修改软件时间
+如果手动修改软件时间，可以用 `date -s`
+
+
+
 
 
 ## 创建 root 密码

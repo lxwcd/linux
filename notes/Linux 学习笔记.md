@@ -4909,8 +4909,8 @@ systemd 常驻内存
 如果启动某个服务时需要依赖另一个服务，systemd 会自动启动依赖服务
 
 - 根据 daemon 功能分类
-systemd 定义所有的服务为一个服务单位（unit）
-将该 unit 归类到不同的服务类型（type）中
+systemd 中将每个服务称为一个服务单位（unit）
+不同的 unit 归类到不同的服务类型（type）中
 如 service、 socket、 target、 path、 snapshot、 timer 等多个类型（type）
 方便管理
 
@@ -5610,9 +5610,41 @@ ommysql 模块需要安装 rsyslog-mysql 包
 
 
 # logratate
- 
 
+## ubuntu 22.04
+- 服务加载但未启动，static 表示不自动启动
+- 由 logrotate.timer 触发
+```bash
+[root@client2:mysql]$ systemctl status logrotate.
+logrotate.service  logrotate.timer
+[root@client2:mysql]$ systemctl status logrotate.service
+○ logrotate.service - Rotate log files
+     Loaded: loaded (/lib/systemd/system/logrotate.service; static)
+     Active: inactive (dead) since Tue 2023-05-09 09:55:12 CST; 6h ago
+TriggeredBy: ● logrotate.timer
+       Docs: man:logrotate(8)
+             man:logrotate.conf(5)
+   Main PID: 959 (code=exited, status=0/SUCCESS)
+        CPU: 385ms
 
+5月 09 09:55:10 ubunut22 systemd[1]: Starting Rotate log files...
+5月 09 09:55:12 ubunut22 systemd[1]: logrotate.service: Deactivated successfully.
+5月 09 09:55:12 ubunut22 systemd[1]: Finished Rotate log files.
+```
+```bash
+[root@client2:mysql]$ systemctl status logrotate.timer
+● logrotate.timer - Daily rotation of log files
+     Loaded: loaded (/lib/systemd/system/logrotate.timer; enabled; vendor preset: enabled)
+     Active: active (waiting) since Tue 2023-05-09 09:55:09 CST; 6h ago
+    Trigger: Wed 2023-05-10 00:00:00 CST; 7h left
+   Triggers: ● logrotate.service
+       Docs: man:logrotate(8)
+             man:logrotate.conf(5)
+
+5月 09 09:55:09 ubunut22 systemd[1]: Started Daily rotation of log files.
+[root@client2:mysql]$
+```
+- active (waiting) 状态表示正在执行中，不过要等其他的事件才能继续处理
 
 ## /var/log/boot.log
 - 本次开机启动时相关流程
