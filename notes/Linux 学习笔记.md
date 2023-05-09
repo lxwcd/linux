@@ -4812,12 +4812,12 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 - 唤醒可能造成延迟
 
 
-#### 服务的依赖性问题
+### 服务的依赖性问题
 - 服务可能有依赖性
 - 有些服务可能依赖其他服务
 - init 在管理员手动处理这些有依赖关系的服务时，不能协助唤醒依赖服务
 
-#### 运行级别
+### 运行级别
 - init 启动后可以根据用户自定义的运行级别（runlevel）来唤醒不同的服务
 - 不同的服务会进入不同的操作界面
 - 共 7 个运行级别
@@ -5006,7 +5006,7 @@ lrwxrwxrwx. 1 root root   41 Feb 21 15:19 dbus-org.bluez.service -> /usr/lib/sys
     - active (exited)
     仅执行一次就退出
     - active (waiting)
-    需要等待其他时间发生才能继续运行
+    需要等待其他事件发生才能继续运行
     - inactive (dead)
     没有运行
 
@@ -5048,7 +5048,7 @@ May 03 09:05:41 rocky8-3 httpd[1234]: Server configured, listening on: port 80
     - disabled
     开机不启动
     - static
-    不能自动启动，但可能别其他 enabled 的服务唤醒
+    不能自动启动，但可能被其他 enabled 的服务唤醒
     如依赖属性的服务
     - mask
     无论如何都不能启动，已被强制注销（非删除）
@@ -5584,6 +5584,36 @@ Additional units to install or uninstall when this service is installed or unins
 - 通常只有 root 能读
 - /var/log 目录下
 
+
+# rsyslog
+- 旧格式 sysklogd [sysklogd format](https://www.rsyslog.com/doc/master/configuration/sysklogd_format.html)
+(包含 facility 介绍)
+
+> The facility is one of the following keywords: auth, authpriv, cron, daemon, ftp, kern, lpr, mail, mark, news, security (same as auth), syslog, user, uucp and local0 through local7. The keyword security is deprecated and mark is only for internal use and therefore should not be used in applications. The facility specifies the subsystem that produced the message, e.g. all mail programs log with the mail facility (LOG_MAIL) if they log using syslog.
+
+> The priority is one of the following keywords, in ascending order: debug, info, notice, warning, warn (same as warning), err, error (same as err), crit, alert, emerg, panic (same as emerg). The keywords warn, error and panic are deprecated and should not be used anymore. The priority defines the severity of the message.
+
+
+- 高级用法，
+
+
+
+## 配置格式
+[Configuration Formats](https://www.rsyslog.com/doc/v8-stable/configuration/conf_formats.html)
+## 全部模块查看
+[Modules](https://www.rsyslog.com/doc/v8-stable/configuration/modules/index.html)
+## 将日志存到数据库 
+
+[ommysql: MySQL Database Output Module](https://www.rsyslog.com/doc/v8-stable/configuration/modules/ommysql.html)
+
+ommysql 模块需要安装 rsyslog-mysql 包
+
+
+# logratate
+ 
+
+
+
 ## /var/log/boot.log
 - 本次开机启动时相关流程
 
@@ -5703,6 +5733,46 @@ root      182438  0.0  0.0 221936  1204 pts/0    S+   17:44   0:00 grep --color=
 如果日志一直记录会变得很大，可以通过 logrotate（日志文件轮循）工具处理日志容量与更新问题
 将旧的日志文件更名，建立一个空的日志文件
 旧的日志文件保留一段时间没问题后，让系统自动删除
+
+
+
+## 日志实验 
+- 准备两个客户端主机
+ubuntu 22.04：10.0.0.200，client1
+ubuntu 22.04：10.0.0.151，client2
+- 准备一个 rsyslog 日志服务器用于管理日志
+ubuntu 22.04：10.0.0.160，rsylog
+- 准备一个 mysql 数据库服务器，将日志发送到数据库存放
+rocky 8.6：10.0.0.82，mysql
+
+1. 服务端开启接受网络日志功能
+`/etc/rsyslog.conf` 
+
+```bash
+  1 # /etc/rsyslog.conf configuration file for rsyslog
+  2 #
+  3 # For more information install rsyslog-doc and see
+  4 # /usr/share/doc/rsyslog-doc/html/configuration/index.html
+  5 #
+  6 # Default logging rules can be found in /etc/rsyslog.d/50-default.conf
+  7
+  8
+  9 #################
+ 10 #### MODULES ####
+ 11 #################
+ 12
+ 13 module(load="imuxsock") # provides support for local system logging
+ 14 #module(load="immark")  # provides --MARK-- message capability
+ 15
+ 16 # provides UDP syslog reception
+ 17 module(load="imudp")
+ 18 input(type="imudp" port="514")
+ 19
+ 20 # provides TCP syslog reception
+ 21 module(load="imtcp")
+ 22 input(type="imtcp" port="514")
+```
+
 
 
 
@@ -10351,6 +10421,9 @@ www.boce.com
 ************************************
 //TODO：加密与安全
 
+# 远程连接服务器
+## 工作站类型
+- workstation 是不提供因特网服务的主机，仅提供大量的运算能力给用户
 # ssh 服务
 
 ## ssh 连接中公钥交换原理
@@ -10411,6 +10484,32 @@ ssh_config.d  ssh_host_ecdsa_key  ssh_host_ed25519_key.pub  ssh_import_id
 [19:37:06 root@ubuntu2004 /etc/ssh]#ssh-keygen -l -E "sha256" -f ssh_host_ed25519_key.pub
 256 SHA256:gLez30G4gynTfEWJe7kvn3I0w5x8a18+/wvDQorzCEk root@cdqz-KPL-W0X (ED25519)
 ```
+
+- 客户端确认指纹后输入 `yes` 则将服务端的公钥文件，如 `ssh_host_ed25519_key.pub` 
+  下载到自己家目录的 `$HOME/.ssh/known_hosts` 文件中，以后再次连接时就不需要确认指纹 
+
+
+如果不想输入 yes 来确认指纹，修改客户端配置文件
+
+
+```
+The reason you cannot use `sha256sum` to calculate the fingerprint of `ssh_host_ed25519_key.pub` is that the fingerprint is not simply a hash of the public key file. It is actually a specific representation of the public key that includes a hash of the key and some other metadata.
+
+The fingerprint of an SSH public key is calculated using a specific algorithm that takes into account the type of key, the hash algorithm used to generate the key, and the actual public key data. For example, the fingerprint of an Ed25519 public key is calculated using the SHA-256 hash algorithm, but it includes additional information such as the key type and length.
+
+To calculate the fingerprint of an SSH public key, you should use a tool that is specifically designed for this purpose, such as `ssh-keygen` or `openssl`. These tools will generate the correct representation of the public key and calculate the fingerprint using the appropriate algorithm.
+```
+
+
+
+
+## 安装 ssh 服务端
+
+## 查看 ssh 配置文件
+### Ubuntu 查看
+
+
+
 
 ****************************
 //LABEL: 防火墙
@@ -10596,6 +10695,7 @@ num   pkts bytes target     prot opt in     out     source               destina
 
 - 关闭启用的连接跟踪机制，加快穿越防火墙的速度
 - raw is used only for configuring packets so that they are exempt from connection tracking
+- 如扩展模块中的 state 模块跟踪状态，如果在 raw 表中定义了关闭连接跟踪的规则，则不会跟踪
 
 内置链：
 - OUTPUT 
@@ -11697,3 +11797,8 @@ FORWARD 和 INPUT ?
 
 
 ## kvm
+
+
+**********************
+
+# 日志服务管理
