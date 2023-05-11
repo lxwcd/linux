@@ -1397,9 +1397,50 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 
 #### 指定创建用户时是否创建 mail spool
 - ubuntu 22.04 默认不创建 mail spool，rocky 8.6 默认创建
-- 将 ubuntu 22.04 `CREATE_MAIL_SPOOL` 那行去掉注释则创建 mail spool
-![1](https://img-blog.csdnimg.cn/5adf2c804b274490aa60a3b1e60da9f6.png)
-![2](https://img-blog.csdnimg.cn/9b6908cacd1e4c0fad84d9f950266e7f.png)
+- 将 ubuntu 22.04 `/etc/default/useradd` 文件中的 `CREATE_MAIL_SPOOL` 那行取消注释则
+在 `/var/mail/` 目录中为用户创建邮件文件
+
+从 `/etc/login.defs` 说明，ubuntu22.04 不再将 `MAIL_DIR` 作为环境变量，
+该变量修改后仅在 `useradd/userdel/usermod` 命令中使用
+
+如果不创建邮件文件，用 `userdel -rf` 删除用户时会提示没有邮件文件
+
+```bash
+ 13 # REQUIRED for useradd/userdel/usermod
+ 14 #   Directory where mailboxes reside, _or_ name of file, relative to the
+ 15 #   home directory.  If you _do_ define MAIL_DIR and MAIL_FILE,
+ 16 #   MAIL_DIR takes precedence.
+ 17 #
+ 18 #   Essentially:
+ 19 #      - MAIL_DIR defines the location of users mail spool files
+ 20 #        (for mbox use) by appending the username to MAIL_DIR as defined
+ 21 #        below.
+ 22 #      - MAIL_FILE defines the location of the users mail spool files as the
+ 23 #        fully-qualified filename obtained by prepending the user home
+ 24 #        directory before $MAIL_FILE
+ 25 #
+ 26 # NOTE: This is no more used for setting up users MAIL environment variable
+ 27 #       which is, starting from shadow 4.0.12-1 in Debian, entirely the
+ 28 #       job of the pam_mail PAM modules
+ 29 #       See default PAM configuration files provided for
+ 30 #       login, su, etc.
+ 31 #
+ 32 # This is a temporary situation: setting these variables will soon
+ 33 # move to /etc/default/useradd and the variables will then be
+ 34 # no more supported
+ 35 MAIL_DIR        /var/mail
+ 36 #MAIL_FILE      .mail
+```
+
+`/etc/default/useradd` 文件中取消注释
+```bash
+  2 # Defines whether the mail spool should be created while
+  1 # creating the account
+36  CREATE_MAIL_SPOOL=yes
+```
+
+
+
 
 &nbsp;
 
@@ -10458,7 +10499,10 @@ www.boce.com
 - workstation 是不提供因特网服务的主机，仅提供大量的运算能力给用户
 # ssh 服务
 
+//FIXME: 待补充
 ## ssh 连接中公钥交换原理
+> [SSH Handshake Explained](https://goteleport.com/blog/ssh-handshake-explained/)
+
 - 客户端第一次连接服务端时会显示服务端的指纹，指明了生成指纹所使用的公钥文件
 以及加密算法，不同的客户端连接服务器时使用的算法可能不同
 
