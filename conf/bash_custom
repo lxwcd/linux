@@ -17,3 +17,10 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 PS1="\[\e[36m\][\u@\h \W]\$ \[\e[0m\]"
 
 
+
+######################  alias  ###########################
+
+alias lsh='ls -A | grep -E "^[.].+$"'
+alias ssh_noask="ssh -o StrictHostKeyChecking=no "
+alias ssh_ask="ssh -o StrictHostKeyChecking=ask "
+
