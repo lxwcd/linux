@@ -373,7 +373,7 @@ endif
 # 修改网卡名  
 > [NetworkInterfaceNames](https://wiki.debian.org/NetworkInterfaceNames)
 
-- 以身份执行，普通用户有些操作需要 sudo 命令执行
+- 以 root 身份执行，普通用户有些操作需要 sudo 命令执行
 ## 传统的网卡命名规则
 - 传统的网卡命名统一叫 `ethX`，`X`为编号，如 `eth0`，`eth1` 等
 - 编号根据启动时内核识别的顺序命名

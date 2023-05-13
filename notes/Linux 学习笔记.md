@@ -9295,7 +9295,8 @@ whois++         63/udp          whoispp
 ```
 
 ## 配置文件永久添加
-> 网卡配置文件参数介绍：[nm-settings-ifcfg-rh](https://developer-old.gnome.org/NetworkManager/stable/nm-settings-ifcfg-rh.html)
+> ubuntu 网卡配置文件参数介绍：[netplan.5.html](https://manpages.ubuntu.com/manpages/bionic/man5/netplan.5.html)
+> rocky8 网卡配置文件参数介绍：[nm-settings-ifcfg-rh](https://developer-old.gnome.org/NetworkManager/stable/nm-settings-ifcfg-rh.html)
 
 
 - 如网卡为 `eth0`，则该网卡的第一个虚拟接口为 `eth0:0`
@@ -9893,7 +9894,7 @@ devices connected on a bus, where N is the bus number and X is the slot number
 
 # 修改新命名规则为旧命名规则
 > [Linux: Disable assignment of new styled names for network interfaces](https://michlstechblog.info/blog/linux-disable-assignment-of-new-names-for-network-interfaces/)
-> 
+ 
 
 
 - 编辑 `/etc/default/grub` 文件，在变量 `GRUB_CMDLINE_LINUX`的值中添加两个内核参数 `net.ifnames=0 biosdevname=0`

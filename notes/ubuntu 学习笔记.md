@@ -648,6 +648,208 @@ drwx------ 5 root root 4096 May 11 20:07 ../
 3. 在 mobaxterm 上导入公钥
 
 
+## 安装 network-manager
+1. 安装包
+```bash
+sudo apt install -y network-manager
+```
+
+2. 修改网卡配置文件
+> netplan 官网：[netplan](https://netplan.io/)
+> ubuntu 网卡配置文件参数介绍：[netplan.5.html](https://manpages.ubuntu.com/manpages/bionic/man5/netplan.5.html)
+> [Netplan network configuration tutorial for beginners](https://linuxconfig.org/netplan-network-configuration-tutorial-for-beginners)
+
+在 `/etc/netplan` 目录下的 `/.yaml` 网卡配置文件中指定 `renderer` 为 `NetworkManager`
+```bash
+  # This file describes the network interfaces available on your system
+1 # For more information, see netplan(5).
+2 network:
+3   version: 2
+4  #renderer: networkd
+5   renderer: NetworkManager
+```
+
+## 修改网卡名和 IP 
+
+### 查看启动方式 BIOS 还是 UEFI
+> [Guide To Check UEFI or BIOS In Windows/Linux System](https://servonode.com/check-uefi-or-bios-in-widows-or-linux)
+
+- 查看 /sys/firmware/efi 目录
+`/sys/firmware/efi` 目录存在则为 UEFI 启动
+
+```bash
+[root@ubuntu22-c0 ~]$ ls /sys/firmware/
+acpi/   dmi/    memmap/
+```
+
+从结果可知改启动方式为 BIOS
+
+## 修改网卡命名规则
+
+1. 查看初始网卡名
+`ip a` 或者 `ip link` 查看初始网卡名为 ens33：
+```bash
+root@ubuntu22 init.d $ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: ens33: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 00:0c:29:e7:c8:8e brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+    inet 10.0.0.157/24 metric 100 brd 10.0.0.255 scope global dynamic ens33
+       valid_lft 921sec preferred_lft 921sec
+    inet6 fe80::20c:29ff:fee7:c88e/64 scope link 
+       valid_lft forever preferred_lft forever
+```
+
+2. 修改 /etc/default/grub 配置文件
+```bash
+root@ubuntu22 init.d $ vim /etc/default/grub
+
+# If you change this file, run 'update-grub' afterwards to update
+# /boot/grub/grub.cfg.
+# For full documentation of the options in this file, see:
+#   info -f grub -n 'Simple configuration'
+
+GRUB_DEFAULT=0
+GRUB_TIMEOUT_STYLE=hidden
+GRUB_TIMEOUT=0
+GRUB_DISTRIBUTOR=`lsb_release -i -s 2> /dev/null || echo Debian`
+GRUB_CMDLINE_LINUX_DEFAULT=""
+#GRUB_CMDLINE_LINUX="" #默认该变量为空
+
+# 新增两个内核参数
+GRUB_CMDLINE_LINUX=" net.ifnames=0" 
+```
+
+3. 更新 /boot/grub/grub.cfg
+系统为 BIOS 引导方式
+
+- 方法一：执行 update-grub 命令更新 /boot/grub/grub.cfg
+```bash
+[root@ubuntu22-c0 ~]$ whatis update-grub
+update-grub (8)      - stub for grub-mkconfig
+```
+```bash
+root@ubuntu22 init.d $ update-grub
+Sourcing file `/etc/default/grub'
+Sourcing file `/etc/default/grub.d/init-select.cfg'
+Generating grub configuration file ...
+Found linux image: /boot/vmlinuz-5.15.0-69-generic
+Found initrd image: /boot/initrd.img-5.15.0-69-generic
+Found linux image: /boot/vmlinuz-5.15.0-67-generic
+Found initrd image: /boot/initrd.img-5.15.0-67-generic
+Warning: os-prober will not be executed to detect other bootable partitions.
+Systems on them will not be added to the GRUB boot configuration.
+Check GRUB_DISABLE_OS_PROBER documentation entry.
+done
+```
+
+- 方法二： 执行命令 `grub-mkconfig -o /boot/grub/grub.cfg` 
+结果和上面方法相同
+
+4. 修改网卡配置文件
+- 需要在 `/etc/netplan` 目录下的 `.yaml` 网卡配置文件中的网卡名改为新的网卡名
+- 可以将网卡配置名字改为新网卡名，如 `eth0.yaml`
+- 让网卡配置文件生效 `netplan apply`
+- 可以将原始配置文件放在一个备份目录中
+- 注意指明默认网关时的参数 `gateway4` 已经被弃用，用新用法代替：
+```bash
+gateway4, gateway6 (scalar)
+  Deprecated, see Default routes.  Set default gateway for IPv4/6, for manual  address  configura‐
+  tion.   This  requires  setting  addresses too.  Gateway IPs must be in a form recognized by in‐
+  et_pton(3).  There should only be a single gateway per IP address family set in your global con‐
+  fig,  to make it unambiguous.  If you need multiple default routes, please define them via rout‐
+  ing-policy.
+
+  Example for IPv4: gateway4: 172.16.0.1 Example for IPv6: gateway6: "2001:4::1"
+```
+```bash
+Default routes
+  The most common need for routing concerns the definition of default routes to reach the wider Internet.
+  Those default routes can only defined once per IP family and routing table.  A  typical  example  would
+  look like the following:
+
+        eth0:
+          [...]
+          routes:
+          - to: default # could be 0/0 or 0.0.0.0/0 optionally
+            via: 10.0.0.1
+            metric: 100
+            on-link: true
+          - to: default # could be ::/0 optionally
+            via: cf02:de:ad:be:ef::2
+        eth1:
+          [...]
+          routes:
+          - to: default
+            via: 172.134.67.1
+            metric: 100
+            on-link: true
+            table: 76 # Not on the main routing table, does not conflict with the eth0 default route
+```
+- 修改配置文件中的 `match` 的 `name` 并不会修改 `nmcli connection` 看到的 NAME 字段？
+```bash
+    # This file describes the network interfaces available on your system
+  1 # For more information, see netplan(5).
+  2 network:
+  3   version: 2
+  4  #renderer: networkd
+  5   renderer: NetworkManager
+  6   ethernets:
+  7     eth0:
+  8       match:
+  9         name: eth0
+ 10       addresses:
+ 11       - 10.0.0.200/24
+ 12      #gateway4: 10.0.0.2
+ 13       routes:
+ 14       - to: default
+ 15         via: 10.0.0.2
+```
+`NAME` 字段的结果为 `netplan-eth0` 非 `eth0`
+```bash
+[root@ubuntu22-c0 ~]$ nmcli connection
+NAME                UUID                                  TYPE      DEVICE
+netplan-eth0        626dd384-8b3d-3690-9511-192b2c79b3fd  ethernet  eth0
+Wired connection 1  30df2f20-c39d-3ccf-86aa-efc296ba006b  ethernet  --
+```
+可用 `nmcli connection delete` 删除第二个连接
+```bash
+[root@ubuntu22-c0 netplan]$ nmcli connection delete Wired\ connection\ 1
+Connection 'Wired connection 1' (30df2f20-c39d-3ccf-86aa-efc296ba006b) successfully deleted.
+[root@ubuntu22-c0 netplan]$ nmcli connection
+NAME          UUID                                  TYPE      DEVICE
+netplan-eth0  626dd384-8b3d-3690-9511-192b2c79b3fd  ethernet  eth0
+[root@ubuntu22-c0 netplan]$ nmcli connection reload
+[root@ubuntu22-c0 netplan]$ nmcli connection show
+NAME          UUID                                  TYPE      DEVICE
+netplan-eth0  626dd384-8b3d-3690-9511-192b2c79b3fd  ethernet  eth0
+```
+
+5. reboot
+此时用 `ip a` 或 `ip link` 可看到网卡名已修改，变为 `eth0`
+```bash
+[root@ubuntu22-c0 netplan]$ ip link
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
+    link/ether 00:0c:29:98:e3:96 brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+    altname ens33
+```
+
+
+## 修改主机名
+`hostnamectl set-hostname` 修改主机名，重启后生效
+```bash
+[root@ubuntu22-c0 netplan]$
+[root@ubuntu22-c0 netplan]$ hostnamectl set-hostname "ubuntu22-c1"
+[root@ubuntu22-c0 netplan]$ bash
+```
 
 
 # 安装 git 
