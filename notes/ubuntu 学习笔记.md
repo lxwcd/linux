@@ -517,11 +517,89 @@ PermitRootLogin yes
 PermitEmptyPasswords yes
 ```
 
-### 第一次 ssh 连接时跳过 yes 输入
-编辑 `/etc/ssh/sshd_config` 文件，做下面修改：
+### 第一次 ssh 连接服务端时跳过 yes 输入
+本机作为客户端要连接另一个服务端时，第一次连接会显示指纹，需要手动输入 `yes`
 ```bash
- StrictHostKeyChecking no
+[root@client2:.ssh]$ ssh 10.0.0.83
+The authenticity of host '10.0.0.83 (10.0.0.83)' can't be established.
+ED25519 key fingerprint is SHA256:79+7Kl1TAiNCPzDdmMcgKetf3vADMOxOS+lKRDsss9s.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])?
 ```
+
+1. 修改客户端配置文件永久生效
+如果想跳过直接连接，可以修改 ssh 客户端配置文件
+用 `man ssh_config` 查看帮助文档
+```bash
+StrictHostKeyChecking
+  If this flag is set to yes, ssh(1) will never automatically add host keys to the
+  ~/.ssh/known_hosts file, and refuses to connect to hosts whose host key has changed.  This pro‐
+  vides maximum protection against man-in-the-middle (MITM) attacks, though it can be annoying when
+  the /etc/ssh/ssh_known_hosts file is poorly maintained or when connections to new hosts are fre‐
+  quently made.  This option forces the user to manually add all new hosts.
+
+  If this flag is set to accept-new then ssh will automatically add new host keys to the user's
+  known_hosts file, but will not permit connections to hosts with changed host keys.  If this flag
+  is set to no or off, ssh will automatically add new host keys to the user known hosts files and
+  allow connections to hosts with changed hostkeys to proceed, subject to some restrictions.  If
+  this flag is set to ask (the default), new host keys will be added to the user known host files
+  only after the user has confirmed that is what they really want to do, and ssh will refuse to
+  connect to hosts whose host key has changed.  The host keys of known hosts will be verified auto‐
+  matically in all cases.
+```
+CheckHostIP
+  If set to yes ssh(1) will additionally check the host IP address in the known_hosts file.  This
+  allows it to detect if a host key changed due to DNS spoofing and will add addresses of destina‐
+  tion hosts to ~/.ssh/known_hosts in the process, regardless of the setting of
+  StrictHostKeyChecking.  If the option is set to no (the default), the check will not be executed.
+```
+
+编辑 `/etc/ssh/ssh_config` 文件，做下面修改：
+```bash
+ 1 #   StrictHostKeyChecking ask
+36      StrictHostKeyChecking no
+```
+修改后直接就能生效
+
+2. 命令行设置选项临时生效
+```bash
+[root@client2:.ssh]$ ssh -o StrictHostKeyChecking=no root@10.0.0.83
+Warning: Permanently added '10.0.0.83' (ED25519) to the list of known hosts.
+Activate the web console with: systemctl enable --now cockpit.socket
+
+Last login: Sat May 13 13:24:09 2023 from 10.0.0.83
+```
+
+3. 设置别名，根据情况选择命令选项
+设置别名为了永久生效，放到之前建立的  `/etc/bash_custom` 文件中
+```bash
+alias ssh_noask='ssh -o StrictHostKeyChecking=no '
+```
+使配置生效：
+```bash
+[root@ubuntu22-c0 ~]$ . /etc/bash_custom
+[root@ubuntu22-c0 ~]$ alias ssh_noask
+alias ssh_noask='ssh -o StrictHostKeyChecking=no '
+```
+测试：
+```bash
+[root@ubuntu22-c0 ~]$ ssh 10.0.0.160
+The authenticity of host '10.0.0.160 (10.0.0.160)' can't be established.
+ED25519 key fingerprint is SHA256:mIKaNdEZjhLK4lSyWlVtBy/tJ1KNmM9413+abzPl7gw.
+This key is not known by any other names
+Are you sure you want to continue connecting (yes/no/[fingerprint])? no
+Host key verification failed.
+[root@ubuntu22-c0 ~]$ ssh_noask 10.0.0.160
+Warning: Permanently added '10.0.0.160' (ED25519) to the list of known hosts.
+Welcome to Ubuntu 22.04 LTS (GNU/Linux 5.15.0-71-generic x86_64)
+```
+
+如果想将配置文件改为 `no`，可以再定义一个别名，临时使用验证：
+```bash
+alias ssh_ask="ssh -o StrictHostKeyChecking=ask "
+```
+
+
 
 ### ssh 基于密钥连接
 1. 用 `ssh-keygen` 生成密钥对，算法用默认选项，不设置密码
