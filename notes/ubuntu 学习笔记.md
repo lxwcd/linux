@@ -1,5 +1,11 @@
 ubuntu 22.04 学习
 
+# 环境准备
+1. vmware 中安装 ubuntu22.04 无图形界面系统
+2. 准备好一个版本做好基本初始化操作，保存快照
+3. 做实验学习时复制初始化版本文件夹，修改 IP 和主机名，保存各自的初始化好的快照
+4. 每次实验前恢复到初始化完成后状态
+
 # bug
 ## `/etc/bash_completion` 配置文件调用问题
 - 为了测试，在 `/etc/bash_completion` 的最上方写个说明
@@ -669,7 +675,9 @@ sudo apt install -y network-manager
 5   renderer: NetworkManager
 ```
 
-## 修改网卡名和 IP 
+## 修改网卡名 
+- Ubuntu中如果只有一个网卡，其名字改为旧的明明方式后，如果改为 `eth1` 则不能生效，
+  设置为 `eth0` 才能正常用？（网卡配置文件设置，网卡配置文件名均修改）
 
 ### 查看启动方式 BIOS 还是 UEFI
 > [Guide To Check UEFI or BIOS In Windows/Linux System](https://servonode.com/check-uefi-or-bios-in-widows-or-linux)
@@ -842,12 +850,58 @@ netplan-eth0  626dd384-8b3d-3690-9511-192b2c79b3fd  ethernet  eth0
     altname ens33
 ```
 
+## 修改 IP
+准备多个虚拟供学习用，一个虚拟机 ip 为 `10.0.0.200`，作为初始化虚拟机
+实际使用时将初始好的虚拟机文件夹复制一份，修改 IP 为 `10.0.0.201`，后面的依次递增
+
+1. 修改网卡配置文件中的 `addresses`
+```bash
+    # This file describes the network interfaces available on your system
+  1 # For more information, see netplan(5).
+  2 network:
+  3   version: 2
+  4  #renderer: networkd
+  5   renderer: NetworkManager
+  6   ethernets:
+  7     eth0:
+  8       match:
+  9         name: eth0
+ 10       addresses:
+ 11       - 10.0.0.201/24
+ 12      #gateway4: 10.0.0.2
+ 13       routes:
+ 14       - to: default
+ 15         via: 10.0.0.2
+```
+
+2. netplan apply 使其生效
+```bash
+[root@ubuntu22-c1 ~]$ ip a
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP group default qlen 1000
+    link/ether 00:0c:29:98:e3:96 brd ff:ff:ff:ff:ff:ff
+    altname enp2s1
+    altname ens33
+    inet 10.0.0.201/24 brd 10.0.0.255 scope global noprefixroute eth0
+       valid_lft forever preferred_lft forever
+    inet6 fe80::20c:29ff:fe98:e396/64 scope link
+       valid_lft forever preferred_lft forever
+```
+
+
+
 
 ## 修改主机名
 `hostnamectl set-hostname` 修改主机名，重启后生效
+或者重新开一个 shell 看到效果
 ```bash
-[root@ubuntu22-c0 netplan]$
-[root@ubuntu22-c0 netplan]$ hostnamectl set-hostname "ubuntu22-c1"
+[root@ubuntu22-c1 netplan]$
+[root@ubuntu22-c1 netplan]$ hostnamectl set-hostname "ubuntu22-c0"
 [root@ubuntu22-c0 netplan]$ bash
 ```
 

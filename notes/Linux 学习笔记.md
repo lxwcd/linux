@@ -3069,6 +3069,30 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 
 &nbsp;
 
+### 利用 xargs 命令
+> [How to copy a single file to multiple directories in Linux or Unix](https://www.cyberciti.biz/faq/linux-unix-copy-a-file-to-multiple-directories-using-cp-command/)
+
+
+
+```bash
+$ tree 1
+1
+└── 2
+    └── 3.txt
+
+$ xargs -n 1 cp -av 1 <<< "2/ 3/ 4/"
+'1' -> '2/'
+'1/2' -> '2/2'
+'1/2/3.txt' -> '2/2/3.txt'
+'1' -> '3/'
+'1/2' -> '3/2'
+'1/2/3.txt' -> '3/2/3.txt'
+'1' -> '4/'
+'1/2' -> '4/2'
+'1/2/3.txt' -> '4/2/3.txt'
+$ ls
+1  2  3  4  
+```
 ## 删除文件或目录 rm
 - 如果文件正在编辑，默认 `rm` 文件可以直接删除，删除后用 `ls` 查看无此文件，但如果在另一个终端仍编辑已删除的文件然后保存，会重新生成该文件，文件名不变，无任何提示，再用 `ls` 查看可以看到已删除的文件
 
@@ -11879,3 +11903,111 @@ FORWARD 和 INPUT ?
 **********************
 
 # 日志服务管理
+
+
+*********************************
+
+# NFS
+
+```bash
+/home/joe       pc001(rw,all_squash,anonuid=150,anongid=100)
+
+```
+
+两个 web 服务：10.0.0.203 和 10.0.0.204 :
+安装web 服务：
+[How To Install the Apache Web Server on Ubuntu 22.04](https://www.digitalocean.com/community/tutorials/how-to-install-the-apache-web-server-on-ubuntu-22-04)
+
+```bash
+[root@Web2 data]$ apt install -y apache2
+
+[root@Web2 data]$ ufw status
+Status: inactive
+
+```
+
+```bash
+[root@Web2 html]$ systemctl status apache2.service
+● apache2.service - The Apache HTTP Server
+     Loaded: loaded (/lib/systemd/system/apache2.service; enabled; vendor preset: enabled)
+     Active: active (running) since Sun 2023-05-14 15:06:32 CST; 11min ago
+       Docs: https://httpd.apache.org/docs/2.4/
+    Process: 54259 ExecStart=/usr/sbin/apachectl start (code=exited, status=0/SUCCESS)
+   Main PID: 54263 (apache2)
+      Tasks: 7 (limit: 2193)
+     Memory: 10.9M
+        CPU: 153ms
+     CGroup: /system.slice/apache2.service
+             ├─54263 /usr/sbin/apache2 -k start
+             ├─54267 /usr/sbin/apache2 -k start
+             ├─54268 /usr/sbin/apache2 -k start
+             ├─54269 /usr/sbin/apache2 -k start
+             ├─54270 /usr/sbin/apache2 -k start
+             ├─54271 /usr/sbin/apache2 -k start
+             └─54747 /usr/sbin/apache2 -k start
+
+May 14 15:06:31 Web2 systemd[1]: Starting The Apache HTTP Server...
+May 14 15:06:32 Web2 apachectl[54262]: AH00558: apache2: Could not reliably determine the server's fully qualifi>
+May 14 15:06:32 Web2 systemd[1]: Started The Apache HTTP Server.
+[root@Web2 html]$
+```
+```bash
+[root@Web2 html]$ ps aux | grep apache2
+www-data   46083  0.0  0.0   3736   160 ?        Ss   15:04   0:00 /usr/bin/htcacheclean -d 120 -p /var/cache/apache2/mod_cache_disk -l 300M -n
+root       54263  0.0  0.9 206360 19736 ?        Ss   15:06   0:00 /usr/sbin/apache2 -k start
+www-data   54267  0.0  0.4 206852  8980 ?        S    15:06   0:00 /usr/sbin/apache2 -k start
+www-data   54268  0.0  0.4 206868  8980 ?        S    15:06   0:00 /usr/sbin/apache2 -k start
+www-data   54269  0.0  0.4 206852  8980 ?        S    15:06   0:00 /usr/sbin/apache2 -k start
+www-data   54270  0.0  0.4 206852  8980 ?        S    15:06   0:00 /usr/sbin/apache2 -k start
+www-data   54271  0.0  0.5 206916 10676 ?        S    15:06   0:00 /usr/sbin/apache2 -k start
+www-data   54747  0.0  0.4 206852  8980 ?        S    15:09   0:00 /usr/sbin/apache2 -k start
+root       57152  0.0  0.1   9564  2356 pts/1    S+   15:19   0:00 grep --color=auto apache2
+```
+web 服务 owner 为 www-data
+
+```bash
+[root@Web2 html]$ id www-data
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+[root@Web2 html]$ getent passwd 33
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+[root@Web2 html]$
+[root@Web2 html]$ getent passwd lx
+lx:x:1001:1001::/home/lx:/bin/bash
+```
+
+
+NFS 服务器 rocky8.6 10.0.0.83 
+rocky 上已经有 tape（33）组，暂时将其该名为 www-data，该组没有用户使用
+```bash
+[root@NFS html]$ getent group 33
+tape:x:33:
+[root@NFS html]$ vim /etc/group
+[root@NFS html]$ man group
+(reverse-i-search)`useradd': ^Ceradd -u 33 -g 33 -d /var/www -s /bin/nologin -r www-data
+[root@NFS html]$ useradd -u 33 -g 33 -d /var/www -s /bin/nologin -r www-data^C
+[root@NFS html]$ useradd -u 33 -g 33 -d /var/www -s /bin/nologin -r www-data
+[root@NFS html]$ id 33
+uid=33(www-data) gid=33(tape) groups=33(tape)
+[root@NFS html]$ groupmod -n www-data tape
+[root@NFS html]$ id 33
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+[root@NFS html]$
+```
+
+***********
+LVS 10.0.0.202 ubuntu 22.04
+
+
+router 
+开启 ip_forward
+```bash
+[root@lvs netplan]$ vim /etc/sysctl.conf
+[root@lvs netplan]$ sysctl -p
+net.ipv4.ip_forward = 1
+[root@lvs netplan]$ cat /proc/sys/net/ipv4/ip_forward
+1
+```
+
+```bash
+route add -net 192.168.10.0/24 gw 172.16.18.2 dev eth1
+```

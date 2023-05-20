@@ -1,4 +1,4 @@
-﻿# 学习资源
+# 学习资源
 > [学习 Shell 脚本编程的免费资源 | Linux 中国](https://zhuanlan.zhihu.com/p/155613380)
 
 
