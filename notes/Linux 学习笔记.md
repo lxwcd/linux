@@ -4169,6 +4169,10 @@ reverse lines charaterwise
 
 # tree
 
+```bash
+
+```
+
 
 # seq
 
@@ -6320,6 +6324,42 @@ May 03 21:01:01 rocky8-2 CROND[6658]: (root) CMD (run-parts /etc/cron.hourly)
 ![](img/2023-03-19-16-21-08.png)
 
 
+```bash
+[root@ubuntu22 html]$ dd if=/dev/zero of=index.html bs=1M count=10
+10+0 records in
+10+0 records out
+10485760 bytes (10 MB, 10 MiB) copied, 0.0347324 s, 302 MB/s
+[root@ubuntu22 html]$ ll -h
+total 11M
+drwxr-xr-x  2 nginx nginx 4.0K May 18 18:30 ./
+drwxr-xr-x 12 nginx nginx 4.0K May 18 15:57 ../
+-rw-r--r--  1 nginx nginx  497 May 18 14:11 50x.html
+-rw-r--r--  1 nginx nginx  10M May 18 18:31 index.html
+[root@ubuntu22 html]$
+i
+[root@ubuntu22 html]$ sed -i '1i\nginx 22' index.html
+[root@ubuntu22 html]$ head -n3 index.html
+nginx 22
+[root@ubuntu22 html]$ ll -h
+total 11M
+drwxr-xr-x  2 nginx nginx 4.0K May 18 19:25 ./
+drwxr-xr-x 12 nginx nginx 4.0K May 18 15:57 ../
+-rw-r--r--  1 nginx nginx  497 May 18 14:11 50x.html
+-rw-r--r--  1 nginx nginx  11M May 18 19:25 index.html
+```
+# lsof
+```bash
+[root@ubuntu22 ~]$ lsof -i :80
+COMMAND   PID  USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
+nginx   92778  root    6u  IPv4 239792      0t0  TCP *:http (LISTEN)
+nginx   92779 nginx    6u  IPv4 239792      0t0  TCP *:http (LISTEN)
+nginx   92780 nginx    6u  IPv4 239792      0t0  TCP *:http (LISTEN)
+```
+
+# watch
+
+
+
 
 # 好玩工具
 > [11 Fun Linux Command-Line Programs You Should Try When Bored](https://www.makeuseof.com/fun-linux-command-line-programs/)
@@ -7127,6 +7167,12 @@ Permissive
 ## 挂载的目的
 - 为什么要挂载
 
+
+## 查看已挂载的所有设置
+
+```bash
+
+```
 
 ## mount 临时挂载
 
@@ -10378,34 +10424,189 @@ root@rocky86 firmware $ dmesg | grep efi:
 
 # 域名解析
 
-## 静态文件解析
+- 先查本机缓存
+- 再查 /etc/hosts 文件（有些域名解析工具会忽略 `/etc/hosts` ？）
+- 本地无记录，找配置的 DNS 域名服务器查询
+- 如果本地域名服务器查找不到内容，则本地域名服务器代替主机以 DNS 客户的身份向根域名服务器发出查询请求报文
+
+
+
+## 本地 DNS 缓存
+> [DNS Caching in Linux](https://www.baeldung.com/linux/configure-dns-caching)
+
+- DNS 缓存是临时的，开机时没有缓存，如果用 `ping` 后将该记录缓存
+- 解析 DNS 时先查本机缓存再去查 `/etc/hosts` 文件
+
+
+- ubuntu22.04 用 `resolvectl` 命令查看 DNS 缓存
+```bash
+root@router ~ $ resolvectl
+dns                    llmnr                  query                  statistics
+dnsovertls             log-level              reset-server-features  status
+dnssec                 mdns                   reset-statistics       tlsa
+domain                 nta                    revert
+flush-caches           openpgp                service
+root@router ~ $ resolvectl statistics
+DNSSEC supported by current servers: no
+
+Transactions
+Current Transactions: 0
+  Total Transactions: 16
+
+Cache
+  Current Cache Size: 3
+          Cache Hits: 1
+        Cache Misses: 21
+
+DNSSEC Verdicts
+              Secure: 0
+            Insecure: 0
+               Bogus: 0
+       Indeterminate: 0
+root@router ~ $ resolvectl query www.baidu.com
+www.baidu.com: 124.237.176.3                   -- link: eth2
+               124.237.176.4                   -- link: eth2
+               (www.a.shifen.com)
+
+-- Information acquired via protocol DNS in 32.1ms.
+-- Data is authenticated: no; Data was acquired via local or encrypted transport: no
+-- Data from: network
+```
+
+- ubuntu20.04 用 `systemd-resolve` 命令查看 DNS 缓存
+```bash
+[11:12:33 root@ubuntu2004 ~]#systemd-resolve --
+--class                  --openpgp                --service                --set-mdns
+--cname=no               --protocol               --service-address=no     --set-nta
+--flush-caches           --raw                    --service-txt=no         --statistics
+--help                   --reset-server-features  --set-dns                --status
+--interface              --reset-statistics       --set-dnssec             --tlsa
+--legend=no              --revert                 --set-domain             --type
+--no-pager               --search=no              --set-llmnr              --version
+[11:12:33 root@ubuntu2004 ~]#systemd-resolve --statistics
+DNSSEC supported by current servers: no
+
+Transactions
+Current Transactions: 0
+  Total Transactions: 275
+
+Cache
+  Current Cache Size: 0
+          Cache Hits: 0
+        Cache Misses: 24
+
+DNSSEC Verdicts
+              Secure: 0
+            Insecure: 0
+               Bogus: 0
+       Indeterminate: 0
+```
+
+- rocky8 用 systemd-resolve 查看
+```bash
+[root@nfs ~]$ systemd-resolve --
+--class                  --openpgp                --service                --set-mdns
+--cname=no               --protocol               --service-address=no     --set-nta
+--flush-caches           --raw                    --service-txt=no         --statistics
+--help                   --reset-server-features  --set-dns                --status
+--interface              --reset-statistics       --set-dnssec             --tlsa
+--legend=no              --revert                 --set-domain             --type
+--no-pager               --search=no              --set-llmnr              --version
+[root@nfs ~]$ systemd-resolve --statistics
+DNSSEC supported by current servers: yes
+
+Transactions
+Current Transactions: 0
+  Total Transactions: 2
+
+Cache
+  Current Cache Size: 0
+          Cache Hits: 0
+        Cache Misses: 0
+
+DNSSEC Verdicts
+              Secure: 0
+            Insecure: 0
+               Bogus: 0
+       Indeterminate: 0
+```
+也可以用 `nscd`，但默认未安装
+```bash
+[root@nfs ~]$ whatis nscd
+nscd (8)             - name service cache daemon
+```
+
+## 静态文件解析 `/etc/hosts` 
 > [hosts(file)](https://en.wikipedia.org/wiki/Hosts_(file))
+> [How to reload /etc/hosts after editing in Linux?](https://linuxhint.com/reload-edited-etchosts-linux/)
 
 - linux: /etc/hosts
 - windows11: %windir%/system32/drivers/etc/hosts
 - host 文件中列出域名与 IP 对应的关系
 
-## 
-- DNS 服务器解析域名
+- hosts 文件解析域名是早期网络规模较小时使用的方案
+- 管理机构提供该文件的下载地址并定期更新
+- 早期使用方案，但网络规模太大后不适用，因此之后引入 DNS 服务器提供域名解析服务
 
-# `/etc/hosts` 文件
-> [How to reload /etc/hosts after editing in Linux?](https://linuxhint.com/reload-edited-etchosts-linux/)
-
-- `/etc/hosts` 
 - 主机中的文本文件，定义域名和 IP 地址的对应关系
 - DNS 解析时最先查看的文件，找到对应 IP 则直接请求 IP 地址，如 ping 命令会找该文件，但有些域名解析工具会忽略该文件
 - hosts 文件中找不到，则会向本机配置的 DNS 服务器提出域名解析请求
 - 修改该文件后会立即生效，除非某些情况该文件被应用程序缓存了
 
 
-## hosts 文件引入
-- hosts 文件解析域名是早期网络规模较小时使用的方案
-- 管理机构提供该文件的下载地址并定期更新
-- 但目前网络
+## DNS 服务器解析
 
-# /etc/resolve.conf 查看 DNS 服务器的 IP
+### 查看本机使用的 DNS 服务器
+#### resolvectl status
+```bash
+[root@ubuntu22 ~]$ resolvectl status
+Global
+       Protocols: -LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+resolv.conf mode: stub
+
+Link 2 (eth0)
+    Current Scopes: DNS
+         Protocols: +DefaultRoute +LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+Current DNS Server: 10.0.0.2
+       DNS Servers: 10.0.0.2
+
+Link 3 (eth1)
+Current Scopes: none
+     Protocols: -DefaultRoute +LLMNR -mDNS -DNSOverTLS DNSSEC=no/unsupported
+```
+
+#### /etc/resolve.conf 查看 DNS 服务器的 IP
 - 如果设置 DHCP 服务，该文件会被自动修改，一般不用手动改
 
+- ubuntu22.04 中该文件显示 DNS 服务器为 127.0.0.53
+通过 `man systemd-resolved` 查看说明（没明白）
+通过 `resolvectl status` 可以看见使用的 DNS 服务器为 `10.0.0.2`
+```bash
+[root@ubuntu22 netplan]$ cat /etc/resolv.conf
+# This is /run/systemd/resolve/stub-resolv.conf managed by man:systemd-resolved(8).
+# Do not edit.
+#
+# This file might be symlinked as /etc/resolv.conf. If you're looking at
+# /etc/resolv.conf and seeing this text, you have followed the symlink.
+#
+# This is a dynamic resolv.conf file for connecting local clients to the
+# internal DNS stub resolver of systemd-resolved. This file lists all
+# configured search domains.
+#
+# Run "resolvectl status" to see details about the uplink DNS servers
+# currently in use.
+#
+# Third party programs should typically not access this file directly, but only
+# through the symlink at /etc/resolv.conf. To manage man:resolv.conf(5) in a
+# different way, replace this symlink by a static file or a different symlink.
+#
+# See man:systemd-resolved.service(8) for details about the supported modes of
+# operation for /etc/resolv.conf.
+
+nameserver 127.0.0.53
+options edns0 trust-ad
+search .
+```
 
 
 # DNS 域名系统
@@ -10515,102 +10716,12 @@ named.conf zone . 为什么删掉
 www.boce.com
 
 
-
-************************************
-//TODO：加密与安全
-
 # 远程连接服务器
 ## 工作站类型
 - workstation 是不提供因特网服务的主机，仅提供大量的运算能力给用户
-# ssh 服务
 
-//FIXME: 待补充
-## ssh 连接中公钥交换原理
-> [SSH Handshake Explained](https://goteleport.com/blog/ssh-handshake-explained/)
-
-- 客户端第一次连接服务端时会显示服务端的指纹，指明了生成指纹所使用的公钥文件
-以及加密算法，不同的客户端连接服务器时使用的算法可能不同
-
-如服务端为 ubuntu20.04，其 `/etc/ssh` 目录中有几种不同算法的公钥：
-```bash
-[18:59:15 root@ubuntu2004 /etc/ssh]#ls
-moduli        sshd_config         ssh_host_ecdsa_key.pub    ssh_host_rsa_key
-ssh_config    sshd_config.d       ssh_host_ed25519_key      ssh_host_rsa_key.pub
-ssh_config.d  ssh_host_ecdsa_key  ssh_host_ed25519_key.pub  ssh_import_id
-```
-- `rsa` 和  `ecdsa` 分别对应不同的密钥交换算法
-
-
-客户端第一次连接，如 rocky8 连接，会提示指纹信息：
-```bash
-[root@rocky8-3 .ssh]$ ssh 192.168.137.17
-The authenticity of host '192.168.137.17 (192.168.137.17)' can't be established.
-ECDSA key fingerprint is SHA256:iBJIDP0FkveLmB549s75m3T7qfYU4nuNUKLeJqwRj2M.
-Are you sure you want to continue connecting (yes/no/[fingerprint])?
-```
-从提示可以看出使用的公钥为 `ssh_host_ecdsa_key.pub`，对该公钥进行数字前面的单项哈希算法为 `SHA256`
-
-而客户端 ubuntu22.04 来连接服务器时，提示为：
-```bash
-[root@ubunut22:~]$ ssh  192.168.137.17
-The authenticity of host '192.168.137.17 (192.168.137.17)' can't be established.
-ED25519 key fingerprint is SHA256:gLez30G4gynTfEWJe7kvn3I0w5x8a18+/wvDQorzCEk.
-This key is not known by any other names
-Are you sure you want to continue connecting (yes/no/[fingerprint])?
-```
-从提示可以看出使用的公钥为 `ssh_host_ed25519_key.pub`，对该公钥进行数字前面的单项哈希算法为 `SHA256`
-因此两者的指纹不同
-
-- 验证指纹是否正确
-此时客户端需要确认指纹是否正确从而确认服务端的是相连接的服务端而非其他中间人
-服务端可以在自己主机上查看生成的指纹，从而进行比对（单项哈希算法生成的指纹不可逆的）
-
-1）服务端可以通过连自己查看指纹，但这里默认的公钥文件为 `ssh_host_ecdsa_key.pub`
-```bash
-[19:23:41 root@ubuntu2004 /etc/ssh]#ssh 127.0.0.1
-The authenticity of host '127.0.0.1 (127.0.0.1)' can't be established.
-ECDSA key fingerprint is SHA256:iB[19:34:49 root@ubuntu2004 /etc/ssh]#ls
-moduli        sshd_config         ssh_host_ecdsa_key.pub    ssh_host_rsa_key
-ssh_config    sshd_config.d       ssh_host_ed25519_key      ssh_host_rsa_key.pub
-ssh_config.d  ssh_host_ecdsa_key  ssh_host_ed25519_key.pub  ssh_import_id
-```
-
-2）通过 ssh-keygen 生成指纹进行比对
-`ssh-keygen -l [-v] [-E fingerprint_hash] [-f input_keyfile]`
-`-l` 表示显示公钥文件的指纹
-`-E` 显示用于数字签名的单向哈希算法，可选的有 `sha256` 和 `md5`，默认为 `sha256`
-`-f` 指定公钥文件
-
-```bash
-[19:37:06 root@ubuntu2004 /etc/ssh]#ssh-keygen -l -E "sha256" -f ssh_host_ed25519_key.pub
-256 SHA256:gLez30G4gynTfEWJe7kvn3I0w5x8a18+/wvDQorzCEk root@cdqz-KPL-W0X (ED25519)
-```
-
-- 客户端确认指纹后输入 `yes` 则将服务端的公钥文件，如 `ssh_host_ed25519_key.pub` 
-  下载到自己家目录的 `$HOME/.ssh/known_hosts` 文件中，以后再次连接时就不需要确认指纹 
-
-
-如果不想输入 yes 来确认指纹，修改客户端配置文件
-
-
-```
-The reason you cannot use `sha256sum` to calculate the fingerprint of `ssh_host_ed25519_key.pub` is that the fingerprint is not simply a hash of the public key file. It is actually a specific representation of the public key that includes a hash of the key and some other metadata.
-
-The fingerprint of an SSH public key is calculated using a specific algorithm that takes into account the type of key, the hash algorithm used to generate the key, and the actual public key data. For example, the fingerprint of an Ed25519 public key is calculated using the SHA-256 hash algorithm, but it includes additional information such as the key type and length.
-
-To calculate the fingerprint of an SSH public key, you should use a tool that is specifically designed for this purpose, such as `ssh-keygen` or `openssl`. These tools will generate the correct representation of the public key and calculate the fingerprint using the appropriate algorithm.
-```
-
-
-
-
-## 安装 ssh 服务端
-
-## 查看 ssh 配置文件
-### Ubuntu 查看
-
-
-
+************************************
+//TODO：加密与安全
 
 ****************************
 //LABEL: 防火墙
@@ -11906,108 +12017,3 @@ FORWARD 和 INPUT ?
 
 
 *********************************
-
-# NFS
-
-```bash
-/home/joe       pc001(rw,all_squash,anonuid=150,anongid=100)
-
-```
-
-两个 web 服务：10.0.0.203 和 10.0.0.204 :
-安装web 服务：
-[How To Install the Apache Web Server on Ubuntu 22.04](https://www.digitalocean.com/community/tutorials/how-to-install-the-apache-web-server-on-ubuntu-22-04)
-
-```bash
-[root@Web2 data]$ apt install -y apache2
-
-[root@Web2 data]$ ufw status
-Status: inactive
-
-```
-
-```bash
-[root@Web2 html]$ systemctl status apache2.service
-● apache2.service - The Apache HTTP Server
-     Loaded: loaded (/lib/systemd/system/apache2.service; enabled; vendor preset: enabled)
-     Active: active (running) since Sun 2023-05-14 15:06:32 CST; 11min ago
-       Docs: https://httpd.apache.org/docs/2.4/
-    Process: 54259 ExecStart=/usr/sbin/apachectl start (code=exited, status=0/SUCCESS)
-   Main PID: 54263 (apache2)
-      Tasks: 7 (limit: 2193)
-     Memory: 10.9M
-        CPU: 153ms
-     CGroup: /system.slice/apache2.service
-             ├─54263 /usr/sbin/apache2 -k start
-             ├─54267 /usr/sbin/apache2 -k start
-             ├─54268 /usr/sbin/apache2 -k start
-             ├─54269 /usr/sbin/apache2 -k start
-             ├─54270 /usr/sbin/apache2 -k start
-             ├─54271 /usr/sbin/apache2 -k start
-             └─54747 /usr/sbin/apache2 -k start
-
-May 14 15:06:31 Web2 systemd[1]: Starting The Apache HTTP Server...
-May 14 15:06:32 Web2 apachectl[54262]: AH00558: apache2: Could not reliably determine the server's fully qualifi>
-May 14 15:06:32 Web2 systemd[1]: Started The Apache HTTP Server.
-[root@Web2 html]$
-```
-```bash
-[root@Web2 html]$ ps aux | grep apache2
-www-data   46083  0.0  0.0   3736   160 ?        Ss   15:04   0:00 /usr/bin/htcacheclean -d 120 -p /var/cache/apache2/mod_cache_disk -l 300M -n
-root       54263  0.0  0.9 206360 19736 ?        Ss   15:06   0:00 /usr/sbin/apache2 -k start
-www-data   54267  0.0  0.4 206852  8980 ?        S    15:06   0:00 /usr/sbin/apache2 -k start
-www-data   54268  0.0  0.4 206868  8980 ?        S    15:06   0:00 /usr/sbin/apache2 -k start
-www-data   54269  0.0  0.4 206852  8980 ?        S    15:06   0:00 /usr/sbin/apache2 -k start
-www-data   54270  0.0  0.4 206852  8980 ?        S    15:06   0:00 /usr/sbin/apache2 -k start
-www-data   54271  0.0  0.5 206916 10676 ?        S    15:06   0:00 /usr/sbin/apache2 -k start
-www-data   54747  0.0  0.4 206852  8980 ?        S    15:09   0:00 /usr/sbin/apache2 -k start
-root       57152  0.0  0.1   9564  2356 pts/1    S+   15:19   0:00 grep --color=auto apache2
-```
-web 服务 owner 为 www-data
-
-```bash
-[root@Web2 html]$ id www-data
-uid=33(www-data) gid=33(www-data) groups=33(www-data)
-[root@Web2 html]$ getent passwd 33
-www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
-[root@Web2 html]$
-[root@Web2 html]$ getent passwd lx
-lx:x:1001:1001::/home/lx:/bin/bash
-```
-
-
-NFS 服务器 rocky8.6 10.0.0.83 
-rocky 上已经有 tape（33）组，暂时将其该名为 www-data，该组没有用户使用
-```bash
-[root@NFS html]$ getent group 33
-tape:x:33:
-[root@NFS html]$ vim /etc/group
-[root@NFS html]$ man group
-(reverse-i-search)`useradd': ^Ceradd -u 33 -g 33 -d /var/www -s /bin/nologin -r www-data
-[root@NFS html]$ useradd -u 33 -g 33 -d /var/www -s /bin/nologin -r www-data^C
-[root@NFS html]$ useradd -u 33 -g 33 -d /var/www -s /bin/nologin -r www-data
-[root@NFS html]$ id 33
-uid=33(www-data) gid=33(tape) groups=33(tape)
-[root@NFS html]$ groupmod -n www-data tape
-[root@NFS html]$ id 33
-uid=33(www-data) gid=33(www-data) groups=33(www-data)
-[root@NFS html]$
-```
-
-***********
-LVS 10.0.0.202 ubuntu 22.04
-
-
-router 
-开启 ip_forward
-```bash
-[root@lvs netplan]$ vim /etc/sysctl.conf
-[root@lvs netplan]$ sysctl -p
-net.ipv4.ip_forward = 1
-[root@lvs netplan]$ cat /proc/sys/net/ipv4/ip_forward
-1
-```
-
-```bash
-route add -net 192.168.10.0/24 gw 172.16.18.2 dev eth1
-```

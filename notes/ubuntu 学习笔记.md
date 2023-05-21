@@ -762,6 +762,8 @@ done
 4. 修改网卡配置文件
 - 需要在 `/etc/netplan` 目录下的 `.yaml` 网卡配置文件中的网卡名改为新的网卡名
 - 可以将网卡配置名字改为新网卡名，如 `eth0.yaml`
+- 和 rocky8 不同，所有网卡配置（除了环回网络接口）都可写到一个配置文件中
+- 和 rocky8 不同，网卡配置文件的名字不需要和网卡的设备名相同，如全部网卡配置一个文件 `00-network-manager.yaml`
 - 让网卡配置文件生效 `netplan apply`
 - 可以将原始配置文件放在一个备份目录中
 - 注意指明默认网关时的参数 `gateway4` 已经被弃用，用新用法代替：
@@ -799,7 +801,7 @@ Default routes
             on-link: true
             table: 76 # Not on the main routing table, does not conflict with the eth0 default route
 ```
-- 修改配置文件中的 `match` 的 `name` 并不会修改 `nmcli connection` 看到的 NAME 字段？
+- 修改配置文件中的 `match` 的 `name` 并不会修改 `nmcli connection` 看到的 NAME 字段
 ```bash
     # This file describes the network interfaces available on your system
   1 # For more information, see netplan(5).
@@ -818,7 +820,7 @@ Default routes
  14       - to: default
  15         via: 10.0.0.2
 ```
-`NAME` 字段的结果为 `netplan-eth0` 非 `eth0`
+`NAME` 字段的结果为 `netplan-eth0` 非 `eth0`，和 rocky8 不同
 ```bash
 [root@ubuntu22-c0 ~]$ nmcli connection
 NAME                UUID                                  TYPE      DEVICE
