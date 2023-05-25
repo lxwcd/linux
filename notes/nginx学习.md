@@ -4,6 +4,91 @@ Nginx 学习
 # 学习资源
 
 
+
+# URI URL URN
+
+
+# 安装
+
+## 编译安装
+> [Building nginx from Sources](http://nginx.org/en/docs/configure.html)
+> [Installation and Compile-Time Options](https://www.nginx.com/resources/wiki/start/topics/tutorials/installoptions/)
+
+- ubuntu22.04 编译安装选项如下：
+```bash
+[root@ubuntu22 ~]$ nginx -V
+nginx version: nginx/1.22.1
+built by gcc 11.3.0 (Ubuntu 11.3.0-1ubuntu1~22.04.1)
+built with OpenSSL 3.0.2 15 Mar 2022
+TLS SNI support enabled
+configure arguments: --prefix=/apps/nginx --user=nginx --group=nginx --with-http_ssl_module --with-http_v2_module --with-http_realip_module --with-http_stub_status_module --with-http_gzip_static_module --with-pcre --with-stream --with-stream_ssl_module --with-stream_realip_module
+```
+
+nginx 的源码包在 `/usr/local/src/nginx-1.24.0` 路径下
+```bash
+[root@ubuntu22 nginx-1.24.0]$ pwd
+/usr/local/src/nginx-1.24.0
+[root@ubuntu22 nginx-1.24.0]$ ls
+auto  CHANGES  CHANGES.ru  conf  configure  contrib  html  LICENSE  Makefile  man  objs  README  src
+[root@ubuntu22 nginx-1.24.0]$ ls conf
+fastcgi.conf  fastcgi_params  koi-utf  koi-win  mime.types  nginx.conf  scgi_params  uwsgi_params  win-utf
+```
+编译后文件在 `/apps/nginx` 目录中
+```bash
+[root@ubuntu22 nginx-1.24.0]$ cd /apps/nginx/
+[root@ubuntu22 nginx]$ ls
+client_body_temp  conf  fastcgi_temp  html  logs  proxy_temp  run  sbin  scgi_temp  uwsgi_temp
+[root@ubuntu22 nginx]$ ls conf/
+fastcgi.conf          fastcgi_params.default  mime.types          nginx.conf.default   uwsgi_params
+fastcgi.conf.default  koi-utf                 mime.types.default  scgi_params          uwsgi_params.default
+fastcgi_params        koi-win                 nginx.conf          scgi_params.default  win-utf
+```
+
+<font color=red>上面 `conf/nginx.conf` 为 nginx 配置文件，下面两个地方所相对的路径为什么不同？</font>
+
+```bash
+include       mime.types;
+
+location / {
+              root   html;
+              index  index.html index.htm;
+           }
+
+```
+
+```bash
+[root@ubuntu22 nginx-1.24.0]$ nginx -V
+nginx version: nginx/1.24.0
+built by gcc 11.3.0 (Ubuntu 11.3.0-1ubuntu1~22.04.1)
+built with OpenSSL 3.0.2 15 Mar 2022
+TLS SNI support enabled
+configure arguments: --prefix=/apps/nginx --user=nginx --group=nginx --with-http_ssl_module --with-http_v2_module --with-http_realip_module --with-http_stub_status_module --with-http_gzip_static_module --with-pcre --with-stream --with-stream_ssl_module --with-stream_realip_module --add-module=/usr/local/src/nginx-module-vts-master --add-module=/usr/local/src/echo-nginx-module-master
+```
+
+编译完成后选项
+```bash
+Configuration summary
+  + using system PCRE library
+  + using system OpenSSL library
+  + using system zlib library
+
+  nginx path prefix: "/apps/nginx"
+  nginx binary file: "/apps/nginx/sbin/nginx"
+  nginx modules path: "/apps/nginx/modules"
+  nginx configuration prefix: "/apps/nginx/conf"
+  nginx configuration file: "/apps/nginx/conf/nginx.conf"
+  nginx pid file: "/apps/nginx/logs/nginx.pid"
+  nginx error log file: "/apps/nginx/logs/error.log"
+  nginx http access log file: "/apps/nginx/logs/access.log"
+  nginx http client request body temporary files: "client_body_temp"
+  nginx http proxy temporary files: "proxy_temp"
+  nginx http fastcgi temporary files: "fastcgi_temp"
+  nginx http uwsgi temporary files: "uwsgi_temp"
+  nginx http scgi temporary files: "scgi_temp"
+```
+
+
+
 # 性能优化 
 1. sendfile on 使用零拷贝
 2. 高并发配置
@@ -346,3 +431,91 @@ location / {
 }
 ```
 
+# 持续连接（persistent connection）
+> [keepalive_timeout](https://nginx.org/en/docs/http/ngx_http_core_module.html#keepalive_timeout)
+
+HTTP/1.1 协议支持持续链接，即万维网服务器在发送响应给客户端（浏览器）后仍在一段时间内
+保持这条连接，使同一客户端和该服务器可以继续在这条连接上传输后续的 HTTP 请求报文和响应报文
+
+这种持续连接只要传送的文档都在一个服务器上就行，不局限于一个页面的文档
+
+
+一个页面包含很多超链接，
+
+
+# access_log 访问日志设置
+> [access_log](https://nginx.org/en/docs/http/ngx_http_log_module.html#access_log)
+
+- 当访问某些资源时，可以不记录访问日志
+
+```bash
+  1 location ~* .*\.(gif|jpg|png|ico|css|jpg|jpeg)$ {
+  2 access_log off;
+  3 #access_log /dev/null;
+  4 }
+```
+
+# 设置网站图标 favicon
+
+
+# 第三方模块
+
+## echo 模块显示信息
+> [openresty/echo-nginx-module](https://github.com/openresty/echo-nginx-module)
+
+- 放在 `location` context 中
+- 需要指定其 MIME 类型，否则浏览器中不会识别为文本而将其下载成一个文件
+不指定时，怎么查看浏览器将其解析为哪种类型？
+```bash
+ location /echo {
+               default_type text/html;
+              echo "The current uri is $request_uri";
+               echo "The current ip is $remote_addr";
+           }
+```
+
+- curl 查看换行，浏览器中未换行
+
+```
+[root@mysql ~]$ curl 10.0.0.202/echo
+The current uri is /echo
+The current ip is 10.0.0.82
+The current ip is
+The current ip is /apps/nginx/html
+[root@mysql ~]$
+[root@mysql ~]$ curl 10.0.0.202/echo | cat -A
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   107    0   107    0     0   104k      0 --:--:-- --:--:-- --:--:--  104k
+The current uri is /echo$
+The current ip is 10.0.0.82$
+The current ip is $
+The current ip is /apps/nginx/html$
+[root@mysql ~]$
+[root@mysql ~]$ curl 10.0.0.202/echo | cat
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+100   107    0   107    0     0  53500      0 --:--:-- --:--:-- --:--:-- 53500
+The current uri is /echo
+The current ip is 10.0.0.82
+The current ip is
+The current ip is /apps/nginx/html
+```
+
+
+
+
+#  Nginx 做反向代理
+
+## 反向代理和代理
+
+## proxy_pass 
+> [proxy_pass](https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass)
+
+- 查看官网例子，注意 URL 是否指定区别
+指定
+- 端口号
+不指明则默认 80，后端服务器可以用其他端口，如 8080，此时需要指明端口
+
+
+## 启用缓存功能提升效率

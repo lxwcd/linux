@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# custom.sh
-
 # set vi-style line editing interface
 set -o vi
 
@@ -23,4 +21,9 @@ PS1="\[\e[36m\][\u@\h \W]\$ \[\e[0m\]"
 alias lsh='ls -A | grep -E "^[.].+$"'
 alias ssh_noask="ssh -o StrictHostKeyChecking=no "
 alias ssh_ask="ssh -o StrictHostKeyChecking=ask "
+alias tree_v="tree -pughDFv "
+alias ps_aux="ps aux | head -n1; ps aux | grep -i "
+
+
+
 
