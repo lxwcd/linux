@@ -163,7 +163,7 @@ fi
 root 家目录的 `.bashrc` 没有注释该脚本的调用，因此只执行一次
 
 ### 解决
-- root 家目录的 `.bashrc` 中取消注释
+- root 家目录的 `.bashrc` 中取消对 `/etc/bash_completion` 脚本调用的注释
 防止 non-login shell 登录不执行该脚本
 ```bash
 # enable programmable completion features (you don't need to enable
@@ -178,6 +178,9 @@ fi
 参考 rocky8 防止两次执行 `/etc/bashrc` 脚本的方案
 
 在 `/usr/share/bash-completion/bash_completion` 脚本中命令前加上如下判断：
+```bash
+ubuntu@VM-ubuntu22:~$ sudo vim $(cut /etc/bash_completion -d ' ' -f2)
+```
 ```bash
 # Prevent doublesourcing
 if [ -z "$COMPLETION_SOURCED" ]; then
@@ -311,7 +314,7 @@ Functions:
 if [ -f /etc/bash_custom ]; then
     . /etc/bash_custom
 fi
-````
+```
 
 `/etc/bashrc_custom` 对普通用户只读，不可写，可以执行该脚本但需要 root 修改
 ```bash

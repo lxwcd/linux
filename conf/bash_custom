@@ -22,7 +22,7 @@ alias lsh='ls -A | grep -E "^[.].+$"'
 alias ssh_noask="ssh -o StrictHostKeyChecking=no "
 alias ssh_ask="ssh -o StrictHostKeyChecking=ask "
 alias tree_v="tree -pughDFv "
-alias ps_aux="ps aux | head -n1; ps aux | grep -i "
+alias ps_v="ps auxf | head -n1; ps auxf | grep -i "
 
 
 

@@ -2,17 +2,88 @@ Nginx 学习
 
 
 # 学习资源
+> [nginx documentation](https://nginx.org/en/docs/)
 
 
 
 # URI URL URN
 
 
+# cookie
+
+# session
+
+# token
+
 # 安装
 
 ## 编译安装
 > [Building nginx from Sources](http://nginx.org/en/docs/configure.html)
 > [Installation and Compile-Time Options](https://www.nginx.com/resources/wiki/start/topics/tutorials/installoptions/)
+
+
+不指定路径时默认编译完后路径如下：
+```bash
+Configuration summary
+  + using system PCRE library
+  + using system OpenSSL library
+  + using system zlib library
+
+  nginx path prefix: "/usr/local/nginx"
+  nginx binary file: "/usr/local/nginx/sbin/nginx"
+  nginx modules path: "/usr/local/nginx/modules"
+  nginx configuration prefix: "/usr/local/nginx/conf"
+  nginx configuration file: "/usr/local/nginx/conf/nginx.conf"
+  nginx pid file: "/usr/local/nginx/logs/nginx.pid"
+  nginx error log file: "/usr/local/nginx/logs/error.log"
+  nginx http access log file: "/usr/local/nginx/logs/access.log"
+  nginx http client request body temporary files: "client_body_temp"
+  nginx http proxy temporary files: "proxy_temp"
+  nginx http fastcgi temporary files: "fastcgi_temp"
+  nginx http uwsgi temporary files: "uwsgi_temp"
+  nginx http scgi temporary files: "scgi_temp"
+```
+
+
+编译完成后用软连接形式将 `nginx` 链接至 PATH 环境变量中，如 `/usr/sbin`
+
+```bash
+[root@VM-ubuntu22 nginx]$ ln -sv /usr/local/nginx/sbin/nginx /usr/sbin/
+```
+
+修改配置文件
+
+写 service 文件
+```bash
+[root@VM-ubuntu22 nginx]$ vim /lib/systemd/system/nginx.service
+
+[Unit]
+Description=A high performance web server and a reverse proxy server
+Documentation=https://nginx.org/en/docs/
+After=network.target remote-fs.target nss-lookup.target
+Wants=network-online.target
+
+[Service]
+Type=forking
+PIDFile=/usr/local/nginx/run/nginx.pid
+ExecStartPre=/bin/rm -f /usr/local/nginx/run/nginx.pid
+ExecStartPre=/usr/local/nginx/sbin/nginx -t
+ExecStart=/usr/local/nginx/sbin/nginx -c /usr/local/nginx/conf/nginx.conf
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s TERM $MAINPID
+KillSignal=SIGQUIT
+TimeoutStopSec=5
+KillMode=process
+PrivateTmp=true
+LimitNOFILE=100000
+
+[Install]
+WantedBy=multi-user.target
+usr/local/nginx/sbin/nginx'
+```
+
+
+
 
 - ubuntu22.04 编译安装选项如下：
 ```bash
@@ -86,6 +157,30 @@ Configuration summary
   nginx http uwsgi temporary files: "uwsgi_temp"
   nginx http scgi temporary files: "scgi_temp"
 ```
+
+### 添加额外模块编译安装
+> [What does the *-dev *-dbg and *-utils mean?](https://stackoverflow.com/questions/19032398/what-does-the-dev-dbg-and-utils-mean)
+
+
+编译时指定 `--with-pcre`，如果未安装相关库，则会提示：
+```bash
+./configure: error: the HTTP rewrite module requires the PCRE library.
+You can either disable the module by using --without-http_rewrite_module
+option, or install the PCRE library into the system, or build the PCRE library
+statically from the source with nginx by using --with-pcre=<path> option.
+```
+搜索相关库：
+```bash
+[root@VM-ubuntu22 nginx-1.24.0]$ apt list *pcre3*
+Listing... Done
+libpcre3-dbg/jammy-updates,jammy-security 2:8.39-13ubuntu0.22.04.1 amd64
+libpcre3-dev/jammy-updates,jammy-security 2:8.39-13ubuntu0.22.04.1 amd64
+libpcre32-3/jammy-updates,jammy-security 2:8.39-13ubuntu0.22.04.1 amd64
+libpcre3/jammy-updates,jammy-security,now 2:8.39-13ubuntu0.22.04.1 amd64 [installed]
+```
+安装 `libpcre3-dev`
+
+
 
 
 
@@ -456,6 +551,17 @@ HTTP/1.1 协议支持持续链接，即万维网服务器在发送响应给客�
 ```
 
 # 设置网站图标 favicon
+
+# 压缩
+> [NGINX GZIP_STATIC: WHAT IT DOES AND HOW TO USE IT?](https://www.carnaghan.com/nginx-gzip_static/)
+
+- 什么时候适合压缩？
+- 哪些文件适合压缩？
+- 压缩的优势和劣势？
+
+- 什么是预压缩？
+
+
 
 
 # 第三方模块
