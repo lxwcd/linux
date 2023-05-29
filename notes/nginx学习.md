@@ -44,6 +44,10 @@ Configuration summary
   nginx http scgi temporary files: "scgi_temp"
 ```
 
+安装完成后怎么查看配置文件等路径？
+查看 service 文件
+
+
 
 编译完成后用软连接形式将 `nginx` 链接至 PATH 环境变量中，如 `/usr/sbin`
 
@@ -82,6 +86,22 @@ WantedBy=multi-user.target
 usr/local/nginx/sbin/nginx'
 ```
 
+让 service 文件生效
+```bash
+[root@VM-ubuntu22 nginx]$ systemctl daemon-reload
+```
+查看 nginx.service 状态
+```bash
+[root@VM-ubuntu22 nginx]$ systemctl status nginx.service
+○ nginx.service - A high performance web server and a reverse proxy server
+     Loaded: loaded (/lib/systemd/system/nginx.service; disabled; vendor preset: enabled)
+     Active: inactive (dead)
+       Docs: https://nginx.org/en/docs/
+```
+开启服务并设置为开机自启
+```bash
+[root@VM-ubuntu22 nginx]$ systemctl enable --now nginx.service
+```
 
 
 
