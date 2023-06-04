@@ -457,3 +457,31 @@ Synchronizing state of php8.1-fpm.service with SysV service script with /lib/sys
 Executing: /lib/systemd/systemd-sysv-install enable php8.1-fpm
 Created symlink /etc/systemd/system/multi-user.target.wants/zabbix-server.service → /lib/systemd/system/zabbix-server.service.
 ```
+
+# 登录 zabbix web 界面
+> [Login and configuring user](https://www.zabbix.com/documentation/6.0/en/manual/quickstart/login)
+
+- 配置完成后，在浏览器中输入 zabbix sever 的 server name，即登录 zabbix
+- 根据官方介绍，初始的用户名和密码分别为： `Admin` `zabbix`
+- 登录后，默认只有一个监控的主机，即 zabbix server 自己，因为 zabbix server 上安装了 zabbix agent 用来监控自己
+
+
+
+# Agent 和 Agent2
+- 被监控的一端要安装 Zabbix angent
+- 两个版本的区别
+
+
+# 在被监控主机上安装 zabbix agent
+> [Download and install Zabbix](https://www.zabbix.com/download?zabbix=6.0&os_distribution=ubuntu&os_version=22.04&components=agent&db=&ws=)
+
+例如将 mysql 服务器进行监控，因此需要安装 zabbix agent
+
+- 根据官方介绍下载 .deb 包
+```bash
+wget https://repo.zabbix.com/zabbix/6.0/ubuntu/pool/main/z/zabbix-release/zabbix-release_6.0-4+ubuntu22.04_all.deb
+dpkg -i zabbix-release_6.0-4+ubuntu22.04_all.deb
+apt update
+```
+
+
