@@ -1718,6 +1718,26 @@ Ubuntu 22.04.1 测试两者区别，adduser 会交互式让输入密码，默认
 ![1](https://img-blog.csdnimg.cn/938eb5a96be74d02a71809c18a200433.png)
 ![1](https://img-blog.csdnimg.cn/c01885f953d44d4689cf5d71da8cfdfa.png)
 
+
+
+添加 NOPASSWD 可以不用输入密码，如为用户 `uu` 设置权限
+```bash
+uu  ALL=(ALL:ALL) NOPASSWD: ALL
+```
+
+以后用户 uu 用 `sudo` 命令后不用输入密码
+```bash
+[root@zabbix zabbix_agentd.d]$ useradd -s /usr/bin/bash uu
+[root@zabbix zabbix_agentd.d]$ su uu
+uu@zabbix:/etc/zabbix/zabbix_agentd.d$ cat /etc/shadow
+cat: /etc/shadow: Permission denied
+uu@zabbix:/etc/zabbix/zabbix_agentd.d$ sudo cat /etc/shadow | head -n2
+root:$y$j9T$sM6qch5ObbQXD.2Qp755m/$kzwDdTHvHQKswOq7mpQpungyh4QU6.Du12ZLuWIaUS1:19485:0:99999:7:::
+daemon:*:19213:0:99999:7:::
+uu@zabbix:/etc/zabbix/zabbix_agentd.d$
+```
+
+
 ******************************
 
 visudo 的其他用法见 [第十四章、Linux 账号管理与 ACL 权限配置](http://cn.linux.vbird.org/linux_basic/0410accountmanager_4.php#sudo)。
@@ -6435,6 +6455,7 @@ apt install apache2-utils
 - 通常不同的 distribution 所释出的 RPM 文件不能用在其他的 distributions 上
 
 ![](img/2023-03-21-17-46-43.png)
+
 ### RPM 包文件命令
 > [Package filename and label](https://en.wikipedia.org/wiki/RPM_Package_Manager#Package_filename_and_label)
 
@@ -6653,6 +6674,42 @@ systemctl restart httpd.service
 ```bash
 sudo systemctl stop firewalld.service
 ```
+
+### yum info 查看软件包的信息
+仓库中有但还未安装的软件包也能查询
+
+```bash
+root@Rocky8 ~ $ yum search virt-manager
+Last metadata expiration check: 1:00:22 ago on Tue 06 Jun 2023 01:59:45 PM CST.
+======================================== Name Exactly Matched: virt-manager ========================================
+virt-manager.noarch : Desktop tool for managing virtual machines via libvirt
+============================================ Name Matched: virt-manager ============================================
+virt-manager-common.noarch : Common files used by the different Virtual Machine Manager interfaces
+root@Rocky8 ~ $
+root@Rocky8 ~ $ rpm -q virt-manager
+package virt-manager is not installed
+root@Rocky8 ~ $
+root@Rocky8 ~ $ yum info virt-manager
+Last metadata expiration check: 1:01:00 ago on Tue 06 Jun 2023 01:59:45 PM CST.
+Available Packages
+Name         : virt-manager
+Version      : 3.2.0
+Release      : 4.el8
+Architecture : noarch
+Size         : 620 k
+Source       : virt-manager-3.2.0-4.el8.src.rpm
+Repository   : appstream
+Summary      : Desktop tool for managing virtual machines via libvirt
+URL          : https://virt-manager.org/
+License      : GPLv2+
+Description  : Virtual Machine Manager provides a graphical tool for administering virtual
+             : machines for KVM, Xen, and LXC. Start, stop, add or remove virtual devices,
+             : connect to a graphical or serial console, and see resource usage statistics
+             : for existing VMs on local or remote machines. Uses libvirt as the backend
+             : management API.
+```
+
+
 
 
 

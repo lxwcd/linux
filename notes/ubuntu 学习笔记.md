@@ -915,3 +915,19 @@ netplan-eth0  626dd384-8b3d-3690-9511-192b2c79b3fd  ethernet  eth0
 ```bash
 sudo apt update && apt install -y git
 ```
+
+
+
+
+
+# ubuntu server 最小化安装
+- ubuntu22.04 最小化安装
+
+
+
+## 安装必要的工具包
+
+## 安装 iputils-ping 来用 ping 探测网络
+
+
+## 安装 
