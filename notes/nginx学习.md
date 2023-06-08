@@ -5,17 +5,187 @@ Nginx 学习
 > [nginx documentation](https://nginx.org/en/docs/)
 
 
+# HTTP 超文本传输协议
 
-# URI URL URN
+## URI URL URN
 
 
-# cookie
+## cookie
 
-# session
+## session
 
-# token
+## token
 
-# 安装
+
+
+## HTTP 工作机制
+
+
+## HTTP 协议版本
+
+
+## HTTP 请求访问的完整过程
+
+## HTTP 报文头结构
+
+# Web 相关工具
+## links
+
+## wget
+
+## curl
+
+
+## httpie
+
+## 压力测试工具
+
+
+# Web 服务
+
+
+## 用户访问体验统计
+- 互联网用回顾速度体验的 1-3-10 原则，1 秒较优，3~10 秒较慢，10 秒以上无法接受
+
+## 影响用户体验的因素
+
+
+# 服务端 I/O 流程
+
+
+
+# I/O 模型
+
+## 同步和异步
+- 同步
+
+- 异步
+
+## 阻塞和非阻塞
+- 阻塞
+
+- 非阻塞
+
+
+## 磁盘 I/O
+
+
+## 网络 I/O
+
+
+# I/O 具体实现方式
+
+## select
+
+## poll
+
+## epoll
+
+## kqueue
+
+## IOCP
+
+## /dev/poll
+
+## rtsig
+
+## eventport
+
+
+# I/O 实现方式的选择
+
+
+# 零拷贝
+
+## MMAP
+
+## SENDFILE
+
+## DMA 辅助的 SENDFILE
+
+
+
+# 经典的 Web 服务端 —— Apache
+> [apache](https://apache.org/)
+
+## Apache prefork 模型
+
+## Apache worker 模型
+- 多进程和多线程混合模型
+- 一个控制进程，启动多个子进程，每个子进程包含固定的线程
+- 线程处理请求，线程不够时在启动一个新的子进程
+
+
+## Apache event 模型
+- 最新模式，支持事件驱动模型（epoll）
+- 在 worker 模型的基础上，每个子进程中增加一个监听线程，可以释放空闲的线程
+
+
+# 高性能的 Web 服务端 —— Nginx
+> [nginx](https://nginx.org/en/)
+
+- Nginx 分为社区版和商业版
+- Nginx 的社区版分为开发版（奇数）、最新稳定版（偶数）和过期版
+- 功能丰富，既可以做 http 服务器，又可以做反向代理和邮件服务器
+- 能快速响应静态网页的请求
+- 内置模块多，且支持很多第三方的扩展模块
+
+
+## Nginx VS apache 
+
+
+## Nginx 其他二次发行版
+
+### Tengine
+
+### OpenResty
+
+
+## Nginx 功能
+- 静态的 Web 资源服务器，处理 html，js，css，图片等
+- http/https 反向代理
+- 结合 FastCGI/uWSGI/SCGI 等协议反向代理动态资源请求
+- tcp/udp 协议的请求转发（反向代理）
+- imap4/pop3 邮件协议的反向代理
+
+
+## Nginx 基础特性
+- 模块化设计，较好的扩展性
+- 高可靠性
+- 支持热部署
+不停机更新配置文件，升级版本，更换日志文件
+- 低内存消耗
+10000 个 keep-alive 连接模式下的非活动连接，仅需 2.5M 内存
+- event-driven
+
+
+## Nginx 中 Web 服务相关功能
+- 设置多个虚拟主机（server）
+- 支持 keep-alive 和管道连接（一个连接做多次请求）
+
+
+## Nginx 架构
+
+
+## Nginx 进程结构
+- 多进程模型
+- 一个 Master 主进程和多个 Worker 进程组成
+
+### Master 进程任务
+
+
+### Worker 进程任务
+
+
+## Nginx 启动建立 http 连接的过程
+
+## Nginx 对 http 处理过程
+
+
+
+
+
+# 安装 nginx
 
 ## 编译安装
 > [Building nginx from Sources](http://nginx.org/en/docs/configure.html)
@@ -632,8 +802,11 @@ The current ip is /apps/nginx/html
 
 
 #  Nginx 做反向代理
+## 正向代理和反向代理
 
-## 反向代理和代理
+
+## Nginx 做反向代理
+
 
 ## proxy_pass 
 > [proxy_pass](https://nginx.org/en/docs/http/ngx_http_proxy_module.html#proxy_pass)
