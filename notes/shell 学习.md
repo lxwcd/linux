@@ -1405,6 +1405,7 @@ Error loading webview: Error: Could not register service worker: InvalidStateErr
 ******************
 #### ${parameter-} 和 ${parameter} 区别
 > [Is "${PS1-}" valid syntax and how does it differ from plain "$PS1"?](https://unix.stackexchange.com/questions/352110/is-ps1-valid-syntax-and-how-does-it-differ-from-plain-ps1)
+> [2.6.2 Parameter Expansion](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_02)
 
 
 ![](img/2023-04-06-20-29-18.png)

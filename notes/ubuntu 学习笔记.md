@@ -856,6 +856,9 @@ netplan-eth0  626dd384-8b3d-3690-9511-192b2c79b3fd  ethernet  eth0
 ```
 
 ## 修改 IP
+> [Netplan network configuration tutorial for beginners](https://linuxconfig.org/netplan-network-configuration-tutorial-for-beginners)
+
+
 准备多个虚拟供学习用，一个虚拟机 ip 为 `10.0.0.200`，作为初始化虚拟机
 实际使用时将初始好的虚拟机文件夹复制一份，修改 IP 为 `10.0.0.201`，后面的依次递增
 

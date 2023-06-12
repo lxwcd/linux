@@ -10310,6 +10310,42 @@ virbr0  25fcd9c2-6677-453b-a64d-366e2622174e  bridge    virbr0
 
 ## 网络接口配置
 
+Certainly! Here is a more detailed example:
+
+Suppose you have two Ethernet interfaces on your system: `enp0s25` and `enp1s0`.
+
+You want to assign the static IP address `192.168.1.10/24` to `enp0s25` and the static IP address `192.168.2.10/24` to `enp1s0`. You also want to specify the DNS servers and the default gateway for both interfaces.
+
+Here's how you would write the Netplan configuration file (`/etc/netplan/*.yaml`):
+
+```
+network:
+  version: 2
+  renderer: NetworkManager
+  ethernets:
+    id0:
+      match:
+        name: enp0s25
+      dhcp4: false
+      addresses: [192.168.1.10/24]
+      gateway4: 192.168.1.1
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4]
+    id1:
+      match:
+        name: enp1s0
+      dhcp4: false
+      addresses: [192.168.2.10/24]
+      gateway4: 192.168.2.1
+      nameservers:
+        addresses: [8.8.8.8, 8.8.4.4]
+```
+
+In this example, the `ethernets` section contains two Ethernet interface configurations, each with a unique `id`. The `match` keyword is used to associate the configuration directives with the corresponding interface names.
+
+So, `id0` is associated with `enp0s25`, and `id1` is associated with `enp1s0`. Under each `ethernets` section, you can specify the configuration directives for the corresponding interface, such as IP address, default gateway, DNS servers, and so on.
+
+Therefore, using `id0` and `id1` as unique identifiers for each interface is optional, but it can help you to manage multiple interfaces more easily and to apply different configurations to different interfaces.
 
 
 # 查看启动方式 BIOS 还是 UEFI
