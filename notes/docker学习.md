@@ -108,6 +108,15 @@ live-restore: true docker 服务器重启后原来正在
 
 
 # Docker 安装
+> [Install Docker Engine](https://docs.docker.com/engine/install/)
+
+
+- 安装要求
+
+- ubuntu22.04 安装 docker
+
+
+
 注意各组件版本一致问题
 
 
@@ -248,7 +257,8 @@ tmux|screen
 ## docker exec 进入已经运行的容器
 - 一般指定 shell 类型
 
-
+- 进入后可以执行 exit 退出容器，通过 docker ps -a 查看容器已经处于退出状态，
+  可以再用 docker start 启动容器
 
 
 # busybox 
@@ -256,6 +266,17 @@ tmux|screen
 - 
 
 # 创建镜像
+
+## docker commit 基于容器创建镜像
+- `man docker-commit` 查看帮助
+
+制作镜像和容器的状态无关，停止状态也可以制作镜像
+
+
+
+## docker build 基于 DockerFile 创建镜像
+
+
 
 ## Dockerfile
 

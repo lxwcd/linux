@@ -2706,6 +2706,45 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ## 创建目录 mkdir
 ![1](https://img-blog.csdnimg.cn/668b0eb4694341a4912041d3a2c79ab4.png)
 
+
+- mkdir -p 创建多级目录
+创建多级目录是如果用 `{}` 扩展，注意 `{}` 内的文件夹名用逗号分隔时不能有空格 
+```bash
+[root@docker dockerfile]$ mkdir -pv  web/{nginx, apache, tomcat, jdk}
+mkdir: created directory 'web'
+mkdir: created directory 'web/{nginx,'
+mkdir: created directory 'apache,'
+mkdir: created directory 'tomcat,'
+mkdir: created directory 'jdk}'
+[root@docker dockerfile]$ tree
+.
+├── apache,
+├── jdk}
+├── tomcat,
+└── web
+    └── {nginx,
+```
+
+```bash
+[root@docker dockerfile]$ mkdir -pv  web/{nginx,apache,tomcat,jdk}
+mkdir: created directory 'web'
+mkdir: created directory 'web/nginx'
+mkdir: created directory 'web/apache'
+mkdir: created directory 'web/tomcat'
+mkdir: created directory 'web/jdk'
+[root@docker dockerfile]$ tree
+.
+└── web
+    ├── apache
+    ├── jdk
+    ├── nginx
+    └── tomcat
+
+5 directories, 0 files
+```
+
+
+
 ## 删除空目录 rmdir
 ![1](https://img-blog.csdnimg.cn/27df270623284bbb9143f23cbb522598.png)
 ![2](https://img-blog.csdnimg.cn/af88523932464511aa2e66f9f931d6dd.png)
