@@ -231,6 +231,23 @@ en_US.UTF-8
 ```
 - 修改完后重启
 
+
+## 修改系统时区
+
+### 利用 timedatectl 修改时区
+不记得时补全
+```bash
+[root@docker Asia]$ timedatectl set-timezone Asia/Shanghai
+```
+
+### 利用 tzdata 修改时区
+安装 tzdata，该软件是交互安装，第一次选择 Asia(6)，第二次选择 Shanghai(70)
+用下面方式安装不用交互
+```bash
+echo -e "6\n70" | sudo apt install -y tzdata
+```
+
+
 ## 检查系统时间
 - 查看系统的时区是否正确
 1) `date` 查看时区，如中国应为 CST
@@ -278,6 +295,8 @@ Functions:
 
 - date 修改软件时间
 如果手动修改软件时间，可以用 `date -s`
+
+
 
 
 ## 创建 root 密码

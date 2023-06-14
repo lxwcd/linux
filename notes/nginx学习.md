@@ -33,7 +33,32 @@ Nginx 学习
 
 ## wget
 
+### wget -p
+
+```
+The `wget -p` command is used to download a web page and all of its dependencies, such as images and stylesheets, to a local directory while preserving their directory structure.
+
+The `-p` option, short for `--page-requisites`, tells `wget` to download all of the page's requisites, including inline images, sounds, and stylesheets. It also downloads all linked components, such as images and scripts, that are necessary to properly display the web page.
+
+When using `wget -p`, the downloaded files are saved with their original directory structure preserved. This means that each file is downloaded to a subdirectory that mirrors the directory structure of the web page and all of its dependencies.
+
+For example, running `wget -p http://example.com` would download the web page at `http://example.com` as well as all of its dependencies and store them in subdirectories of the current directory.
+
+Note that the `-p` option is just one of many options available in `wget`, which is a versatile command-line tool for downloading files and web pages from the Internet.
+```
+
+### wget  -P 指定文件保存的目录
+- 指定下载文件存放的目录
+- 目录必须事先存在
+
+```bash
+[root@docker nginx]$ wget -P /usr/local/src/ https://nginx.org/download/nginx-1.24.0.tar.gz
+```
+
+
+
 ## curl
+
 
 
 ## httpie
