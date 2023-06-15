@@ -264,6 +264,8 @@ docker.io/library/ubuntu:22.04
 ## docker cp 容器和宿主机之前复制文件
 > [docker cp](https://docs.docker.com/engine/reference/commandline/cp/)
 
+- 指定容器名可以用容器的 ID（可以不写全，但写出的部分能唯一定位容器）或 NAMES
+
 
 
 ## docker run
@@ -535,7 +537,7 @@ Here's an example of using `bash -c` to run a Bash command passed as an argument
 
 ```
 bash -c 'echo "Hello, world!"'
-``
+```
 In this example, the `bash -c` command runs the `echo "Hello, world!"` command as a snippet of Bash shell code passed as an argument. The output would be "Hello, world!" printed on the screen.
 
 The `-c` option can be also useful to execute multiple commands using a single command line argument. For example:
@@ -554,3 +556,195 @@ dockerfile  image   container
 两个阶段镜像
 
 ~- 相当于 $OLDPWD
+
+
+
+# 制作 nginx 镜像
+1. 从官方仓库找 nginx 镜像
+
+
+
+# 基于 alpine 制作 nginx 镜像
+
+## 制作 alpine 镜像
+> alpine 包管理命令：[Alpine Package Keeper](https://wiki.alpinelinux.org/wiki/Alpine_Package_Keeper#)
+
+新建用户：[Setting up a new user](https://wiki.alpinelinux.org/wiki/Setting_up_a_new_user)
+
+```bash
+adduser [OPTIONS] USER [GROUP]
+
+Create new user, or add USER to GROUP
+
+     -h --home DIR           Home directory
+     -g --gecos GECOS        GECOS field
+     -s --shell SHELL        Login shell named SHELL by example /bin/bash
+     -G --ingroup GRP        Group (by name)
+     -S --system             Create a system user
+     -D --disabled-password  Don't assign a password, so cannot login
+     -H --no-create-home     Don't create home directory
+     -u --uid UID            User id
+     -k SKEL                 Skeleton directory (/etc/skel)
+```
+
+
+
+### 拉取 alpine 镜像并打标签
+- 从官方仓库找 alpine 镜像，查看版本，支持的 tags
+  如果需要最新版，不用指定 tag，默认为 `latest`
+```bash
+[root@docker ~]$ docker pull alpine
+[root@docker dockerfile]$ docker pull alpine
+Using default tag: latest
+latest: Pulling from library/alpine
+59bf1c3509f3: Pull complete
+Digest: sha256:21a3deaa0d32a8057914f36584b5288d2e5ecc984380bc0118285c70fa8c9300
+Status: Downloaded newer image for alpine:latest
+docker.io/library/alpine:latest
+```
+
+- 用 docker images 查看镜像
+```bash
+[root@docker ~]$ docker images
+REPOSITORY         TAG       IMAGE ID       CREATED         SIZE
+alpine             latest    c059bfaa849c   18 months ago   5.59MB
+```
+
+- docker run 创建容器并进入 alpine 中查看版本和其他信息
+alpine 是系统，可以以交互方式进入容器
+```bash
+
+[root@docker dockerfile]$ docker run -it --name alpine-01 alpine:latest sh
+/ # cat /etc/os-release
+NAME="Alpine Linux"
+ID=alpine
+VERSION_ID=3.15.0
+PRETTY_NAME="Alpine Linux v3.15"
+HOME_URL="https://alpinelinux.org/"
+BUG_REPORT_URL="https://bugs.alpinelinux.org/"
+```
+
+- 为镜像打标签
+上面查看该镜像的版本为 3.15，官方支持的 tags 中就有 3.15
+
+
+
+## 做初始化操作，制作 Dockfile
+利用拉取的 alpine 镜像创建容器，进入容器中做一些初始化操作，将这些操作的步骤写到 Dockerfile 中
+
+- 创建 Dockerfile 文件
+
+
+### 修改软件仓库路径
+
+软件仓库路径为 `/etc/apk/repositories`
+```bash
+~ # cd /etc/apk
+/etc/apk # ls
+arch               keys               protected_paths.d  repositories       world
+/etc/apk # cat repositories
+https://dl-cdn.alpinelinux.org/alpine/v3.15/main
+https://dl-cdn.alpinelinux.org/alpine/v3.15/community
+/etc/apk #
+```
+
+找到一个镜像源，如清华大学镜像网站 [https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.15/](https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.15/)
+
+替换源：
+```bash
+/etc/apk # sed -i.orig 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/' /etc/apk/repositories
+/etc/apk # ls
+arch               keys               protected_paths.d  repositories       repositories.orig  world
+/etc/apk # cat repositories
+https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.15/main
+https://mirrors.tuna.tsinghua.edu.cn/alpine/v3.15/community
+/etc/apk #
+/etc/apk # cat repositories.orig
+https://dl-cdn.alpinelinux.org/alpine/v3.15/main
+https://dl-cdn.alpinelinux.org/alpine/v3.15/community
+/etc/apk # ls protected_paths.d/
+```
+
+
+
+
+- 检查时区，修改时区
+> 时区介绍：[List of tz database time zones](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List)
+
+
+默认时区为 UTC
+```bash
+[root@docker dockerfile]$ docker run -it --name alpine-01 alpine:3.15 sh
+/ # date
+Thu Jun 15 03:13:18 UTC 2023
+```
+
+安装 `tzdata` 来修改时区
+> [Setting the timezone](https://wiki.alpinelinux.org/wiki/Setting_the_timezone)
+
+- alpine 用 apk 安装，加上 `--no-cache` 选项可以减少空间，不缓存包的索引信息
+- 设置完时区可以用 `apk del tzdata` 删除包
+```sh
+/ # apk add --no-cache tzdata
+/ # cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+/ # echo "Asia/Shanghai" > /etc/timezone
+/ # date
+Thu Jun 15 14:38:41 CST 2023
+/ # apk del tzdata
+(1/1) Purging tzdata (2023c-r0)
+Executing busybox-1.34.1-r3.trigger
+OK: 6 MiB in 14 packages
+/ # date
+Thu Jun 15 06:30:36 UTC 2023
+```
+
+
+- 安装必要的工具
+```bash
+apk add --no-cache bash curl wget
+```
+
+
+## 创建 Dockerfile
+
+```bash
+FROM alpine:3.15
+
+LABEL author="lx" \
+      description="alpine-based image" \
+      version="v1.0"
+
+RUN sed -i.orig 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/' /etc/apk/repositories \
+    && apk add --no-cache tzdata \
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && echo "Asia/Shanghai" > /etc/timezone \
+    && apk del tzdata \
+```
+
+
+在当前目录下创建构建脚本 build.sh 
+```bash
+#!/bin/bash
+
+docker build -t alpine-base:3.15 .
+```
+
+
+执行构建脚本
+
+查看新生成的镜像
+```bash
+[root@docker alpine]$ docker images
+REPOSITORY         TAG       IMAGE ID       CREATED          SIZE
+alpine-base        3.15      b031c1f21234   10 seconds ago   5.61MB
+alpine             3.15      c059bfaa849c   18 months ago    5.59MB
+```
+
+
+## 制作 nginx 镜像
+- 用于搭建 wordpress
+- 安装 php-fpm nginx
+- 配置
+
+
+

@@ -545,3 +545,9 @@ client_max_body_size 100M;
 
 ### 共享配置文件设置
 - 确定一个和客户端都有的账号：root
+
+
+# 实验三 docker 实验 
+编译安装 nginx ，容器中两个 nginx 服务器，前面一个 LVS 调度
+
+nginx 镜像：编译安装
