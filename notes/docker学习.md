@@ -225,6 +225,10 @@ Note that dangling images can also occur when a build context is used to create 
 
 
 
+
+
+
+
 ## docker pull 拉取镜像
 > [docker pull](https://docs.docker.com/engine/reference/commandline/pull/)
 
@@ -290,7 +294,7 @@ docker.io/library/ubuntu:22.04
 
 
 ### docker run -d 容器后台执行
-这个后台是否跟终端有管
+这个后台是否跟终端有关
 &
 nohub
 tmux|screen
@@ -394,14 +398,149 @@ tmux|screen
 
 
 ### COPY
+> [COPY](https://docs.docker.com/engine/reference/builder/#copy)
+
+> COPY [--chown=<user>:<group>] [--chmod=<perms>] <src>... <dest>
+> COPY [--chown=<user>:<group>] [--chmod=<perms>] ["<src>",... "<dest>"]
+
+- 将宿主机的文件拷贝到容器中，源为宿主机，目的地址为容器中目录
+- 宿主机如果为目录，则默认将目录中的文件内容全部拷贝，包括子目录，不拷贝目录本身
+- 容器的目录如果不存在，则全部不存在的目录可以自动新建
+- 宿主机的文件默认当前目录为 Dockerfile 所在的目录，如果要拷贝的文件在当前目录的上级，可以写相对路径
+```bash
+COPY ../install.sh /root/
+```
+如果源文件写宿主机中绝对路径，报错：
+```bash
+COPY /etc/test.txt /root/
+```
+- COPY 拷贝目录时格式，如下面两种写法
+```bash
+COPY php8/* /root/php8/
+COPY php8/ /root/php8-1/
+```
+Dockerfile 当前目录有一个 php8 的文件夹，其内容入下：
+```bash
+[root@docker nginx]$ ls
+build.sh  Dockerfile  php8  src
+[root@docker nginx]$ tree php8
+php8
+├── conf.d
+├── php-fpm.conf
+├── php-fpm.d
+│   └── www.conf
+└── php.ini
+
+2 directories, 3 files
+```
+
+生成镜像后查看，第一种 `php8/*` 的写法，拷贝的没有子目录
+```bash
+[root@docker nginx]$ docker run -it --name test2 nginx-alpine:3.15-02 bash
+bash-5.1# cd /root
+bash-5.1# ls
+b.sh    php8    php8-1
+bash-5.1# ls -l php8
+total 104
+-rw-r--r--    1 root     root          5329 Oct 26  2022 php-fpm.conf
+-rw-r--r--    1 root     root         72548 Jun 15 19:59 php.ini
+-rw-r--r--    1 root     root         20547 Jun 15 19:56 www.conf
+bash-5.1#
+bash-5.1# ls -l php8-1/
+total 88
+drwxr-xr-x    2 root     root          4096 Jun 15 18:46 conf.d
+-rw-r--r--    1 root     root          5329 Oct 26  2022 php-fpm.conf
+drwxr-xr-x    2 root     root          4096 Jun 17 16:40 php-fpm.d
+-rw-r--r--    1 root     root         72548 Jun 15 19:59 php.ini
+bash-5.1#
+```
+
+- 拷贝文件时，可以使用 chown 和 chmod 修改属性，会将文件夹中全部的文件修改
+```bash
+RUN addgroup -g 201 -S www \
+    && adduser -s /sbin/nologin -S -D -H -u 201 -G www www
+
+COPY ../install.sh /root/b.sh
+COPY php8/* /root/php8/
+COPY --chown=www:www --chmod=777 php8/ /root/php/php8-1
+```
+
+进入容器中查看：
+```bash
+[root@docker nginx]$ docker run -it --name test nginx-alpine:3.15-02 bash
+bash-5.1# cd /root/
+bash-5.1# ls
+b.sh  php   php8
+bash-5.1# ls -lR php
+php:
+total 4
+drwxr-xr-x    4 www      www           4096 Jun 17 16:40 php8-1
+
+php/php8-1:
+total 88
+drwxrwxrwx    2 www      www           4096 Jun 15 18:46 conf.d
+-rwxrwxrwx    1 www      www           5329 Oct 26  2022 php-fpm.conf
+drwxrwxrwx    2 www      www           4096 Jun 17 16:40 php-fpm.d
+-rwxrwxrwx    1 www      www          72548 Jun 15 19:59 php.ini
+
+php/php8-1/conf.d:
+total 0
+
+php/php8-1/php-fpm.d:
+total 24
+-rwxrwxrwx    1 www      www          20547 Jun 15 19:56 www.conf
+bash-5.1# exit
+exit
+
+```
+
 
 ### ADD
 - 复制，解压缩
 
 ### ENV
 
+### ARG
+> [ARG](https://docs.docker.com/engine/reference/builder/#arg)
 
-## run
+- 传递构建（build）阶段需要用到的变量，和 ENV 不同，不会在镜像创建容器时使用
+- 定义的变量在创建镜像时会显示出来，因此不建议将一些需要保密的参数指定为 ARG
+- 可以定义多个 ARG，Docerfile 中每个 directive 会创建一层镜像，因此将多个写为一个 ARG 可以减少镜像层
+- 注意如果多个变量中后面的要引用前面的变量，则不能写在一个 ARG 中
+```bash
+ARG NGINX_VERSION="1.24.0" \
+    NGINX_URL="https://nginx.org/download/" \
+    NGINX_FILE="nginx-${NGINX_VERSION}.tar.gz" \
+    NGINX_SRC="/tmp/src" \
+    NGINX_PREFIX="/usr/local/nginx" \
+    NGINX_DATA="/data/www"
+
+ADD src/${NGINX_FILE} ${NGINX_SRC}
+```
+
+上面的 `NGINX_FILE` 用到 `NGINX_VERSION`，虽然写法上有前后次序，但会提示错误：
+```bash
+ => ERROR [2/2] ADD src/nginx-.tar.gz /tmp/src 
+------
+ > [2/2] ADD src/nginx-.tar.gz /tmp/src:
+------
+```
+从错误提示可以看出，`NGINX_FILE` 的值不对
+
+做如下修改后成功：
+```bash
+ARG NGINX_VERSION="1.24.0"
+ARG NGINX_URL="https://nginx.org/download/" \
+    NGINX_FILE="nginx-${NGINX_VERSION}.tar.gz" \
+    NGINX_SRC="/tmp/src" \
+    NGINX_PREFIX="/usr/local/nginx" \
+    NGINX_DATA="/data/www"
+```
+
+
+
+
+## RUN
 写多个 run 会创建多层镜像？
 
 安装包
@@ -504,30 +643,6 @@ docker -v <卷名>:<容器目录>
 
 
 
-# Docker 网络管理
-同一宿主机中容器的网络通信
-容器的 IP 每次启动都变，不固定
-
-
-可以修改 daemon.json，bip
-
-
-ip a 看到的网络接口的选项
-<> 和后面的 UP|DOWN 状态 含义
-
-
-wget -qo - 172.17.0.2
-
-容器重启又会分配一个新的 IP 
-
---link 容器名
-客户端访问服务器时指定 --link 容器名时，自动将服务器的容器名和 IP 写到 /etc/hosts 中
-
-如果 服务器 容器重启，则 /etc/hosts 文件中会更新主机名和 IP 
-
-
-容器别名，例如 mysql 容器的名为 mysql，
-为 mysql 取多个别名，客户端可以用别名
 
 
 
@@ -569,6 +684,7 @@ dockerfile  image   container
 ## 制作 alpine 镜像
 > alpine 包管理命令：[Alpine Package Keeper](https://wiki.alpinelinux.org/wiki/Alpine_Package_Keeper#)
 
+### 新建用户
 新建用户：[Setting up a new user](https://wiki.alpinelinux.org/wiki/Setting_up_a_new_user)
 
 ```bash
@@ -586,6 +702,21 @@ Create new user, or add USER to GROUP
      -u --uid UID            User id
      -k SKEL                 Skeleton directory (/etc/skel)
 ```
+
+### 包管理
+> alpine 包管理命令：[Alpine Package Keeper](https://wiki.alpinelinux.org/wiki/Alpine_Package_Keeper#)
+
+- 安装包
+```bash
+apk --no-cache add 
+```
+
+- 更新包
+```bash
+apk update
+```
+
+
 
 
 
@@ -748,3 +879,73 @@ alpine             3.15      c059bfaa849c   18 months ago    5.59MB
 
 
 
+# Docker 网络管理
+同一宿主机中容器的网络通信
+容器的 IP 每次启动都变，不固定
+
+
+可以修改 daemon.json，bip
+
+
+ip a 看到的网络接口的选项
+<> 和后面的 UP|DOWN 状态 含义
+
+
+wget -qO - 172.17.0.2
+
+容器重启又会分配一个新的 IP 
+
+--link 容器名
+客户端访问服务器时指定 --link 容器名时，自动将服务器的容器名和 IP 写到 /etc/hosts 中
+
+如果 服务器 容器重启，则 /etc/hosts 文件中会更新主机名和 IP 
+
+
+容器别名，例如 mysql 容器的名为 mysql，
+为 mysql 取多个别名，客户端可以用别名
+
+
+## Host 模式
+
+## Container
+创建一个已存在的容器
+创建其他容器，指定网络为 --netowrk container:名称或 ID
+
+第二个容器网络依附第一个容器，和第一个容器共享网络，但第二个容器关系上类似 slave 关系，不能主动暴露端口，第一个容器停止，第二个容器看不到 IP ?
+??? 
+
+
+如一个宿主机上装 nginx 搭建 wordpress，再用一个容器
+装 mysql，让 mysql 依赖 nginx 服务器网络
+
+端口暴露是分开的？
+nginx 暴露 80 端口(宿主机)，外部可以访问，mysql 3306 不对外曝露端口，只有 nginx 访问 3306
+
+启动顺序 /etc/rc.d
+
+特权
+
+
+## 自定义网络
+ping 名字
+不用写 IP 
+一个宿主机中不同网段的容器能通信吗？
+默认不行，通过 iptables 规则实现隔离
+
+镜像拉取加速，用镜像网站
+
+
+
+
+# Docker Compose 容器单机编排工具
+单机运行多个容器时管理多个的容器的启动，如顺序，网络配置等
+
+类似 makefile
+
+依赖 docker，docker service 必须正常运行
+
+insecure-registries: 不走 443
+
+
+# 高可用
+粒度高
