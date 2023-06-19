@@ -3692,6 +3692,38 @@ reverse lines charaterwise
 ![6](https://img-blog.csdnimg.cn/44aa08666420415385eee96b98b37587.png)
 
 
+## 将标准输入内容保存到文件
+利用 here document 在终端输入多行内容并保存到文件
+```bash
+➜  test ls
+➜  test tee 1.txt <<EOF
+heredoc> a
+heredoc> b
+heredoc> c
+heredoc> EOF
+a
+b
+c
+➜  test cat 1.txt
+a
+b
+c
+➜  test cat /etc/issue
+Ubuntu 20.04.5 LTS \n \l
+```
+
+## 用 root 权限保存 vim 修改的文档
+> [How does the vim "write with sudo" trick work?](https://stackoverflow.com/questions/2600783/how-does-the-vim-write-with-sudo-trick-work)
+
+普通用户编辑一个需要 root 权限的文档时，不能直接用 `:w` 保存，此时可以在命令行输入
+`:w !sudo tee % > /dev/null` 保存
+
+后面的 `> /dev/null` 将标准输出的内容不显示，因为 `tee` 命令会将当前 vim buffer 的内容显示到标准输出
+
+`%` 表示当前的文档名
+
+
+
 # getent 命令
 > [Linux getent 命令手册](https://www.360blogs.top/linux-getent-cmd/)
 

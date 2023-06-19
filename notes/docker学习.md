@@ -376,6 +376,21 @@ tmux|screen
 
 
 ## docker build 基于 DockerFile 创建镜像
+> [docker build](https://docs.docker.com/engine/reference/commandline/build/)
+
+将构建的命令写道一个脚本中，如 `build.sh`，脚本和 Dockerfile 在一个目录
+```bash
+#!/bin/bash
+
+#docker build --no-cache -t nginx-alpine:3.15-01 .
+docker build  -t nginx-alpine:3.15-02 -f Dockerfile1 .
+```
+
+`-t` 为镜像指定标签
+`-f` 指定 Docerfile 的文件名，不写则默认为 `Dockerfile`
+最后写上文件路径，`.` 表示当前目录
+
+
 
 ### Dockerfile 文件格式
 > [Dockerfile reference](https://docs.docker.com/engine/reference/builder/)
@@ -599,8 +614,6 @@ RUN ls
 3. 写 .dockerignore 文件防止复制时拷贝不必要的文件
 4. 多级构建，如一些静态编译的 go 程序
 
-# lab
-tomcat 
 
 # docker 数据管理
 LowerDir: 镜像文件，RO，layer0
@@ -872,10 +885,6 @@ alpine             3.15      c059bfaa849c   18 months ago    5.59MB
 ```
 
 
-## 制作 nginx 镜像
-- 用于搭建 wordpress
-- 安装 php-fpm nginx
-- 配置
 
 
 
@@ -949,3 +958,65 @@ insecure-registries: 不走 443
 
 # 高可用
 粒度高
+
+
+# Docker 资源限制
+pam 模块 limit 
+
+docker 远程管理，客户端和服务端两个主机上
+
+OOM 优先级机制
+每个进程有个进程分数 /proc/PID/oom_score_adj
+可以修改，值越高越容易被 kill
+
+/proc/PID/oom_score 只读，系统综合进程的内存消耗量
+
+PID 不固定，每次启动可能不同
+
+docker 有自己管理资源的方式
+
+
+# 压力测试 stree-ng
+
+
+
+
+
+# lab
+
+
+## LNMP 搭建 wordpress
+
+### 基于 alpine 做基础镜像
+- 选择 alpine:3.15
+- 修改软件仓库源为镜像源
+- 修改时区
+
+
+### nginx + php 镜像
+- 基于前面的 alpine-base 基础镜像
+
+
+### mysql 镜像
+#### 利用 ubuntu:22.04 镜像制作 mysql 镜像
+Dockerfile 中安装 mysql 制作镜像失败，但用 ubuntu22.04 镜像中生成的容器中安装 mysql 成功 ？
+```bash
+ => [4/5] RUN apt install -y mysql-server                                                                   338.8s
+ => => # Cannot stat file /proc/1/fd/22: Permission denied
+ => => # Cannot stat file /proc/1/fd/23: Permission denied
+ => => # Cannot stat file /proc/1/fd/24: Permission denied
+ => => # Cannot stat file /proc/1/fd/25: Permission denied
+ => => # mysqld will log errors to /var/log/mysql/error.log
+ => => # mysqld is running as pid 759
+```
+按照提示说明，是权限问题？ 但进入容器中为什么能成功安装?
+Dockerfile 中怎么提升权限？ docker run 指令中可以指定 --privileged 
+
+
+#### 利用官方的 mysql 镜像
+> [mysql](https://hub.docker.com/_/mysql/)
+
+通过传递环境变量来调整 mysql 的配置
+
+
+
