@@ -271,6 +271,16 @@ docker.io/library/ubuntu:22.04
 - 指定容器名可以用容器的 ID（可以不写全，但写出的部分能唯一定位容器）或 NAMES
 
 
+### 将容器的一个目录拷贝到宿主机的目录中
+- 如果不想拷贝容器目录只拷贝目录中的文件，则目录最后加 /.
+```bash
+[root@docker nginx]$ docker cp nginx-02:/data/www/. data/ -a
+```
+- 拷贝目录本身以及目录中的文件
+```bash
+[root@docker nginx]$ docker cp nginx-02:/data/www/ data/ -a
+```
+
 
 ## docker run
 运行容器
@@ -607,6 +617,7 @@ RUN ls
 
 ## .dockerignore 文件
 和 DockerFile 在一个目录
+
 
 # 创建镜像优化
 1. RUN 尽可能只写一个，写多个 RUN 指令会创建多个镜像
@@ -995,6 +1006,14 @@ docker 有自己管理资源的方式
 
 ### nginx + php 镜像
 - 基于前面的 alpine-base 基础镜像
+- nginx 镜像的配置文件、日志和 wordpress 的数据都做持久化，即将宿主机的目录挂载到容器中
+- 宿主机中为 nginx 镜像创建一个用户和组，如 www，选择一个容器和宿主机中都未被使用的用户和组
+```bash
+useradd -s /sbin/nologin -u 124 -g 124 -r -M www
+groupadd -g 124 -r www
+```
+将宿主机中要挂载到容器中的目录的用户和组改为 www
+配置文件中指定的 nginx 和 php-fpm 的用户和组都改为 www
 
 
 ### mysql 镜像
@@ -1018,5 +1037,21 @@ Dockerfile 中怎么提升权限？ docker run 指令中可以指定 --privilege
 
 通过传递环境变量来调整 mysql 的配置
 
+- 用 mysql:5.7
+
+mysql 官方镜像生成的容器中，mysql 的数据的 owner 和 group 为 mysql(999)
+将 mysql 的数据和配置文件做持久化，在宿主机中创建一个 uid 和 gid 与容器相同的用户 mysql
+宿主机中已经有 group 为 999 的组（docker），但无 uid 为 999 的用户
+```bash
+[root@docker mysql]$ getent group 999
+docker:x:999:
+[root@docker mysql]$ id docker
+id: ‘docker’: no such user
+[root@docker mysql]$ useradd -s /sbin/nologin -u 999 -g 999 -r -M mysql
+[root@docker mysql]$ id mysql
+uid=999(mysql) gid=999(docker) groups=999(docker)
+```
 
 
+如果 mysql 暴露的端口为 3307 而非默认的 3306，则 wordpress 初始化时需要指明主机以及端口
+其中主机的 ip 为 mysql 宿主机而非 mysql 容器的 IP，宿主机将 3307 进行转发给 Mysql 容器的 3306
