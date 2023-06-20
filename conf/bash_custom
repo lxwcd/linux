@@ -18,12 +18,10 @@ PS1="\[\e[36m\][\u@\h \W]\$ \[\e[0m\]"
 
 ######################  alias  ###########################
 
+alias rm='DIR=/tmp/rm_$(date +"%Y%m%d%H%M%S"); mkdir ${DIR}; mv -t ${DIR} '
+alias rm_r='\rm -ri '
 alias lsh='ls -A | grep -E "^[.].+$"'
 alias ssh_noask="ssh -o StrictHostKeyChecking=no "
 alias ssh_ask="ssh -o StrictHostKeyChecking=ask "
 alias tree_v="tree -pughDFv "
 alias ps_v="ps auxf | head -n1; ps auxf | grep -i "
-
-
-
-
