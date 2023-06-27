@@ -3104,7 +3104,6 @@ mkdir: created directory 'web/jdk'
 
 
 ### cp --backup 有同名文件先备份
-> [Copying with Linux CP Command](https://www.ionos.com/digitalguide/server/configuration/linux-cp-command/)
 
 - 可以用 `cp -b`，但这样备份的文件名固定，如果再备份一次会覆盖，这种写法不能指定参数
 - `cp --backup=numbered` 会为备份的文件创建数字，多备份几次会有不同的文件名
@@ -4069,6 +4068,77 @@ Ubuntu 20.04.5 LTS \n \l
 ![2](https://img-blog.csdnimg.cn/279e1f8a4c5c46018de7186b2a8699e9.png)
 
 <br/>
+
+### --strip-components 去除目录结构
+1. 原始目录结构：
+```bash
+[root@docker tmp]$ tree dir1/
+dir1/
+├── subdir1
+│   └── t1.txt
+└── subdir2
+    └── t2.txt
+
+2 directories, 2 files
+``` 
+
+2. 将该目录打包
+```bash
+[root@docker tmp]$ tar zcvf dir1.tar.gz dir1/
+```
+
+3. 直接解压到其他目录中，解压后目录结构和原始相同
+```bash
+[root@docker tmp]$ tar xzvf dir1.tar.gz  -C dir1-1/
+dir1/
+dir1/subdir2/
+dir1/subdir2/t2.txt
+dir1/subdir1/
+dir1/subdir1/t1.txt
+[root@docker tmp]$ ls
+dir1  dir1-1  dir1.tar.gz
+[root@docker tmp]$ tree dir1-1/
+dir1-1/
+└── dir1
+    ├── subdir1
+    │   └── t1.txt
+    └── subdir2
+        └── t2.txt
+
+3 directories, 2 files
+```
+
+4. 解压后去掉第一级目录
+```bash
+[root@docker tmp]$ tar xzvf dir1.tar.gz -C dir1-2/ --strip-components=1
+dir1/subdir2/
+dir1/subdir2/t2.txt
+dir1/subdir1/
+dir1/subdir1/t1.txt
+[root@docker tmp]$ tree dir1-
+dir1-1/ dir1-2/
+[root@docker tmp]$ tree dir1-2
+dir1-2
+├── subdir1
+│   └── t1.txt
+└── subdir2
+    └── t2.txt
+
+2 directories, 2 files
+```
+
+5. 解压后去掉第二级目录
+```bash
+[root@docker tmp]$ tar xzvf dir1.tar.gz -C dir1-3/ --strip-components=2
+dir1/subdir2/t2.txt
+dir1/subdir1/t1.txt
+[root@docker tmp]$ tree dir1-3
+dir1-3
+├── t1.txt
+└── t2.txt
+
+0 directories, 2 files
+```
 
 ### 打包多个文件
 ![1](https://img-blog.csdnimg.cn/96a774a4ec844b45980c5e540c611ee5.png)
@@ -6452,6 +6522,9 @@ nginx   92780 nginx    6u  IPv4 239792      0t0  TCP *:http (LISTEN)
 # watch
 
 
+# chroot
+切根
+将某个程序限制在特定目录，更安全
 
 
 # 好玩工具

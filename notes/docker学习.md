@@ -115,6 +115,8 @@ In summary, Overlay2 is a storage driver used by Docker to manage container file
 可以修改存储引擎
 
 
+docker 客户端用 socket 和 dockerd 守护进程通信
+
 # Docker 优化
 用镜像网址代替官网
 
@@ -378,6 +380,10 @@ tmux|screen
 
 # 创建镜像
 
+
+
+
+
 ## docker commit 基于容器创建镜像
 - `man docker-commit` 查看帮助
 
@@ -406,11 +412,29 @@ docker build  -t nginx-alpine:3.15-02 -f Dockerfile1 .
 > [Dockerfile reference](https://docs.docker.com/engine/reference/builder/)
 
 
+- 如果环境变量后面多个值，可以通过 `\` 换行添加，但最后一行不能加 `\`
+如果最后一行加上 `\`，会影响下面一行的执行
+
+- 使用 `ARG` 时，如果后面的值使用了前面的值，则不能写在一个 `ARG` 中，如：
+```bash
+ARG NGINX_VERSION="1.24.0" \ 
+    NGINX_FILE="nginx-${NGINX_VERSION}.tar.gz" \
+    PATH_TMP="/tmp/src"
+```
+上面的写法第二个变量不能正确赋值，应改为如下写法：
+```bash
+ARG NGINX_VERSION="1.24.0"
+ARG NGINX_FILE="nginx-${NGINX_VERSION}.tar.gz" \
+    PATH_TMP="/tmp/src"
+
+ADD src/${NGINX_FILE} ${PATH_TMP}/
+```
+
+- 能合并到一个指令中写时尽量在一个指令中，增加一个指令会增加一层镜像
 
 
 
 
-## Dockerfile
 
 ### FROM
 
@@ -432,6 +456,8 @@ docker build  -t nginx-alpine:3.15-02 -f Dockerfile1 .
 - 宿主机如果为目录，则默认将目录中的文件内容全部拷贝，包括子目录，不拷贝目录本身
 - 容器的目录如果不存在，则全部不存在的目录可以自动新建
 - 宿主机的文件默认当前目录为 Dockerfile 所在的目录，如果要拷贝的文件在当前目录的上级，可以写相对路径
+- 宿主机的路径只能写相对路径，写绝对路径会报错
+- 如果要修改属性和权限，位置应在最前面，顺序不能错
 ```bash
 COPY ../install.sh /root/
 ```
@@ -439,7 +465,7 @@ COPY ../install.sh /root/
 ```bash
 COPY /etc/test.txt /root/
 ```
-- COPY 拷贝目录时格式，如下面两种写法
+- COPY 拷贝目录时格式，如下面两种写法有区别，用第二种才能正确拷贝目录种全部文件
 ```bash
 COPY php8/* /root/php8/
 COPY php8/ /root/php8-1/
@@ -487,6 +513,7 @@ RUN addgroup -g 201 -S www \
 
 COPY ../install.sh /root/b.sh
 COPY php8/* /root/php8/
+COPY php8/ /root/php8-1/
 COPY --chown=www:www --chmod=777 php8/ /root/php/php8-1
 ```
 
@@ -855,6 +882,7 @@ Thu Jun 15 06:30:36 UTC 2023
 
 
 - 安装必要的工具
+暂时不装
 ```bash
 apk add --no-cache bash curl wget
 ```
@@ -1005,6 +1033,11 @@ docker 有自己管理资源的方式
 
 
 ### nginx + php 镜像
+> [alpine-nginx/Dockerfile](https://github.com/LoicMahieu/alpine-nginx/blob/master/Dockerfile)
+> [docker-nginx/stable/alpine-slim/Dockerfile](https://github.com/nginxinc/docker-nginx/blob/1a8d87b69760693a8e33cd8a9e0c2e5f0e8b0e3c/stable/alpine-slim/Dockerfile)
+
+
+
 - 基于前面的 alpine-base 基础镜像
 - nginx 镜像的配置文件、日志和 wordpress 的数据都做持久化，即将宿主机的目录挂载到容器中
 - 宿主机中为 nginx 镜像创建一个用户和组，如 www，选择一个容器和宿主机中都未被使用的用户和组
