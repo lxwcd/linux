@@ -1473,6 +1473,34 @@ efffffg
 
 
 
+### ${parameter##word} 
+和上面相同，但是做最长匹配
+
+```bash
+[root@docker nginx]$ str="aaabcd-efffffg-123"
+[root@docker nginx]$ str1=${str##-}
+[root@docker nginx]$ echo $str1
+aaabcd-efffffg-123
+[root@docker nginx]$ str1=${str##*-}
+[root@docker nginx]$ echo $str1
+123
+```
+
+```bash
+[root@docker nginx]$ str="aa-abcd-efffffg-123"
+[root@docker nginx]$ str1=${str##a}
+[root@docker nginx]$ echo $str1
+a-abcd-efffffg-123
+```
+```bash
+[root@docker nginx]$ str="aa-abcd-efffffg-123"
+[root@docker nginx]$ str1=${str##*a}
+[root@docker nginx]$ echo $str1
+bcd-efffffg-123
+```
+
+
+
 ## $(command) 子命令扩展
 > [Difference between $() and () in Bash](https://stackoverflow.com/questions/39110485/difference-between-and-in-bash)
 > [3.5.4 Command Substitution](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Substitution)
