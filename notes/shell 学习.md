@@ -1454,7 +1454,7 @@ ubuntu 22.04 中的 `/etc/profile` 配置文件中使用 `${PS1-}` 的用法，�
 ![1](https://img-blog.csdnimg.cn/45c27819f10b4d27a91ff8035234e3f1.png)
 
 
-### ${parameter#word} 
+### ${parameter#word} 按模式匹配移除部分字符串
 > [Shell Parameter Expansion](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Parameter-Expansion)
 
 
@@ -1500,6 +1500,34 @@ bcd-efffffg-123
 ```
 
 
+
+### ${parameter%word} 按模式匹配移除部分字符串
+从尾部匹配开始移除字符串，最短匹配
+
+```bash
+[root@docker nginx]$ str="test.txt"
+[root@docker nginx]$ str="test.txt.txt"
+[root@docker nginx]$ str1=${str%.txt}
+[root@docker nginx]$ echo $str1
+test.txt
+```
+
+### ${parameter%%word} 按模式匹配移除部分字符串
+从尾部匹配开始移除字符串，最长匹配
+
+
+```bash
+[root@docker nginx]$ str="test.txt.txt"
+[root@docker nginx]$ str1=${str%%.txt}
+[root@docker nginx]$ echo $str1
+test.txt
+```
+```bash
+[root@docker nginx]$ str="test.txt.txt"
+[root@docker nginx]$ str1=${str%%.*}
+[root@docker nginx]$ echo $str1
+test
+```
 
 ## $(command) 子命令扩展
 > [Difference between $() and () in Bash](https://stackoverflow.com/questions/39110485/difference-between-and-in-bash)
