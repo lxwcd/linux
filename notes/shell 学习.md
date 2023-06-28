@@ -1453,6 +1453,26 @@ ubuntu 22.04 中的 `/etc/profile` 配置文件中使用 `${PS1-}` 的用法，�
 
 ![1](https://img-blog.csdnimg.cn/45c27819f10b4d27a91ff8035234e3f1.png)
 
+
+### ${parameter#word} 
+> [Shell Parameter Expansion](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Parameter-Expansion)
+
+
+根据 `word` 模式来匹配 `parameterr`， 移除变量 `parameter` 中最从开头到最短匹配到 `word` 的内容
+
+```bash
+[root@docker nginx]$ str="aaabcd-efffffg"
+[root@docker nginx]$ str1=${str#a}
+[root@docker nginx]$ echo $str1
+aabcd-efffffg
+[root@docker nginx]$ str1=${str#*-}
+[root@docker nginx]$ echo $str1
+efffffg
+```
+上面中 `*-` 为匹配模式，如果写成 `str1=${str-}` 则只匹配以 `-` 开头  
+
+
+
 ## $(command) 子命令扩展
 > [Difference between $() and () in Bash](https://stackoverflow.com/questions/39110485/difference-between-and-in-bash)
 > [3.5.4 Command Substitution](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Substitution)
