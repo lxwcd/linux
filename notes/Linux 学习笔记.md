@@ -4600,7 +4600,6 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 > [50 sed Command Examples](https://linuxhint.com/50_sed_command_examples/)
 
 
-
 - `sed` is a stream editor. A stream editor is used to perform basic text transformations on an input stream(a file or input from a pipeline).
 - `sed` can filter text in a pipeline.
 - 一行一行处理，不将整个文件全部加载再处理
@@ -4986,6 +4985,15 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 ![](img/2023-03-16-20-45-45.png)
 
 
+## 例子
+1. 将一个文件中的一行如 `port 6379` 改为 `port num`，num 为变量，该行的开头为 `port`
+
+```bash
+[root@docker init_data]$ num=6371
+[root@docker init_data]$ sed -Ei "s/^port 6379/port ${num}/" 1.conf
+```
+
+注意在 `sed` 中使用变量，用双引号而非单引号包围，单引号会无法识别变量 
 
 
 # UID, EUID, RUID and SUID
