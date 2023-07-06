@@ -107,6 +107,19 @@ In summary, redundancy is the provision of extra or backup resources to prevent 
 高可用集群，避免单点失败（single point of failure）
 增加冗余节点来避免失败
 
+- 无状态：
+如 web 服务
+有健康检查的负载均衡
+keepalived 解决负载均衡器的高可用
+
+
+- 有状态
+如 mysql，用 MHA
+redis 有哨兵
+
+
+
+
 
 # SLA (Service level agreement)
 

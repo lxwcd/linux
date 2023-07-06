@@ -1018,7 +1018,18 @@ docker 有自己管理资源的方式
 # 压力测试 stree-ng
 
 
+# 镜像仓库
+## 官方镜像仓库
+> [hub.docker](https://hub.docker.com/)
 
+- 可以将镜像打标签后传到官方的镜像仓库中
+- 虚拟机中上传到官方仓库容易失败
+
+
+## 阿里云 Docker 仓库
+> [阿里云镜像仓库](https://cr.console.aliyun.com/cn-hangzhou/instance/repositories)
+
+- 创建阿里云账号，将自己制作的镜像上传到阿里云的仓库中，将本地的镜像上传，官方的提示很详细
 
 
 # lab
