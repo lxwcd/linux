@@ -357,10 +357,6 @@ real server IP
 后端服务器的 IP
 
 
-
-
-
-
 # LVS 实现的三种方式
 > [How virtual server works?](http://www.linuxvirtualserver.org/how.html)
 

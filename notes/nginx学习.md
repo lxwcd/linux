@@ -629,10 +629,10 @@ charset utf-8;
 # 指定日志文件的格式
 `log_format` 可以指定日志格式，如默认配置中
 ```bash
-  #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-  #                  '$status $body_bytes_sent "$http_referer" '
-  #                  '"$http_user_agent" "$http_x_forwarded_for"';
-  #access_log  logs/access.log  main;
+#log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+#                  '$status $body_bytes_sent "$http_referer" '
+#                  '"$http_user_agent" "$http_x_forwarded_for"';
+#access_log  logs/access.log  main;
 ```
 
 通过 `log_format` 指定一个格式，该配置的名字为 `main`，
@@ -797,7 +797,7 @@ HTTP/1.1 协议支持持续链接，即万维网服务器在发送响应给客�
 
 - curl 查看换行，浏览器中未换行
 
-```
+```bash
 [root@mysql ~]$ curl 10.0.0.202/echo
 The current uri is /echo
 The current ip is 10.0.0.82
