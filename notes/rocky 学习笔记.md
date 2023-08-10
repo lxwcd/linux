@@ -696,6 +696,7 @@ PING 10.0.0.111 (10.0.0.111) 56(84) bytes of data.
 - 在 xshell 中使用多个虚拟机时，为了查看方便，将 IP 修改为方便辨认的格式
 - 如 `rocky8.6` 安装多个虚拟机，第二个虚拟机该名字为 `10.0.0.82`
 
+
 ## 修改网卡配置文件
 > [Understanding the Network interface configuration file /etc/sysconfig/network-scripts/ifcfg-eth#](https://www.thegeekdiary.com/understanding-the-network-interface-configuration-file-etc-sysconfig-network-scripts-ifcfg-eth/)
 > [11.2. Interface Configuration Files](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/deployment_guide/s1-networkscripts-interfaces)

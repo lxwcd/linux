@@ -10900,6 +10900,11 @@ search .
 
 - DNS 只解析域名，不负责 IP 是否可达
 
+
+# 127.0.0.53
+- man systemd-resolved.service
+
+
 # 公有云上配置 DNS 解析
 
 
