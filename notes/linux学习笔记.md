@@ -1,74 +1,5 @@
-﻿# 学习资源
-笔记主要来源于 `鸟哥的 Linux 私房菜基础篇（第四版）` 和 `鸟哥的 Linux 私房菜服务器架设篇（第三版）`
-
-
-## 官方文档
-> [ubuntu](https://ubuntu.com/tutorials?q=bash#community)
-> [GNU Manual Online](https://www.gnu.org/manual/manual.html)
-> [Linux man pages](https://linux.die.net/man/)
-> [Linux Documentation](https://linux.die.net/)
-
-## 教程
-> [鸟哥的 Linux 私房菜](http://cn.linux.vbird.org/linux_basic/linux_basic.php)
-> [Ubuntu 中文社区](https://forum.ubuntu.org.cn/index.php)
-> [UNIX Tutorial for Beginners](http://www.ee.surrey.ac.uk/Teaching/Unix/)
-> [Linux学习教程](http://c.biancheng.net/linux_tutorial/)
-> [Linux 教程](https://www.runoob.com/linux/linux-tutorial.html)
-> [w3cschool](https://www.w3cschool.cn/linuxc/linuxc-612m3l6o.html)
-> [Linux 入门教程](http://www.imooc.com/wiki/linuxlesson)
-> [Linux 常用命令全拼](https://www.runoob.com/w3cnote/linux-command-full-fight.html)
-> [howtogeek](https://www.howtogeek.com/category/linux/)
-> [Linux Tutorial](https://rc.byu.edu/documentation/unix-tutorial/)
-
-
-
-## 博客
-> [The Linux kernel](https://www.win.tue.nl/~aeb/linux/lk/lk.html#toc10)
-
-
-## 提问网站
-
-> [FORCHANGE AI EDU](https://chat.forchange.cn/)
-
-
-
-# 注意
-- 在不同的系统，使用不同的  `bash` 版本，有些设置可能不同
-	- 如 ubuntu 20.04 中默认创建用户不创建家目录，但 rocky 8.6 中默认创建家目录
-	- 如通配符匹配在 ubuntu 20.04 和 rocky 8.6 中不同，用的 bash 版本不同，见 [3.5.8.1 Pattern Matching](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Pattern-Matching) 对 `[...]` 说明
-![1](https://img-blog.csdnimg.cn/c4ba1d16633d4677a572f566ad26d506.png)
-![2](https://img-blog.csdnimg.cn/1f9c2ef0dc32465b91bfc8f8dca37773.png)
-
-
-
-&nbsp;
-
-# 操作系统下载
-可以在官网或者镜像网站下载。
-
-## Ubuntu
-下载长期支持版。
-
-> [阿里云镜像源](https://mirrors.aliyun.com/ubuntu-releases/)
-> [Ubuntu 官网最新版](https://ubuntu.com/?spm=a2c6h.13651104.0.0.5a1a4763TTb0EY)
-> [Ubuntu 官网 Old Ubuntu Releases](http://old-releases.ubuntu.com/releases/?spm=a2c6h.13651104.0.0.414329cacFG7ic)
-> [阿里云 Old Ubuntu Releases](https://mirrors.aliyun.com/oldubuntu-releases/releases/?spm=a2c6h.25603864.0.0.63826f0f8RacGj)
-
-
-
-# 安装虚拟化软件
-## 虚拟化介绍
-> [Virtualization Explained](https://www.bilibili.com/video/BV1ee4y1z7ix/?spm_id_from=333.999.0.0&vd_source=a99dfd145a3e6aa8000930c149d4bf58)
-
-
-## 安装 VMware Workstation
-> [有那些免费的虚拟机软件？](https://zhuanlan.zhihu.com/p/422262182)
-
-
-
-***************************
-# 操作系统
-> 计算机的心智操作系统值哲学原理 1.3
+﻿# 操作系统
+> 计算机的心智操作系统之哲学原理 1.3
 
 - 操作系统是一个软件系统
 - 替用户及其应用管理计算机上的软硬件资源
@@ -78,36 +9,14 @@
 
 
 # Linux 介绍
-
 > [Operating System - Linux](https://www.tutorialspoint.com/operating_system/os_linux.htm)
 > [What is Linux](https://www.redhat.com/en/topics/linux/what-is-linux)
 > [Architecture of Linux](https://www.javatpoint.com/architecture-of-linux)
-
-
 
 - 一种开源的操作系统软件
 - 管理系统的硬件和资源
 - 介于硬件和应用程序之间
 - 提供一个平台能让用户方便的运行应用程序
-
-
-## Linux 基本组成
-> [Operating System - Linux](https://www.tutorialspoint.com/operating_system/os_linux.htm)
-
-
-- Kernel
-- System Library
-- System Utility
-###  Kernel
-- The core part of linux
-- It onsists of variable modules
-- It interacts directly with the ulderlying hardware 
-- It provides an abstraction to hide low level hardware details to **system or application programs**
-
-### System Library
-- Special functions or programs 
-- Application programs or system utilities access the Kernel's ofeatures through system libraries
-- These libraries implement most of the functionalities of the operating system and do not requires kernel module's code access rights
 
 
 ## 特点
@@ -119,51 +28,24 @@
 - Shell
 - Security
 
-
-### System Utility
-- Do specialized, individual level tasks
-
-
-*********************************
-
+## Linux 基本组成
+> [Operating System - Linux](https://www.tutorialspoint.com/operating_system/os_linux.htm)
 > [Introduction: The Linux Operating System](https://rc.byu.edu/documentation/unix-tutorial/unix1.php) 
 
 
-Three parts of the Linux operating system:
-1. The kernel
-- It is the lowest layer of the Linux operating system
-- It interfaces directly with the computer hardware
-- It provides an interface to programs whereby they may access files, the network, and devices
-
-2. The shell
-- The shell acts as an interface between the user and the kernel
-- It is a command line interpreter (CLI) 
-- It interprets the commands the user types in and executes them
-
-3. The programs
-- Each of programs does one thing and does it well
-
-
-
-
-# Linux 分支介绍
+## Linux 分支介绍
 > [Linux的分支及使用选择](https://zhuanlan.zhihu.com/p/381753464)
-
-
-# 安装 ubuntu
-## ubuntu 安装后基本配置
-
 
 
 # 远程连接
 ## SSH
-
 > [SSH 教程](https://www.cainiaojc.com/ssh/ssh-basic.html)
 > [什么是SSH 以及常见的ssh 功能](https://blog.csdn.net/u013452337/article/details/80847113)
 > [查看linux虚拟机ssh服务是否开启](https://blog.csdn.net/n123456uo/article/details/90261882)
 > [解决：使用xshell连接服务器时无法使用账号密码登录的一种方式](https://blog.csdn.net/LvQiFen/article/details/122182815?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-122182815-blog-96923553.pc_relevant_multi_platform_whitelistv3&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-122182815-blog-96923553.pc_relevant_multi_platform_whitelistv3&utm_relevant_index=1)
 > [SSH远程访问及控制](https://www.cnblogs.com/y0226/p/16806645.html)
 
+详细介绍见网络安全笔记
 
 - SSH 是一种网络协议，主要用于保证远程登录计算机的安全
 - SSH 的软件架构是服务器-客户端模式
@@ -175,12 +57,14 @@ Three parts of the Linux operating system:
 ![2](https://img-blog.csdnimg.cn/7cccddb0b78b475d8113b35f0e956129.png)
 ![1](https://img-blog.csdnimg.cn/5eb10cfa4dfd41888262a129561743e6.png)
 
+
+
 ### 安装 
 - ubuntu 默认安装 openssh-client
 - ubuntu 安装 openssh-server：`sudo apt-get install openssh-server` 
 
 ### root 不能通过 xshell 远程
-- 修改配置文件 /etc/ssh/sshd_config
+- 修改服务端配置文件 /etc/ssh/sshd_config
 编辑 `/etc/ssh/sshd_config` 做如下修改：
 ```bash
 # 添加下面的行
@@ -270,7 +154,6 @@ PermitEmptyPasswords yes
 
 
 
-//TODO: session 待补充
 # session 会话管理
 > [Linux session(会话)](https://www.cnblogs.com/sparkdev/p/12146305.html)
 > [10. Processes](https://www.win.tue.nl/~aeb/linux/lk/lk-10.html)
@@ -282,10 +165,10 @@ PermitEmptyPasswords yes
 > [Tmux 使用教程](https://www.ruanyifeng.com/blog/2019/10/tmux.html)
 
 
-# 基本规则
+# linux 基本规则
 - 区分大小写
 
-# 命令格式
+# linux 命令格式
 > [What's the difference between a flag, an option, and an argument? [closed]](https://unix.stackexchange.com/questions/285575/whats-the-difference-between-a-flag-an-option-and-an-argument)
 
 
@@ -299,7 +182,7 @@ PermitEmptyPasswords yes
 
 
 
-# 常用热键查看
+# linux 常用热键查看
 - `stty -a` 查看热键，`man stty` 查看帮助说明
 
 ![](img/2023-03-17-09-13-44.png)
@@ -327,7 +210,6 @@ PermitEmptyPasswords yes
 ![1](https://img-blog.csdnimg.cn/b92877d442d0478ca70bdddc6aaa33ff.png)
 
 
-//TODO: 待补充 Ctrl C
 ### Ctrl + c 发送 SIGINT 信号
 > [POSIX signals](https://dsa.cs.tsinghua.edu.cn/oj/static/unix_signal.html)
 > [How to Use SIGINT and Other Termination Signals in Linux](https://linuxhandbook.com/termination-signals/)
@@ -337,7 +219,6 @@ PermitEmptyPasswords yes
 - 如果输入 `sleep 100`，可以用该快捷键终止
 
 
-//TODO: 待补充 Ctrl D
 ### Ctrl + d 发送 EOF 
 > [Why does Ctrl-D (EOF) exit the shell?](https://unix.stackexchange.com/questions/110240/why-does-ctrl-d-eof-exit-the-shell)
 
@@ -366,8 +247,12 @@ PermitEmptyPasswords yes
 > [How to change the output color of echo in Linux](https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux)
 
 
-![1](https://img-blog.csdnimg.cn/c48e392891404b25b92337a26541af78.png)
-
+```bash
+[root@ubuntu22-c0 ~]$ echo $PS1
+\[\e[36m\][\u@\h \W]$ \[\e[0m\]
+```
+注意颜色的开始 `\e[36m` 和结束 `\e[0m` 均用方括号括起来，
+否则一行写到屏幕最右端后新的文字在显示上会覆盖原来的内容而非换到第二行
 
 # 安装完成后基本设置
 ## 安装输入法
@@ -380,25 +265,28 @@ PermitEmptyPasswords yes
 
 问题：安装的服务器版本控制台界面很小，字体调大后不能完全显示。
 
+可以不改字体，用 MobaXterm 远程登录，修改和操作更方便
 
 
 ## 设置时区
+### 利用 timedatectl 修改时区
 > [Linux 如何设置时区、时间](https://blog.csdn.net/gezilan/article/details/79422864)
 
-```shell
+```bash
 sudo timedatectl set-timezone 'Asia/Shanghai'
 ```
 
-
-
-
-
+### 利用 tzdata 修改时区
+安装 tzdata，该软件是交互安装，第一次选择 Asia(6)，第二次选择 Shanghai(70)
+用下面方式安装不用交互
+```bash
+echo -e "6\n70" | sudo apt install -y tzdata
+```
 ## 修改提示符 PS1
 > [Controlling-the-Prompt](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Controlling-the-Prompt)
 > [环境变量PS1介绍](https://hongjh.blog.csdn.net/article/details/121312038)
 > [Bash PS1 customization examples](https://linuxhint.com/bash-ps1-customization/)
 > [6.9 Controlling the Prompt](https://www.gnu.org/software/bash/manual/html_node/Controlling-the-Prompt.html)
-
 
 - `man bash` 帮助文档查看环境变量 `$PS1` 的介绍
 ![1](https://img-blog.csdnimg.cn/73a3f9095dc1413e8de842dc0318a530.png)
@@ -410,16 +298,14 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 ![3](https://img-blog.csdnimg.cn/5fb00cec78d54535ba7f7a31f42ce3ee.png)
 
 - 示例
-![3](https://img-blog.csdnimg.cn/7dd9cc7760b949aabb89c0877902cd49.png)
+```bash
+[root@ubuntu22-c0 ~]$ echo $PS1
+\[\e[36m\][\u@\h \W]$ \[\e[0m\]
+```
 
 - 注意该变量设置最好在 `~/.bashrc` 中，如果在 `/etc/profile` 中设置，可能被覆盖
 Ubuntu22.04 中 `~/.bashrc` 中会设置 `PS1`，因此覆盖之前的设置
 不同 bash 版本可能有差异，注意脚本调用顺序和规则
-
-//TODO: 补充
-# PS2
-
-# PS3
 
 
 # 主机名
@@ -449,8 +335,19 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 ```
 
 ## 查看主机名
-![1](https://img-blog.csdnimg.cn/5d474bdd9e3b4c94b700d1f7c36bc022.png)
+```bash
+[root@ubuntu22-c0 ~]$ hostname
+ubuntu22-c0
+[root@ubuntu22-c0 ~]$ hostnamectl --
+--help             --json             --no-ask-password  --static           --version
+--host             --machine          --pretty           --transient
+[root@ubuntu22-c0 ~]$ hostnamectl --pretty
 
+[root@ubuntu22-c0 ~]$ hostnamectl --static
+ubuntu22-c0
+[root@ubuntu22-c0 ~]$ hostnamectl --transient
+ubuntu22-c0
+```
 
 ## 临时修改主机名
 - `hostname` 加新主机名，需要 root 权限，临时生效，不修改配置文件
@@ -462,8 +359,9 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 - `hostname` 查看当前系统主机名
 	- 前面修改主机名时用的 `hostnamectl --static`，因此只修改 `static` 和 `transient` 两个参数
 ![2](https://img-blog.csdnimg.cn/0f220302a5334e428c11d11b3724a562.png)
-- `hostname set-hostname` 永久修改主机名
+- `hostnamectl set-hostname` 永久修改主机名
 ![1](https://img-blog.csdnimg.cn/17c3cc520e6e42c09b45f20c5b2514e8.png)
+
 
 ## /etc/hostname 主机名所在配置文件
 - `hostnamectl` 修改主机名后，可以看到 `/etc/hostname` 配置文件的内容改变，变为新的主机名
@@ -473,29 +371,76 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 - 如果要当前的 shell 的主机名更新，需要退出后重新进入终端 
 
 
-# 查看 Linux 版本
-> [如何查看当前Ubuntu系统的版本](https://blog.csdn.net/mybelief321/article/details/9076331?spm=1001.2101.3001.6661.1&utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-9076331-blog-52074390.pc_relevant_multi_platform_whitelistv3&depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-9076331-blog-52074390.pc_relevant_multi_platform_whitelistv3&utm_relevant_index=1)
+# 查看 Linux 操作系统版本
+- cat /etc/os-release
+```bash
+[root@ubuntu22-c0 ~]$ cat /etc/os-release
+PRETTY_NAME="Ubuntu 22.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="22.04"
+VERSION="22.04.1 LTS (Jammy Jellyfish)"
+VERSION_CODENAME=jammy
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=jammy
+[root@ubuntu22-c0 ~]$
+```
+
+- cat /etc/issue
+ubuntu22.04 默认会显示，可以修改其内容
+
+```bash
+[root@ubuntu22-c0 ~]$ cat /etc/issue
+Ubuntu 22.04.1 LTS \n \l
+```
+
+# 查看 linux 内核版本
+- uname -r
+```bash
+[root@ubuntu22-c0 ~]$ uname -r
+5.15.0-73-generic
+[root@ubuntu22-c0 ~]$ uname -a
+Linux ubuntu22-c0 5.15.0-73-generic #80-Ubuntu SMP Mon May 15 15:18:26 UTC 2023 x86_64 x86_64 x86_64 GNU/Linux
+[root@ubuntu22-c0 ~]$
+```
+
+- cat /proc/version
+```bash
+[root@ubuntu22-c0 ~]$ cat /proc/version
+Linux version 5.15.0-73-generic (buildd@bos03-amd64-060) (gcc (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #80-Ubuntu SMP Mon May 15 15:18:26 UTC 2023
+```
 
 
 # 查看 IP 地址
-![1](https://img-blog.csdnimg.cn/9453b193052247aab98ee0d9d16c303e.png)
 
-## ip a
-
-![](img/2023-03-20-09-45-21.png)
-## hostname -I
-![](img/2023-03-20-09-47-28.png)
-![](img/2023-03-20-09-47-52.png)
+- ip a
+- hostname -I
 
 # 查看登录用户
 ## logname
 ![1](https://img-blog.csdnimg.cn/a870ec486e964186b0ab3d4caa1b6ba6.png)
 
+- 登录系统的用户和当前终端用户有区别，不管当前用 su 切换到哪个用户，登录用户都不变
 
 ## last
 - 查看最近登陆的用户
+```bash
+[lx@ubuntu22-c0 ~]$ whatis last
+last (1)             - show a listing of last logged in users
+[lx@ubuntu22-c0 ~]$
+[lx@ubuntu22-c0 ~]$ last -n5
+root     pts/0        10.0.0.1         Thu Aug 17 12:02   still logged in
+reboot   system boot  5.15.0-73-generi Thu Aug 17 12:01   still running
+root     pts/0        10.0.0.1         Tue Aug  8 11:53 - down   (08:43)
+root     pts/0        10.0.0.1         Tue Aug  8 11:24 - 11:48  (00:24)
+reboot   system boot  5.15.0-73-generi Tue Aug  8 11:23 - 20:37  (09:13)
 
-![](img/2023-03-17-10-56-18.png)
+wtmp begins Tue Feb 21 08:28:33 2023
+```
 
 ## who
 > [who命令、whoami命令和who am i命令的区别](https://blog.csdn.net/u014270566/article/details/124177994)
@@ -505,16 +450,32 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 用 `su` 切换不同用户，`whoami` 显示切换后用户名，但 `who` 显示始终是当前登录系统的用户。
 ![1](https://img-blog.csdnimg.cn/52e6a08cba874f7bb933c33f74055c53.png)
 
+
+```bash
+[lx@ubuntu22-c0 ~]$ whatis who
+who (1)              - show who is logged on
+```
+
+
 ## w 
 - `w` 显示当前全部登录用户以及做的操作
+
+```bash
+[root@ubuntu22-c0 ~]$ whatis w
+w (1)                - Show who is logged on and what they are doing.
+[root@ubuntu22-c0 ~]$ w
+ 16:38:35 up  1:18,  2 users,  load average: 0.00, 0.01, 0.00
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+root     pts/0    10.0.0.1         12:02    3:25m  0.24s  0.04s -bash
+root     pts/1    10.0.0.1         16:37    3.00s  0.03s  0.00s w
+```
 
 # 创建登录欢迎语
 [Linux中创建自己的MOTD](https://www.cnblogs.com/gageshen/p/11565980.html)
 [如何让你的终端欢迎语好看又有趣](https://zhuanlan.zhihu.com/p/115414827)
 [ASCII艺术字（图）集](https://www.bootschool.net/ascii-art)
 
-# Linux 登录
-## ubuntu 登陆后为 root 账号设置密码
+# ubuntu 登陆后为 root 账号设置密码
 - Ubuntu 安装时默认设置的账户为普通账户，没有为 root 账户设置密码
 - 默认账户在 sudo 组中，可以执行 `sudo` 命令
 - 执行 `sudo passwd root`
@@ -528,10 +489,6 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 > [Linux内部命令和外部命令](https://blog.51cto.com/u_15060546/2651988)
 > [hash](https://ipcmen.com/hash)
 > [关於运行档路径的变量： $PATH](http://cn.linux.vbird.org/linux_basic/0220filemanager_1.php#dir_path)
-
-
-
-
 
 
 - 内部命令集成在 shell 中，shell 被执行时这些内部命令被加载到内存中，访问速度快
@@ -551,24 +508,80 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 - `type` 查看是内部命令还是外部命令
 - 命令路径不在环境变量 $PATH 中后，`type` 找不到该命令
 - 外部命令执行后会在 hash 表中缓存下来，如果该命令路径改了，但也在环境变量 $PATH 中，也无法执行该命令，因为会从 hash 缓存中查找，用 `hash -d` 删除该命令的缓存后，可以使用
+- `type --help` 或 `help type` 查看帮助
+```bash
+[root@ubuntu22-c0 ~]$ type --help
+type: type [-afptP] name [name ...]
+    Display information about command type.
 
+    For each NAME, indicate how it would be interpreted if used as a
+    command name.
+
+    Options:
+      -a        display all locations containing an executable named NAME;
+                includes aliases, builtins, and functions, if and only if
+                the `-p' option is not also used
+      -f        suppress shell function lookup
+      -P        force a PATH search for each NAME, even if it is an alias,
+                builtin, or function, and returns the name of the disk file
+                that would be executed
+      -p        returns either the name of the disk file that would be executed,
+                or nothing if `type -t NAME' would not return `file'
+      -t        output a single word which is one of `alias', `keyword',
+                `function', `builtin', `file' or `', if NAME is an alias,
+                shell reserved word, shell function, shell builtin, disk file,
+                or not found, respectively
+
+    Arguments:
+      NAME      Command name to be interpreted.
+
+    Exit Status:
+    Returns success if all of the NAMEs are found; fails if any are not found.
+```
 
 ![1](https://img-blog.csdnimg.cn/afe54a6eea654b37aa85cc5612d9e29f.png)
-### help type 查看 type 命令帮助文档
-![2](https://img-blog.csdnimg.cn/f25dc413d8a24f479b0e8601f722a038.png)
+
 ### type -a 列出命令的全部位置
 - 有些命令可能既是内部命令，又是外部命令，如 `echo` 这种常见命令，因为 shell 种类很多，防止内部命令不能用，则使用外部命令
 ![1](https://img-blog.csdnimg.cn/97a0466bf2e14dc6a4f59ce77352963c.png)
 
-
 ## enable 管理内部命令
-![2](https://img-blog.csdnimg.cn/a236b269162e43ee9db9d1aaafeb5c2b.png)
+```bash
+[root@ubuntu22-c0 ~]$ type enable
+enable is a shell builtin
+[root@ubuntu22-c0 ~]$ enable --help
+enable: enable [-a] [-dnps] [-f filename] [name ...]
+    Enable and disable shell builtins.
+
+    Enables and disables builtin shell commands.  Disabling allows you to
+    execute a disk command which has the same name as a shell builtin
+    without using a full pathname.
+
+    Options:
+      -a        print a list of builtins showing whether or not each is enabled
+      -n        disable each NAME or display a list of disabled builtins
+      -p        print the list of builtins in a reusable format
+      -s        print only the names of Posix `special' builtins
+
+    Options controlling dynamic loading:
+      -f        Load builtin NAME from shared object FILENAME
+      -d        Remove a builtin loaded with -f
+
+    Without options, each NAME is enabled.
+
+    To use the `test' found in $PATH instead of the shell builtin
+    version, type `enable -n test'.
+
+    Exit Status:
+    Returns success unless NAME is not a shell builtin or an error occurs.
+```
 
 ### enable 查看能使用的内部命令
 ![1](https://img-blog.csdnimg.cn/7bb50424a0754ab09460a266204aee4a.png)
 
 ### enable -a 查看全部内部命令以及状态
 ![1](https://img-blog.csdnimg.cn/461c088217834b7b8a1ea832702e905b.png)
+
 ### enable -n 禁用内部命令
 - 禁用后用 `enable` 查看不到
 - 禁用后仍可以用 `enable -a` 查看
@@ -596,6 +609,7 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 
 ## hash -d 从 hash 表中删除缓存的命令
 ![1](https://img-blog.csdnimg.cn/46a6e5138aff4633be131e8572c07a65.png)
+
 ## hash -r 情况 hash 表记录
 - forget all remembered locations
 ![1](https://img-blog.csdnimg.cn/264ca43ee74f4e67bd7a8895d93f3bfe.png)
@@ -605,7 +619,6 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 
 # 别名 alias
 > [alias命令_Linux alias命令：给命令定义别名](http://c.biancheng.net/linux/alias.html)
-
 
 - 优先级：别名 > 内部命令 > 外部命令
 
@@ -618,23 +631,29 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 	- 直接写命令的完整路径
 ![1](https://img-blog.csdnimg.cn/989095a3f6c94a5e8f4dda00600a052b.png)
 ![2](https://img-blog.csdnimg.cn/b66c930ce58f40fcb622f979552db10f.png)
+
+
 ## 自定义别名
 ![1](https://img-blog.csdnimg.cn/30a712a2171443a7acdb8da712322731.png)
 
 ## 删除别名 unalias
+
 ### unalias 删除一个或多个别名
 ![1](https://img-blog.csdnimg.cn/7d7a89cd18aa4ba4a239d05a9d5fe9f1.png)
+
 ### unalias -a 删除全部别名
 ![1](https://img-blog.csdnimg.cn/be270b3652ce4813b66d45748a555688.png)
 
 ## 设置别名永久生效
-- 将别名永久设置：将别名写在 `.bashrc` 文件中（注意要对当前用户生效还是所有用户生效有不同的路径）。
+- 将别名定义写道配置文件中，根据当前系统 shell 调用配置文件的顺序将别名写到合适的位置
+如仅需要别名对当前用户生效，则将别名写在 `.bashrc` 文件中
+配置文件中写入位置等见 shell 笔记中讲解
 
 - 修改文件后立即生效：`source` 命令。（[Linux下source命令详解 ](https://www.cnblogs.com/shuiche/p/9436126.html)）
 
 
 # 获取帮助
-## whatis
+## whatis 简要查看命令说明
 > [linux 命令：whatis详解](https://blog.csdn.net/yspg_217/article/details/122061132)
 
 - 列出命令的简单描述
@@ -642,11 +661,15 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 - rocky 8.6 中装完系统后执行 `whatis hostname` 命令，显示 `hostname: nothing appopriate`，普通用户执行 `sudo mandb`后可以正常使用
 
 ![0](img/2023-03-06-17-53-57.png)
-![1](https://img-blog.csdnimg.cn/ebb4b50a5878470bbab5079b57d9b257.png)
 
+```bash
+[root@ubuntu22-c0 ~]$ whatis whatis
+whatis (1)           - display one-line manual page descriptions
+```
 ## help 查看内部命令
 
 ![1](https://img-blog.csdnimg.cn/a6e3fe3b565b48198ce72a3fdce270e5.png)
+
 ## COMMAND --help 或 COMMAND -h
 有些命令两种格式都支持，有些只支持一种
 
@@ -695,25 +718,41 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 > [Linux man pages](https://linux.die.net/man/)
 > [Linux Documentation](https://linux.die.net/)
 
+# linux 和 windows 互传文件工具
+## xshell 中传文件
 
-## linux 和 windows 互传文件工具
-### xshell 中传文件
+### xftp
+打开窗口，直接拖动文件，可以操作大量文件
 
-#### xftp
+### lrzsz 工具包
+- `sz` 命令发送本地文件到 windows 主机中，输入 sz filename 会弹出窗口选择 windows 中保存的路径
+- `rz` 命令发送 windows 中文件到当前目录，直接输入 `rz` 弹出窗口选择文件
 
-#### lrzsz
-- `sz` 命令
-
+## WSL
+在 windows 中安装 linux 子系统，如 ubuntu 20.04，进入该子系统的 `/mnt` 目录即可以操作windows 中的文件，
+再用 scp 等命令可以在 linux 虚拟机和 windows 中传文件
 
 # 一行执行多个命令
 1. 每个命令用分号（`;`）隔开
-![1](https://img-blog.csdnimg.cn/7a79ec0cdda0451e834f34282f4602c3.png)
+```bash
+[root@ubuntu22-c0 ~]$ ls 1.txt; echo $?; ls snap/ -d; echo $?
+ls: cannot access '1.txt': No such file or directory
+2
+snap/
+0
+```
+
 # 一个命令分成多行
 反斜杠（\）+ `Enter` 按键，中间不能有空格
 
-
-![1](https://img-blog.csdnimg.cn/ed0d1e60b2a2433daca506490e3a1ef5.png)
-![2](https://img-blog.csdnimg.cn/7822f00bab774e7288b7a4ed56ce8061.png)
+```bash
+[root@ubuntu22-c0 ~]$ echo "hel\
+> lo"
+hello
+[root@ubuntu22-c0 ~]$ host\
+> name
+ubuntu22-c0
+```
 
 # 计算器 bc
 > [Linux bc 命令](https://www.runoob.com/linux/linux-comm-bc.html)
@@ -721,14 +760,46 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 
 
 1. scale 
-设置小数点后位数。
-![1](https://img-blog.csdnimg.cn/aa5ba446d66041ed8ee45fe19f64e6f3.png)
+- 设置小数点后位数
+- 默认值为 0，即无小数
+
+```bash
+[root@ubuntu22-c0 ~]$ bc
+bc 1.07.1
+Copyright 1991-1994, 1997, 1998, 2000, 2004, 2006, 2008, 2012-2017 Free Software Foundation, Inc.
+This is free software with ABSOLUTELY NO WARRANTY.
+For details type `warranty'.
+3/2
+1
+scale
+0
+scale=1
+3/2
+1.5
+scale
+1
+scale=2
+3/2
+1.50
+```
+
 2. ibase
 输入数字的进制（2~36），如果输入包含字母，必须大写。
+```bash
+ibase=10
+obase=2
+16
+10000
+255
+11111111
+```
+
 3. obase
 输出数字的进制（2~36）
+
 4. last
 上次打印的结果。
+
 5. quit 结束
 输入 quit 会终止执行 `bc` 命令
 
@@ -736,18 +807,33 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 # 查看系统信息 
 > [Linux 常用命令集合](https://www.runoob.com/w3cnote/linux-common-command.html)
 ## 查看系统是 32 位还是 64 位
+
+### getconf
 > [灵活使用getconf命令来获取系统信息](https://www.cnblogs.com/wjoyxt/p/4815782.html)
 
 `getconf LONG_BIT` 获取系统是 32 位还是 64 位。
+```bash
+[root@ubuntu22-c0 ~]$ whatis getconf
+getconf (1)          - Query system configuration variables
+[root@ubuntu22-c0 ~]$ getconf LONG_BIT
+64
+```
 
+### lscpu
 `lscpu` 也会显示该信息。
 
 ## 查看系统架构
 - `arch` 或 `uname -m`。
 - `lscpu` 也会显示该信息
 
-![1](https://img-blog.csdnimg.cn/81d37f6581334f8f831a832eae7e671c.png)
-
+```bash
+[root@ubuntu22-c0 ~]$ whatis arch
+arch (1)             - print machine hardware name (same as uname -m)
+[root@ubuntu22-c0 ~]$ arch
+x86_64
+[root@ubuntu22-c0 ~]$ uname -m
+x86_64
+```
 
 ## 查看 CPU
 1. `lscpu`
@@ -755,6 +841,27 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 
 ## 查看内存
 > [Linux free命令](https://www.runoob.com/linux/linux-comm-free.html)
+
+```bash
+[root@ubuntu22-c0 ~]$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           1.9Gi       272Mi       1.4Gi       1.0Mi       265Mi       1.5Gi
+Swap:          2.0Gi          0B       2.0Gi
+```
+
+- `total`: This column shows the total amount of physical memory (RAM) and swap space available on the system.
+
+- `used`: It displays the amount of memory that is currently being used by the system.
+
+- `free`: Indicates the amount of memory that is not being used and is available for processes to utilize.
+
+- `shared`: This column represents the amount of memory used by shared memory segments, which are areas of memory that can be accessed by multiple processes.
+
+- `buff/cache`: It shows the amount of memory used by buffers and cache. Buffers are used for temporarily storing data from disk, while cache is used for holding frequently accessed data for faster retrieval.
+
+- `available`: This column represents the estimated amount of memory that is available for starting new processes or expanding existing ones. It takes into account the memory used by the operating system itself and is calculated as the sum of free memory, buffers/caches, and swap space.
+
+The difference between "free" and "available" is that "free" refers specifically to the amount of memory that is not currently in use by any process. On the other hand, "available" takes into consideration both free memory and memory that can be made available by reclaiming space from buffers/caches and swap space if necessary. In other words, "available" reflects the actual amount of memory that can be allocated for new processes or expansions, considering various factors like caching and swapping.
 
 ## 查看磁盘空间
 > [Linux 查看磁盘空间](https://www.runoob.com/w3cnote/linux-view-disk-space.html)
@@ -764,18 +871,50 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 ### df
 > [Linux df 命令](https://www.runoob.com/linux/linux-comm-df.html)
 
-
-![1](https://img-blog.csdnimg.cn/0721fa539ccd459f8d1e417ebfa129c5.png)
-
+```bash
+[root@ubuntu22-c0 ~]$ df -h
+Filesystem                         Size  Used Avail Use% Mounted on
+tmpfs                              193M  1.3M  192M   1% /run
+/dev/mapper/ubuntu--vg-ubuntu--lv   97G  5.8G   87G   7% /
+tmpfs                              965M     0  965M   0% /dev/shm
+tmpfs                              5.0M     0  5.0M   0% /run/lock
+/dev/sda2                          2.0G  253M  1.6G  14% /boot
+tmpfs                              193M     0  193M   0% /run/user/0
+```
 
 ## 查看发行版本
 > [查看 Linux 发行版名称和版本号的 8 种方法](https://zhuanlan.zhihu.com/p/36253769)
 
+```bash
+[root@ubuntu22-c0 ~]$ cat /etc/os-release
+PRETTY_NAME="Ubuntu 22.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="22.04"
+VERSION="22.04.1 LTS (Jammy Jellyfish)"
+VERSION_CODENAME=jammy
+ID=ubuntu
+ID_LIKE=debian
+HOME_URL="https://www.ubuntu.com/"
+SUPPORT_URL="https://help.ubuntu.com/"
+BUG_REPORT_URL="https://bugs.launchpad.net/ubuntu/"
+PRIVACY_POLICY_URL="https://www.ubuntu.com/legal/terms-and-policies/privacy-policy"
+UBUNTU_CODENAME=jammy
+```
+```bash
+[root@ubuntu22-c0 ~]$ cat /proc/version
+Linux version 5.15.0-78-generic (buildd@lcy02-amd64-008) (gcc (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #85-Ubuntu SMP Fri Jul 7 15:25:09 UTC 2023
+[root@ubuntu22-c0 ~]$
+```
 
 # 关机、重启和注销
 
 ## 数据同步写入磁盘 sync
 > [Linux sync命令](https://www.runoob.com/linux/linux-comm-sync.html)
+
+```bash
+[root@ubuntu22-c0 ~]$ whatis sync
+sync (1)             - Synchronize cached writes to persistent storage
+```
 
 ## 关机指令 shutdown
 > [Linux shutdown 命令](https://www.runoob.com/linux/linux-comm-shutdown.html)
@@ -792,6 +931,11 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 - `+m` 形式指定分钟不能为负数，否则报错
 - `hh:mm` 形式指定的小时和分钟如果比现在早，则被认为是第二天的时间
 
+```bash
+[root@ubuntu22-c0 ~]$ date; shutdown +3; shutdown -c
+Fri Aug 18 01:36:39 PM CST 2023
+Shutdown scheduled for Fri 2023-08-18 13:39:39 CST, use 'shutdown -c' to cancel.
+```
 
 ![](img/2023-03-06-17-19-02.png)
 
@@ -807,13 +951,11 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 
 
 ### shutdown -k 广播关机消息，不真的关机
-
 ![](img/2023-03-06-19-44-09.png)
 
 
 ### shutdown --no-wall 不发送 wall message
 - `man wall` 查看 `wall` 介绍
-
 ![](img/2023-03-06-19-51-47.png)
 
 
@@ -822,18 +964,19 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 
 ## 关机指令 halt
 > [Linux halt命令](https://www.runoob.com/linux/linux-comm-halt.html)
+> [Understanding Shutdown, Poweroff, Halt and Reboot Commands in Linux](https://www.tecmint.com/shutdown-poweroff-halt-and-reboot-commands-in-linux/)
+
 
 ## 关机指令 poweroff
 > [Linux poweroff 命令](https://www.runoob.com/linux/linux-comm-poweroff.html)
 
-关闭电源
 
 ## 重启指令 reboot
 > [Linux reboot命令](https://www.runoob.com/linux/linux-comm-reboot.html)
 
 ## 休眠指令suspend
 > [Linux suspend命令](https://www.runoob.com/linux/linux-comm-suspend.html)
-[Linux下怎么让挂起的(suspend or stopped)进程恢复执行(resume)](https://blog.csdn.net/baiyan83/article/details/109759386)
+> [Linux下怎么让挂起的(suspend or stopped)进程恢复执行(resume)](https://blog.csdn.net/baiyan83/article/details/109759386)
 
 
 # init 
@@ -859,18 +1002,20 @@ Each  element  of  the hostname must be from 1 to 63 characters long and the ent
 - 重启
 
 
-# 查看日期和时间的格式
-- `man 3 strftime` 可查看日期和时间的格式
-
 # history 历史命令
 > [原来 history 可以这么强大](https://zhuanlan.zhihu.com/p/371739269)
 
-- 历史记录中序号后面有个 `*`
 - 命令行中输入的命令存在缓冲区中，正常退出 shell 后会将缓冲区中的历史记录写入到 `~/.bash_history` 中
 
 ## history num 显示最后 num 条历史记录
 - `num` 必须大于零
 
+```bash
+[lx@ubuntu22-c0 ~]$ history 3
+    3  [2023-08-18 16:45:55 lx] sudo cat /etc/passwd | head -n2
+    4  [2023-08-18 16:46:00 lx] history
+    5  [2023-08-18 16:51:57 lx] history 3
+```
 ## history -w 将当前缓冲区的历史记录写入到历史记录文件中
 - `history --help | less` 查看说明
   
@@ -959,12 +1104,25 @@ history | head -n5
 - 当前用户的历史记录默认保存在 `~/.bash_history` 文件中，可在该文件中搜索
 
 
+当想根据关键字搜索历史记录，只显示不执行时，用 `!string:p` 很有用，
+如果搜索的词不在开头，需要加上通配符，否则搜索不到
+```bash
+[root@ubuntu22-c0 ~]$ !proc:p
+-bash: !proc: event not found
+[root@ubuntu22-c0 ~]$ !?proc?:p
+cat /proc/version
+[root@ubuntu22-c0 ~]$ !whatis:p
+whatis strftime
+```
+
+
 ## 指定历史记录的格式和保存数目
 ### HISTTIMEFORMAT 指定历史记录的格式
 > [HISTTIMEFORMAT](https://www.gnu.org/software/bash/manual/html_node/Bash-Variables.html#index-HISTTIMEFORMAT)
 
 - `man bash` 后搜索 `HISTTIMEFORMAT` 可查看该变量的说明
-- `man 3 strftime` 可查看日期和时间的格式
+- `man 3 strftime` 可查看日期和时间的格式 (rocky8 有该命令，Ubuntu22.04 没有)
+> [strftime](https://man7.org/linux/man-pages/man3/strftime.3.html)
 - 初始该变量没有值，用 `set` 查看也没该变量，缓冲区中历史记录格式用默认格式
 ```bash
 [root@rocky8-3 ~]# echo $HISTTIMEFORMAT
@@ -976,12 +1134,6 @@ history | head -n5
 ```bash
 export HISTTIMEFORMAT="[%F %T $(whoami)] "
 ```
-- 怎么让历史记录显示颜色？
-
-
-![](img/2023-03-06-12-20-00.png)
-![](img/2023-03-06-12-26-18.png)
-![](img/2023-03-06-12-22-26.png)
 
 ### HISTSIZE 命令行中显示的历史记录的最大数目
 - `man bash` 搜索 `HISTSIZE` 查看说明
@@ -1020,14 +1172,17 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 	- ubuntu 20.04 为 ignoredups:ignorespace
 
 
-
 # hwclock 硬件时间
 > [hwclock](https://linux.die.net/man/8/hwclock)
 
-![](img/2023-03-06-20-07-10.png)
-
-![](img/2023-03-06-20-11-18.png)
-
+```bash
+[root@ubuntu22-c0 ~]$ whatis hwclock
+hwclock (5)          - settings that affect the behaviour of the hwclock init script
+hwclock (8)          - time clocks utility
+[root@ubuntu22-c0 ~]$ date; hwclock -r
+Sat Aug 19 03:22:45 PM CST 2023
+2023-08-19 15:22:43.989096+08:00
+```
 
 # date 系统时间
 > [Date Command in Linux: How to Set, Change, Format and Display Date](https://phoenixnap.com/kb/linux-date-command#ftoc-heading-10)
@@ -1039,14 +1194,11 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 
 ## 日期的格式 
 
-![0](https://img-blog.csdnimg.cn/d6fadabe5ed848b0b2544a07c7bd0b78.png)
-<br/>
-
 - `man date` 查看帮助文档，可看到 FORMAT 介绍
+![0](https://img-blog.csdnimg.cn/d6fadabe5ed848b0b2544a07c7bd0b78.png)
 
 ## -d 指定具体日期
 ![1](https://img-blog.csdnimg.cn/80af8ce7463049628b28bd23bc6a2e25.png)
-
 ![1](https://img-blog.csdnimg.cn/1264f460f34247b2950d7840ee3c596a.png)
 ![2](https://img-blog.csdnimg.cn/b7b87a8f32534b1b9c544bab7d7b5a16.png)
 ![3](https://img-blog.csdnimg.cn/d59789f03b374d07a3f326220a2ee133.png)
@@ -1055,7 +1207,6 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 ## + 指定具体格式
 
 ![0](https://img-blog.csdnimg.cn/9c61e1dc47324ae38bd266657cd76ec2.png)
-
 ![0](https://img-blog.csdnimg.cn/7d2e0c9ce210482e9a0a44b0511b6d3a.png)
 
 
@@ -1077,34 +1228,66 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 
 ![1](https://img-blog.csdnimg.cn/fa41083e511c445d9ba80cf2cf6e68b2.png)
 
-
+## -u 显示 UTC 时间
+```bash
+[root@ubuntu22-c0 ~]$ date; date -u
+Sat Aug 19 03:31:58 PM CST 2023
+Sat Aug 19 07:31:58 AM UTC 2023
+[root@ubuntu22-c0 ~]$
+[root@ubuntu22-c0 ~]$ date -d '-1 day CST'; date -d '-1 day'-u
+Fri Aug 18 03:34:25 PM CST 2023
+Sat Aug 19 07:34:25 AM CST 2023
+```
 
 ## 应用
 
-//FIXME: 时区转换
-### CST 和 UTC 时区时间转换
 ### Use date with Other Commands
 ![1](https://img-blog.csdnimg.cn/15c1d1aaed4e4820abed78946b1cb403.png)
-<br/>
 
 ### 显示过去某天的星期
 ![](img/2023-03-15-14-12-20.png)
 
+### date 命令显示 24 小时制
+```bash
+[root@ubuntu22-c0 ~]$ date +"%Y-%m-%d %H:%M:%S"
+2023-08-19 16:01:21
+```
+
 ### 查看距离当前一定时间的具体日期
 - `date -d` 或 `date --date`
 
+```bash
+[root@ubuntu22-c0 ~]$ date -d "+2 hour"
+Sat Aug 19 05:56:25 PM CST 2023
+```
+
 ### 查看距离某个日期一定时间的具体日期
+```bash
+[root@ubuntu22-c0 ~]$ date -d "2023-09-01 +2 days"
+Sun Sep  3 12:00:00 AM CST 2023
+[root@ubuntu22-c0 ~]$ date -d "2023-09-01 "
+Fri Sep  1 12:00:00 AM CST 2023
+```
+```bash
+[root@ubuntu22-c0 ~]$ date -d "2023-09-01 15:57:20  +2 days"
+Sat Sep  2 09:57:20 PM CST 2023
+```
 
+### 计算两日期之间相差的天数
+例如计算从 2023-01-01 到今天相差的天、时、分和秒
 
+```bash
+current_date=$(date +%s)
+target_date=$(date -d "2023-01-01" +%s)
 
+time_difference=$((target_date - current_date))
+days=$((time_difference / 86400))
+hours=$(( (time_difference % 86400) / 3600 ))
+minutes=$(( (time_difference % 3600) / 60 ))
+seconds=$((time_difference % 60))
 
-### 计算某一天距离今天有多少天
-
-
-
-
-### 计算
-
+echo "Time difference: $days days, $hours hours, $minutes minutes, $seconds seconds."
+```
 
 # 修改 bash 快捷键为 Vi 快捷键
 > [Bash 行操作](https://wangdoc.com/bash/readline)
@@ -1113,29 +1296,13 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 - 在 `~/.bashrc` 中加上 `set -o vi` 后，用 `source ~/.bashrc` 使配置生效
 
 
-
-# 二进制文件查看
+# hexdump 查看二进制文件
 > [Linux命令学习总结：hexdump](https://www.cnblogs.com/kerrycode/p/5077687.html)
 
-# windows格式文件转换为Linux 格式文件
+# dos2unix windows格式文件转换为Linux 格式文件
 > [Linux命令 dos2unix - 将DOS格式文本文件转换成Unix格式](https://www.w3cschool.cn/linuxc/linuxc-gvjq3lbf.html)
 
 
-
-//FIXME: 环境变量
-# 环境变量
-> [Environment variable](https://en.wikipedia.org/wiki/Environment_variable)
-
-
-- 不区分大小写
-- `env` 查看
-- 什么时候设置？
-- 环境变量的作用域？
-- 环境修改后影响范围？ 
-
-
-
-//LABEL: echo
 # echo
 > [echo command in Linux with Examples](https://www.geeksforgeeks.org/echo-command-in-linux-with-examples/)
 > [How to use Linux echo command](https://www.ionos.com/digitalguide/server/configuration/linux-echo-command/)
@@ -1149,15 +1316,76 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 ![](img/2023-03-14-19-46-54.png)
 ![](img/2023-03-14-19-48-11.png)
 
+- \b 为退格符，删掉前面一个字符
+```bash
+[root@ubuntu22-c0 ~]$ echo  "a\bbc"
+a\bbc
+[root@ubuntu22-c0 ~]$ echo -e "a\bbc"
+bc
+```
 
-- `echo -e "a b c \c"` 输出的内容不会换行，相当于 `echo -n "a b c "`
-## <font color=red>echo $(ls) 和 ls</font>
+- \n 换行符
+```bash
+[root@ubuntu22-c0 ~]$ echo -e "a\nb\nc"
+a
+b
+c
+```
+
+- \t 水平制表符
+```bash
+[root@ubuntu22-c0 ~]$ echo -e "a\tb\tc"
+a       b       c
+```
+
+- \v 垂直制表符
+```bash
+[root@ubuntu22-c0 ~]$ echo -e "a\vb\vc"
+a
+ b
+  c
+```
+
+- \r carriage return
+```bash
+[root@ubuntu22-c0 ~]$ echo -e "a\rbc"
+bc
+```
+
+
+- \c 去掉换行符
+```bash
+[root@ubuntu22-c0 ~]$ echo -e "abc\c"
+abc[root@ubuntu22-c0 ~]$
+```
+
+
+## echo $(ls) 和 ls
 > [Difference between 'ls' and 'echo $(ls)'](https://unix.stackexchange.com/questions/283586/difference-between-ls-and-echo-ls)
 > [Command Substitution](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Substitution)
 
 
 
 ![](img/2023-03-16-19-32-57.png)
+
+
+- 直接 `ls` 执行的是别名，输出的内容带颜色（ubuntu22.04）
+```bash
+[root@ubuntu22-c0 ~]$ alias ls
+alias ls='ls --color=auto'
+```
+而 `echo $(ls)` 是将 `ls` 输出的内容作为字符串传递给 `echo` 当参数，没有颜色
+
+- 直接 `ls` 后将输出的内容保存到文件中，会将每项加一个换行符单独显示为一行
+而 `echo $(ls)` 不会
+
+
+# 环境变量
+> [Environment variable](https://en.wikipedia.org/wiki/Environment_variable)
+
+
+- 不区分大小写
+- `env` 查看
 
 # PATH 环境变量
 > [Linux path environment variable](https://linuxconfig.org/linux-path-environment-variable)
@@ -1182,14 +1410,20 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 > [关於运行档路径的变量： $PATH](http://cn.linux.vbird.org/linux_basic/0220filemanager_1.php#dir_path)
 
 
-
-
-
-
 # /dev/null
 > [What is /Dev/Null in Linux?](https://www.geeksforgeeks.org/what-is-dev-null-in-linux/)
 > [shell 脚本中 /dev/null 的用途](https://www.cnblogs.com/wanng/p/shell-dev-null.html)
 
+- 清空文件内容
+```bash
+[root@ubuntu22-c0 ~]$ cat /dev/null > 1.txt
+```
+- 将不需要的信息放到 /dev/null 中
+```bash
+[root@ubuntu22-c0 ~]$ ls a
+ls: cannot access 'a': No such file or directory
+[root@ubuntu22-c0 ~]$ ls a 2> /dev/null
+```
 
 # 用户
 > [Linux User Administration: A Complete Guide to Managing Multi-User Systems](https://www.linuxfordevices.com/tutorials/linux-user-administration)
@@ -1215,6 +1449,7 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 
 ### 新建普通用户 UID 超过 60000 影响
 - 根据配置文件 `/etc/login.defs`，普通用户的最大 UID 为 60000，但新建 UID 超过 60000 也能新建成功，但有一些影响，见 [Using Large User IDs and Group IDs](https://docs.oracle.com/cd/E19120-01/open.solaris/819-2379/userconcept-35/index.html)
+
 ![1](https://img-blog.csdnimg.cn/415b371e172d4f16a1b0d6f2edbc3b7b.png)
 
 
@@ -1366,10 +1601,6 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 ![3](https://img-blog.csdnimg.cn/21aa866434844f6ebe026d7da2b217b1.png)
 
 
-
-
-
-
 ### /etc/login.defs 用户默认设置文件 
 > [Linux /etc/login.defs：创建用户的默认设置文件](http://c.biancheng.net/view/3059.html)
 
@@ -1385,7 +1616,7 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 ### /etc/default/useradd 指定创建新用户时的默认设置
 > [/etc/default/useradd文件详解](https://blog.csdn.net/qq_41982304/article/details/104953572)
 
-利用 `useradd` 命令添加新用户时默认的设置。
+利用 `useradd` 命令添加新用户时默认的设置，如默认 shell 类型等
 
 #### 指定创建用户时的默认 shell 类型
 - ubuntu 20.04 默认 `/bin/sh`，rocky 8.6 中默认 `/bin/bash` 
@@ -1439,15 +1670,9 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 36  CREATE_MAIL_SPOOL=yes
 ```
 
-
-
-
-&nbsp;
-
 ## 添加用户
 > [useradd](https://linux.die.net/man/8/useradd)
 > [Linux 中useradd命令的使用](https://www.cnblogs.com/Hackerman/p/12535719.html)
-
 
 ### 指定家目录
 1. `-b` 选项指定 basedir，家目录默认由 **basedir** 和**账户名**组合在一起，如：
@@ -1585,8 +1810,6 @@ Ubuntu 22.04.1 测试两者区别，adduser 会交互式让输入密码，默认
 - `/etc/login.defs` 文件中设置 `CREATE_HOME` 变量
 - ubuntu 20.04 需要新加设置
 ![1](https://img-blog.csdnimg.cn/8bf7538b0d8b40d1bba8a1b1ce247f57.png)
-
-
 
 
 ## 新建用户时为家目录中添加指定文件
@@ -2065,9 +2288,6 @@ visudo 的其他用法见 [第十四章、Linux 账号管理与 ACL 权限配置
 - `chmod -R` 递归修改目录中文件的权限，只针对已存在的文件，新建的文件仍是默认权限
 ![9](https://img-blog.csdnimg.cn/07ff8a7dafad4293888ff10ffbb97208.png)
 
-&nbsp;
-
-
 
 ## 默认权限 umask
 > [文件与目录的默认权限与隐藏权限](http://cn.linux.vbird.org/linux_basic/0220filemanager_4.php)
@@ -2088,7 +2308,11 @@ visudo 的其他用法见 [第十四章、Linux 账号管理与 ACL 权限配置
 ![1](https://img-blog.csdnimg.cn/c4e055ef1b8847fb89ba5f65987c9933.png)
 
 
-那个 `e` 是什么？
+The "e" flag in lsattr command output represents the "extent" attribute of the file. 
+
+The extent attribute is used by certain filesystems, such as ext4, to optimize file storage allocation. 
+It indicates that the file is using extents, which are contiguous blocks of disk space allocated for that file. Extents help improve file access and storage efficiency.
+
 
 # 文件特殊权限
 > [文件特殊权限： SUID, SGID, SBIT](http://cn.linux.vbird.org/linux_basic/0220filemanager_4.php#suid_sgid_sbit)
@@ -2364,12 +2588,9 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 - 硬链接和源文件是同一个文件，inode 相同，因此修改其中一个时间，另一个同步改变
 - 修改符号链接时间，默认会修改到源文件而非符号链接文件
 
-
 ![1](https://img-blog.csdnimg.cn/35c2695bb2994c1d824ede4df0d75309.png)
 ![2](https://img-blog.csdnimg.cn/99b2a91aa75d49ac83f11b207ba0cc6d.png)
 ![3](https://img-blog.csdnimg.cn/1280c69c1d4b48d091663aa368f4ce81.png)
-
-&nbsp;
 
 
 # touch 创建新文件
@@ -2423,7 +2644,6 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ![3](https://img-blog.csdnimg.cn/25daaba010fd4ccfaffdab97d595cf78.png)
 
 
-<br/>
 
 ## locate
 > [Linux locate命令](https://www.runoob.com/linux/linux-comm-locate.html)
@@ -2441,9 +2661,6 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ![3](https://img-blog.csdnimg.cn/4b0246e6c6014a8a8deaf3ec5a7ad111.png)![4](https://img-blog.csdnimg.cn/82f84fc8274c473fb47423a358a809b8.png)
 
 
-&nbsp;
-
-//LABEL: find
 ## find
 > [find](http://cn.linux.vbird.org/linux_basic/0220filemanager_5.php#find)
 > [Linux find 命令](https://www.runoob.com/linux/linux-comm-find.html)
@@ -2453,12 +2670,12 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 > [Linux find命令：在目录中查找文件](http://c.biancheng.net/view/779.html)
 > [15 Super Useful Examples of the Find Command in Linux](https://linuxhandbook.com/find-command-examples/)
 
-<br/>
 
 ![1](https://img-blog.csdnimg.cn/e95e08f31182446ab6b1bb05f6cbb927.png)
 
 
-### <font color=red>find 查找没有 x 权限的目录</font>
+### find 查找文件需要的权限
+- 如果目录有 r 权限，没有 x 权限，目录中的文件有 r 权限，find 仍能找到文件
 
 ![](img/2023-03-13-16-41-42.png)
 
@@ -2474,7 +2691,6 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 
 ![1](https://img-blog.csdnimg.cn/68b1aa1fdbdf4384832ae0e9aa90aaf0.png)
 
-<br/>
 
 ### find -name 按文件名在特定目录查找
 - 直接指定文件名为精确查找
@@ -2489,7 +2705,7 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
   
 
 ### <font color=red>find -regex 利用正则表达式查找文件</font>
-> [8.5.2 ‘emacs’ regular expression syntax](https://www.gnu.org/software/findutils/manual/html_node/find_html/emacs-regular-expression-syntax.html)
+> [8.5.2 'emacs' regular expression syntax](https://www.gnu.org/software/findutils/manual/html_node/find_html/emacs-regular-expression-syntax.html)
 
 - 用 Emacs 正则表达式
 
@@ -2504,7 +2720,6 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ![2](https://img-blog.csdnimg.cn/275a735af0014429b56dc702195b73f2.png)
 ![3](https://img-blog.csdnimg.cn/e004236c423e4e81865da24c9395109c.png)
 
-<br/>
 
 ### find -perm 查找特定权限的文件
 #### find -perm mode 精准匹配
@@ -2519,7 +2734,7 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 
 #### find -perm /mode 任意一个权限位的权限匹配即可
 - `find -perm /222` 则只要 	`owner group other` 中一个有 `w` 权限即可
-- `find -perm /002` 则 `other` 必须要有 `w` 权限，其他权限位的 `0` 不是只可以没有权限
+- `find -perm /002` 则 `other` 必须要有 `w` 权限，其他权限位的 `0` 不是可以没有权限
 
 ![](img/2023-03-15-10-41-37.png)
 ![](img/2023-03-19-11-07-57.png)
@@ -2551,13 +2766,31 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ![](img/2023-03-19-14-47-11.png)
 ![](img/2023-03-19-14-46-07.png)
 
-### <font color=red>find -prune 不递归查找目录</font>
+### find -prune 不递归查找目录
 - 不能和 `-delete` 一起使用，`-delete` 默认递归处理目录
 - 要实现该功能可以用 `-maxdepth` 指定深度
 
 ![](img/2023-03-19-14-58-32.png)
-![](img/2023-03-19-14-59-39.png)
 
+```bash
+[root@ubuntu22-c0 1]$ tree
+.
+├── 1
+├── 2
+│   ├── 1
+│   ├── 2
+│   └── 3
+└── 3
+    ├── 1
+    ├── 4
+    ├── 5
+    └── 6
+
+2 directories, 8 files
+[root@ubuntu22-c0 1]$ find -type d -name "3" -prune -o -type f -name "1" -print
+./1
+./2/1
+```
 
 ### find -maxdepth -mindepth 指定目录深度
 - 当前目录深度为 1，指定深度为 1，则只搜索当前目录
@@ -2577,8 +2810,6 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 
 **问题**：这里为什么有错误提示？看结果是删除成功了？
 
-<br/>
-
 ### find -ok command ;
 - 和 `-exec` 类似，但执行命令时会提示
 
@@ -2594,12 +2825,10 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ### find -empty 查找全部空文件
 ![1](https://img-blog.csdnimg.cn/ca5b0856c97f449e85be576545d81f14.png)
 
-<br/>
 
 ### 查找隐藏的文件或目录
 ![1](https://img-blog.csdnimg.cn/675a1bb674e54d039e29b09726542bfe.png)
 
-<br/>
 
 - 这里的点表示符号 `.`，用的是通配符而非正则表达式的符号
 - 通配符 `*` 匹配任意字符，可以没有，因此可以匹配 `.` 
@@ -2624,11 +2853,8 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ![1](https://img-blog.csdnimg.cn/1e83fce016ab42ef8174c18e2e5d91b2.png)
 ![2](https://img-blog.csdnimg.cn/f56f46723e6f459eb7d0ddb454b498c9.png)
 
-<br/>
-
 ### 根据时间查找文件
 > 鸟哥的私房菜解释时间含义：[find](http://cn.linux.vbird.org/linux_basic/0220filemanager_5.php#find)
-
 
 #### 以天为时间
 - mtime atime ctime
@@ -2665,36 +2891,142 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ![2](https://img-blog.csdnimg.cn/862a9118535243fbbf8d4740cfe3ab2f.png)
 ![3](https://img-blog.csdnimg.cn/0d178dd35e4d4ebd84b178b33ae9b623.png)
 
-<br/>
-
-
 ### 操作符
 > [Linux find command](https://www.computerhope.com/unix/ufind.htm#syntax)
 > [What is meant by POSIX compliant?](https://teacherscollegesj.org/what-is-meant-by-posix-compliant/)
 
-
-
 ![1](https://img-blog.csdnimg.cn/d513e67ad06e4d4bb3afadef927131f9.png)
 ![2](https://img-blog.csdnimg.cn/2c081937ac6541fca663cbb765392306.png)
 
-
 - 注意 `( expr )` 使用时括号要转义，即 `\( expr \)`，括号内左右两边有空格
-
+- `-a` 逻辑与
+- `-o` 逻辑或
 
 # 绝对路径和相对路径
 > [绝对路径与相对路径](http://cn.linux.vbird.org/linux_basic/0210filepermission_3.php#dir_path)
 
-
 ![1](https://img-blog.csdnimg.cn/44953df763b84402bc133e5fbd131d35.png)
 ![2](https://img-blog.csdnimg.cn/bf1d988ac5cb4f289c0f343b775284c3.png)
 
-# Linux 目录
-## Linux 目录配置
+# Linux 目录结构
 > [Linux目录配置](http://cn.linux.vbird.org/linux_basic/0210filepermission_3.php)
 
+鸟哥的 Linux 私房菜基础学习篇第 5 章介绍
 
+## 根目录的意义与内容
+- 系统最重要的目录，与启动、还原、系统修复等操作有关
+- 根目录不要放在非常大的分区内，越大则数据越多，越容易发生错误
+
+## 根目录下的子目录
+### /bin
+- 存放可执行文件，单人维护模式下还能被使用的命令，如 cp 等
+在Linux中，单用户维护模式（Single User Mode）是一种特殊的引导模式，也被称为救援模式（Rescue Mode）或故障修复模式（Troubleshooting Mode）。它是用于系统维护和故障排除的一种运行级别。
+
+在单用户维护模式下，只有系统管理员（root用户）可以登录系统，并且系统仅运行最基本的服务和进程。这种模式下，网络服务一般是禁用的，多用户模式下的其他用户也无法登录。这样做的目的是为了防止其他用户对系统进行更改并保护系统的完整性。
+
+单用户维护模式常用于以下情况：
+1. 系统出现严重问题，无法正常启动或登录时，使用该模式可以进入系统进行修复。
+2. 忘记root账户密码时，可以进入单用户维护模式并重置密码。
+3. 进行重要文件的备份和还原操作。
+
+进入单用户维护模式需要在系统引导过程中选择或修改引导参数。具体步骤可以因Linux发行版而有所不同，但通常在GRUB引导菜单中选择相应的选项即可进入单用户维护模式。
+
+一旦进入单用户维护模式，可以执行各种系统维护和故障排除任务，如修复磁盘错误、更新软件包、重置密码、修复启动问题等。
+
+需要注意的是，在进行任何更改之前，建议备份重要数据，并确保了解所执行的操作的影响和潜在风险。
+
+### /boot
+- 启动会使用的文件，包括 linux 内核文件以及启动选项与启动所需配置文件等
+
+### /dev
+- 设备与接口文件，读取该文件等于读写设备，如 /dev/null, /dev/zero, /dev/tty 等
+
+### /etc
+- 配置文件
+- 该目录下文件属性一般是可以让普通用户查看，但只有 root 能修改
+
+#### /etc/opt
+- 第三方辅助软件 /opt 的相关配置文件
+#### /etc/X11
+- 与 X Windows 有关的各种配置文件
+
+### /lib
+- 系统启动时会用到的函数库，以及 /bin 或 /sbin 中命令会调用到的函数库
+
+### /media
+- 放置可删除的设备
+
+### /mnt
+- 暂时挂载某些额外设备时用到
+
+### /opt
+- 第三方辅助软件放置的目录
+
+### /run
+- 系统启动后所产生的各项信息
+
+### /sbin
+- 系统启动过程中需要的，包括启动、修复、还原等所需的命令，只有 root 能使用
+- 服务器软件程序一般放在 /usr/sbin 中
+- 自行安装的软件所产生的系统执行文件一般放在 /usr/local/sbin 中
+
+### /srv
+- service 缩写，服务需要使用的数据目录
+
+### /tmp
+- 临时文件
+
+### /lost+found
+- 使用 /ext2、/ext3、/ext4 文件系统格式会产生的目录
+- 当文件it发生错误时，将一些遗失的片段放置到该目录下
+
+### /proc
+- 虚拟文件系统
+- 放置的数在内存中，如 /proc/cpuinfo
+
+### /sys
+- 虚拟文件系统
+- 主要记录内核与系统硬件信息相关的内容，不占据硬盘容量
+
+### /usr
+- 可分享、不可变动
+- UNIX Software Resource 缩写
+- 系统刚装完后会占用很多硬盘容量
+
+### /var
+- 经常变动的文件
+
+#### /var/cache
+
+#### /var/lock
+
+#### /var/log
+
+#### /var/run
+
+#### /var/spool
+- 放置队列数据，即排队等待其他程序使用的数据，这些数据通常使用后会被删除
+
+## 目录链接关系
+```bash
+[root@ubuntu22-c0 ~]$ ll /bin
+lrwxrwxrwx 1 root root 7 Aug  9  2022 /bin -> usr/bin/
+[root@ubuntu22-c0 ~]$ ll /sbin
+lrwxrwxrwx 1 root root 8 Aug  9  2022 /sbin -> usr/sbin/
+[root@ubuntu22-c0 ~]$ ll /lib
+lrwxrwxrwx 1 root root 7 Aug  9  2022 /lib -> usr/lib/
+[root@ubuntu22-c0 ~]$ ll /var/run
+lrwxrwxrwx 1 root root 4 Aug  9  2022 /var/run -> /run/
+[root@ubuntu22-c0 ~]$ ll /lib64
+lrwxrwxrwx 1 root root 9 Aug  9  2022 /lib64 -> usr/lib64/
+[root@ubuntu22-c0 ~]$ ll /var/lock
+lrwxrwxrwx 1 root root 9 Aug  9  2022 /var/lock -> /run/lock/
+```
+
+# 目录操作
 ## 切换目录 cd
 > [目录的相关操作](http://cn.linux.vbird.org/linux_basic/0220filemanager_1.php#dir_opdir)
+
 
 ![1](https://img-blog.csdnimg.cn/fc84238b2b5b48208c3c2251fa185256.png)
 
@@ -2743,8 +3075,6 @@ mkdir: created directory 'web/jdk'
 5 directories, 0 files
 ```
 
-
-
 ## 删除空目录 rmdir
 ![1](https://img-blog.csdnimg.cn/27df270623284bbb9143f23cbb522598.png)
 ![2](https://img-blog.csdnimg.cn/af88523932464511aa2e66f9f931d6dd.png)
@@ -2752,19 +3082,79 @@ mkdir: created directory 'web/jdk'
 ![4](https://img-blog.csdnimg.cn/45470dee9eec49a6bd44e46dfe7c2cec.png)
 
 
+## basename 和 dirname 获取文件名和目录名
+```bash
+[root@ubuntu22-c0 etc]$ basename /etc/passwd
+passwd
+[root@ubuntu22-c0 etc]$ dirname /etc/passwd
+/etc
+```
 
 # 查看文件系统信息
 [Linux dumpe2fs命令：查看文件系统信息](http://c.biancheng.net/view/889.html)
-
 
 # wc 统计文件字数、字节数和行数
 [Linux命令 wc - 统计文件的字节数、字数、行数](https://www.w3cschool.cn/linuxc/linuxc-rhp23mam.html)
 [wc command in Linux with examples](https://www.geeksforgeeks.org/wc-command-linux-examples/)
 
+```bash
+[root@ubuntu22-c0 ~]$ wc --help
+Usage: wc [OPTION]... [FILE]...
+  or:  wc [OPTION]... --files0-from=F
+Print newline, word, and byte counts for each FILE, and a total line if
+more than one FILE is specified.  A word is a non-zero-length sequence of
+characters delimited by white space.
 
-![1](https://img-blog.csdnimg.cn/66aa9dc631f549ef889ba761604e6b39.png)
-![2](https://img-blog.csdnimg.cn/be91fea971844138adb0335e91c21363.png)
+With no FILE, or when FILE is -, read standard input.
 
+The options below may be used to select which counts are printed, always in
+the following order: newline, word, character, byte, maximum line length.
+  -c, --bytes            print the byte counts
+  -m, --chars            print the character counts
+  -l, --lines            print the newline counts
+      --files0-from=F    read input from the files specified by
+                           NUL-terminated names in file F;
+                           If F is - then read names from standard input
+  -L, --max-line-length  print the maximum display width
+  -w, --words            print the word counts
+      --help     display this help and exit
+      --version  output version information and exit
+```
+
+```bash
+[root@ubuntu22-c0 ~]$ echo "a" | wc -m
+2
+[root@ubuntu22-c0 ~]$ echo "a" | wc -c
+2
+[root@ubuntu22-c0 ~]$ echo -n "a" | wc -m
+1
+[root@ubuntu22-c0 ~]$ echo -n "a" | wc -c
+1
+```
+```bash
+[root@ubuntu22-c0 ~]$ echo "你" | wc -m
+2
+[root@ubuntu22-c0 ~]$ echo "你" | wc -c
+4
+[root@ubuntu22-c0 ~]$ echo -n "你" | wc -m
+1
+[root@ubuntu22-c0 ~]$ echo -n "你" | wc -c
+3
+```
+
+```bash
+[root@ubuntu22-c0 ~]$ cat -A 1.txt
+a b c $
+1 2 3 4  $
+[root@ubuntu22-c0 ~]$ cat 1.txt | wc -L
+9
+[root@ubuntu22-c0 ~]$ cat 1.txt | wc -w
+7
+[root@ubuntu22-c0 ~]$ cat 1.txt | wc -c
+17
+[root@ubuntu22-c0 ~]$ cat 1.txt | wc -m
+17
+```
 
 # 统计目录中文件的数目
 > [how to count files in directory on linux](https://devconnected.com/how-to-count-files-in-directory-on-linux/)
@@ -2799,8 +3189,8 @@ mkdir: created directory 'web/jdk'
 ## du
 > [How to Get the Size of a Directory in Linux](https://linuxize.com/post/how-get-size-of-file-directory-linux/) 
 
-
 ![](img/2023-03-19-16-56-55.png)
+
 # 链接文件
 > [Linux ln 命令](https://www.runoob.com/linux/linux-comm-ln.html)
 > [硬链接和符号链接的区别](https://www.cnblogs.com/LubinLew/p/LinuxFileLink.html)
@@ -2821,7 +3211,7 @@ mkdir: created directory 'web/jdk'
 - 如果源文件**移动到其他地方**，**链接不受影响**
 - 删除源文件后**仍可以操作其他硬链接文件**
 - 删除一个链接文件后，文件的连接数减1，如果删除全部硬链接文件，则文件被删除
-- 硬链接和 源文件的 inode 相同，因此其权限属性等相同，一个修改，其他同步改变
+- 硬链接和源文件的 inode 相同，因此其权限属性等相同，一个修改，其他同步改变
 
 ![1](https://img-blog.csdnimg.cn/42c1c1058f464175b8c664c704f179f1.png)
 ![2](https://img-blog.csdnimg.cn/6494826babcf46e089a48c341657b3fb.png)
@@ -2836,7 +3226,6 @@ mkdir: created directory 'web/jdk'
 ![10](https://img-blog.csdnimg.cn/a489e68cc5de43e88c2613f555f816cf.png)
 
 ### 目录的链接数
-
 - 目录至少有两个链接数，当前目录下其本身占一个，子目录中有个 `./` 表示当前目录，占一个硬链接
 - 根目录 `/` 下也有一个 `../` 目录，其 inode 和当前目录相同（[Why does '/' have an '..' entry?](https://unix.stackexchange.com/questions/5711/why-does-have-an-entry/)）
 - 一般操作系统不允许为目录创建硬链接
@@ -2852,7 +3241,6 @@ mkdir: created directory 'web/jdk'
 > [Why are hard links only valid within the same filesystem?](https://unix.stackexchange.com/questions/290525/why-are-hard-links-only-valid-within-the-same-filesystem)
 
 
-
 - 大多数操作系统，不能为目录创建硬链接
 - 硬链接**不能跨文件系统**使用
 
@@ -2860,7 +3248,6 @@ mkdir: created directory 'web/jdk'
 
 ### 定义
 > [Symbolic link](https://en.wikipedia.org/wiki/Symbolic_link)
-
 
 - 可以在不同的文件系统上使用
 - 链接文件的 **inode 和源文件不同**
@@ -2873,14 +3260,11 @@ mkdir: created directory 'web/jdk'
 - 符号链接文件是一种新的文件类型，`ll` 可看见文件类型为 `l`，与源文件是两个文件
 - 如果创建符号链接失败，查看符号链接时源文件的路径处闪，创建时使用绝对路径创建
 
-
 ![1](https://img-blog.csdnimg.cn/e2aebcc33ee94bd591b585bafd8b43ff.png)
 ![2](https://img-blog.csdnimg.cn/1684a8510d504d59aa7bf63f0e93f0ff.png)
 ![3](https://img-blog.csdnimg.cn/3cbfaa27bd714d3d8756c7d5862b36a2.png)
 ![4](https://img-blog.csdnimg.cn/3d21d81648414e7aa8a1f775f49dde72.png)
 ![5](https://img-blog.csdnimg.cn/85c80fea2512414ea1cee64f64635789.png)
-
-<br/>
 
 ### 符号链接的作用
 > [When do we use symbolic link in Linux?](https://qr.ae/prialT)
@@ -2906,8 +3290,6 @@ mkdir: created directory 'web/jdk'
 ![3](https://img-blog.csdnimg.cn/39b62dfd7f0e453c9aaaa67f4c73c2bc.png)
 
 
-
-//LABEL ls
 # 查看文件目录内容 ls
 > [Linux ls Options](https://ipcisco.com/lesson/linux-ls-command/)
 > [文件与目录的检视： ls](http://cn.linux.vbird.org/linux_basic/0220filemanager_2.php#ls)
@@ -2932,7 +3314,7 @@ mkdir: created directory 'web/jdk'
 - 和源文件相同 
 #### 管道文件
 
-#### <font color=red>目录</font>
+#### 目录
 > [Why is the size of a directory either 0 or 4096?](https://unix.stackexchange.com/questions/503048/why-is-the-size-of-a-directory-either-0-or-4096)
 > [`ls -lS` isn't showing true size of directory](https://unix.stackexchange.com/questions/365369/ls-ls-isnt-showing-true-size-of-directory)
 
@@ -2968,7 +3350,6 @@ mkdir: created directory 'web/jdk'
 
 ![1](https://img-blog.csdnimg.cn/72892ec1b5a045aba10483a53cb3dae3.png)
 
-<br/>
 
 ## ls -F 在列出的文件后加符号表明其类型
 目录加 `/`，可执行文件加 `*`，socket 文件加 `=`
@@ -2979,24 +3360,17 @@ mkdir: created directory 'web/jdk'
 ## 文件大小以较易读的方式显示
 ![1](https://img-blog.csdnimg.cn/e4dfcf4e493e4367b76fc858dd5f3db2.png)
 
-<br/>
-
 ## ls -i 列出 inode 号码
 
 ![1](https://img-blog.csdnimg.cn/37acdd0ac833481499730db1c514eae3.png)
 
-<br/>
-
 ## ll -n 用 UID 和 GID 代替使用者和群组的名称
 ![1](https://img-blog.csdnimg.cn/2a305e1d0c4349e88d41944213d36dd4.png)
 
-<br/>
 
 ## ls -R 查看目录中所有子目录的信息 
 
 ![1](https://img-blog.csdnimg.cn/d68034ef44e84a4ab5af0800d852484a.png)
-
-<br/>
 
 ## ls -s 
 > [Why does ls -l output a different size from ls -s?](https://askubuntu.com/questions/269480/why-does-ls-l-output-a-different-size-from-ls-s)
@@ -3020,7 +3394,8 @@ mkdir: created directory 'web/jdk'
 - 移动文件
 ![1](https://img-blog.csdnimg.cn/15237352ede346b99dd475f576ce19c8.png)
 - 移动目录
-![1](https://img-blog.csdnimg.cn/c0d9d8199fb34e28a9b412982a4d638d.png)![2](https://img-blog.csdnimg.cn/33a2827316eb49cab330b992cd62bf8e.png)
+![1](https://img-blog.csdnimg.cn/c0d9d8199fb34e28a9b412982a4d638d.png)
+![2](https://img-blog.csdnimg.cn/33a2827316eb49cab330b992cd62bf8e.png)
 ![3](https://img-blog.csdnimg.cn/3f2e426c77a04e7385132e8bcfe7087a.png)
 ![4](https://img-blog.csdnimg.cn/1c9933ce374f4e7f9e72cdcf2376ffd3.png)![5](https://img-blog.csdnimg.cn/5ada1b8b5d03482fa90ed57138d64dee.png)
 ![6](https://img-blog.csdnimg.cn/ac1aef3c6a5540ef9e07f3ab1f6dcf4a.png)
@@ -3029,7 +3404,6 @@ mkdir: created directory 'web/jdk'
 # 文件描述符 fd
 > [File descriptor](https://en.wikipedia.org/wiki/File_descriptor)
 > [File descriptor](https://www.computerhope.com/jargon/f/file-descriptor.htm)
-
 
 
 ## lsof 查看文件的文件描述符
@@ -3059,8 +3433,6 @@ vim     2411 root    5u   REG  253,0    12288 6204313 .1.txt.swp
 lrwx------ 1 root root 64 Jul 11 11:17 /proc/2411/fd/5 -> /var/lib/filebeat/registry/filebeat/.1.txt.swp
 ```
 如将 1.txt 删除但该文件的文件描述符仍处于打开状态，`.1.txt.swp` 文件还存在，则可以继续编辑文件并保存
-
-
 
 
 # 文件操作
@@ -3109,10 +3481,8 @@ lrwx------ 1 root root 64 Jul 11 11:17 /proc/2411/fd/5 -> /var/lib/filebeat/regi
 - 递归复制不加其他参数，其文件的属性会改变
 - 递归复制后要保留属性则根据需要添加额外参数
 
-
 ![](img/2023-03-11-16-53-38.png)
 ![](img/2023-03-11-16-57-13.png)
-
 
 ![1](https://img-blog.csdnimg.cn/2ed936f843ee4d5ea044f915ea13d896.png)
 ![2](https://img-blog.csdnimg.cn/92b6632fc0b2417da3d85fcf96eca294.png)
@@ -3146,7 +3516,6 @@ lrwx------ 1 root root 64 Jul 11 11:17 /proc/2411/fd/5 -> /var/lib/filebeat/regi
 - 可以用 `cp -b`，但这样备份的文件名固定，如果再备份一次会覆盖，这种写法不能指定参数
 - `cp --backup=numbered` 会为备份的文件创建数字，多备份几次会有不同的文件名
 
-
 ![](img/2023-03-12-10-56-59.png)
 
 ### 复制多个文件到同一个目录中
@@ -3156,18 +3525,15 @@ lrwx------ 1 root root 64 Jul 11 11:17 /proc/2411/fd/5 -> /var/lib/filebeat/regi
 ![2](https://img-blog.csdnimg.cn/e44132b116064242904ce277334eb2d6.png)
 
 
-### 将一个文件复制多份
+## 将一个文件复制多份
 > [linux系统如何将一个文件同时复制多份](https://www.cnblogs.com/liujiaxin2018/p/9405079.html)
 
-#### 利用 tee 命令
+### 利用 tee 命令
 ![1](https://img-blog.csdnimg.cn/415156de2ea8443991093570b859542d.png)
 
 
-&nbsp;
-
 ### 利用 xargs 命令
 > [How to copy a single file to multiple directories in Linux or Unix](https://www.cyberciti.biz/faq/linux-unix-copy-a-file-to-multiple-directories-using-cp-command/)
-
 
 
 ```bash
@@ -3189,6 +3555,7 @@ $ xargs -n 1 cp -av 1 <<< "2/ 3/ 4/"
 $ ls
 1  2  3  4  
 ```
+
 ## 删除文件或目录 rm
 - 如果文件正在编辑，默认 `rm` 文件可以直接删除，删除后用 `ls` 查看无此文件，但如果在另一个终端仍编辑已删除的文件然后保存，会重新生成该文件，文件名不变，无任何提示，再用 `ls` 查看可以看到已删除的文件
 
@@ -3251,8 +3618,28 @@ alias rm_r='\rm -ri '
 ![5](https://img-blog.csdnimg.cn/05df9b7ac3f04fc8a1eb62964ef59671.png)
 
 
-//TODO 待补充
 ## 同一分区和不同分区移动文件
+### 相同分区移动文件
+When the source and destination are within the same partition, `mv` simply updates the file's directory entry to point to the new location.
+
+In Linux, the `mv` command is used to move or rename files and directories. When the source file and the destination directory are located within the same partition (a logical division of a storage device), `mv` utilizes a mechanism that efficiently updates the file's metadata to reflect the new location. This process involves making changes to the file's directory entry.
+
+1. The `mv` command checks if the source and destination are within the same partition. If they are, it proceeds with the following steps.
+
+2. Instead of physically copying the entire file's content and creating a new file at the destination, `mv` simply updates the file's directory entry. This directory entry serves as a reference or pointer to the file's actual data blocks on the filesystem.
+
+3. The file's directory entry is modified to reflect the new location or filename. This update ensures that the file is logically associated with the new directory or name.
+
+4. The file's inode (a data structure that contains metadata about the file) remains unchanged. It retains the same identification number and retains its ownership, permissions, timestamps, and other attributes.
+
+By updating the directory entry instead of performing a data block copy, the `mv` command completes the task swiftly and efficiently when the source and destination are within the same partition. This approach is advantageous, especially when working with large files, as it saves time and conserves system resources.
+
+
+### 不同分区移动文件
+- If the source and destination are on different partitions, the `mv` command treats it as a copy-and-delete operation.
+- First, the content of the file is physically copied from the source partition to the destination partition, preserving all the file attributes.
+- Once the file is successfully copied, the original file on the source partition is deleted.
+- Moving files between partitions can take longer depending on the size of the file being moved.
 
 ## move -b 移动前备份
 - 和 `cp --backup` 用法相同
@@ -3282,7 +3669,6 @@ alias rm_r='\rm -ri '
 
 ### mv -n 目标文件存在时不移动
 - `mv --no-clobber` 不覆盖已存在的文件
-
 
 ### mv -f 强制移动文件不提示 
 - `-f, --force` 强制移动不提示
@@ -3323,7 +3709,6 @@ alias rm_r='\rm -ri '
 ### 显示多个输入
 ![1](https://img-blog.csdnimg.cn/283dfad016574960a20b87b52aeff211.png)
 
-<br/>
 
 - cat f - g  
 ![1](https://img-blog.csdnimg.cn/4ed436c0d7c2495fbd11d1d1b17d273d.png)
@@ -3346,19 +3731,15 @@ alias rm_r='\rm -ri '
 #### cat -s 压缩连续的空白行
 ![1](https://img-blog.csdnimg.cn/5baa2c8033c24b41874c0f69933a7812.png)
 
-<br/>
 
 #### cat -E
 - 每行结束位置显示 `$`
-
 
 #### cat -A 显示非打印字符
 - 注意 windows 格式和 Linux 格式的文件显示隐藏字符不同
 
 ![1](https://img-blog.csdnimg.cn/f74d98d00cd54b7b8d92395249433e47.png)
 ![](img/2023-03-17-09-58-44.png)
-
-<br/>
 
 - `cat -A` 相当于 `cat -vET`
 
@@ -3367,15 +3748,12 @@ alias rm_r='\rm -ri '
 ![1](https://img-blog.csdnimg.cn/54fc7e2777cb41b9b9a89c6dfd6b7707.png)
 
 ### nl
-
 ![1](https://img-blog.csdnimg.cn/9f374ceadba143928c5de1b36c0c371f.png)
 
 ### rev 反转一行内容
 reverse lines charaterwise
 
 ![1](https://img-blog.csdnimg.cn/1c8d7c15659644f49c578ff5886973ff.png)
-
-
 
 ### more
 > [可翻页检视](http://cn.linux.vbird.org/linux_basic/0220filemanager_3.php#file_content_2)
@@ -3400,6 +3778,21 @@ reverse lines charaterwise
 ![2](https://img-blog.csdnimg.cn/ce2ffd1ca1d845099df82fdf9704ed08.png)
 ![3](https://img-blog.csdnimg.cn/93c5c1f124964b4facc52888c738c8fe.png)
 
+```bash
+[root@ubuntu22-c0 1]$ cat 1
+1
+2
+3
+4
+5
+[root@ubuntu22-c0 1]$ head -n2 1
+1
+2
+[root@ubuntu22-c0 1]$ head -n -2 1
+1
+2
+3
+```
 
 ## tail
 ![1](https://img-blog.csdnimg.cn/e41fbc0ce43449e1ab672625052d2f9c.png)
@@ -3409,6 +3802,25 @@ reverse lines charaterwise
 ![1](https://img-blog.csdnimg.cn/26c79f356d4b4a04813b81fc853cf6d6.png)
 ![2](https://img-blog.csdnimg.cn/57f59673a6d647b8ab57be97a94b17f2.png)
 
+```bash
+[root@ubuntu22-c0 1]$ cat 1
+1
+2
+3
+4
+5
+[root@ubuntu22-c0 1]$ tail -n2 1
+4
+5
+[root@ubuntu22-c0 1]$ tail -n -2 1
+4
+5
+[root@ubuntu22-c0 1]$ tail -n +2 1
+2
+3
+4
+5
+```
 
 ### tail -c NUM
 
@@ -3423,7 +3835,6 @@ reverse lines charaterwise
 
 ## cut
 > [Linux cut命令](https://www.runoob.com/linux/linux-comm-cut.html)
-> 
 
 
 ![1](https://img-blog.csdnimg.cn/c5a6478b73dd49c1882bb01fcae72f3f.png)
@@ -3488,8 +3899,6 @@ reverse lines charaterwise
 > [Linux命令学习总结：hexdump](https://www.cnblogs.com/kerrycode/p/5077687.html)
 
 
-
-//TODO: 补充
 # inode
 > [理解inode](http://www.ruanyifeng.com/blog/2011/12/inode.html)
 > [认识 EXT2 文件系统](http://cn.linux.vbird.org/linux_basic/0230filesystem_1.php)
@@ -3498,12 +3907,8 @@ reverse lines charaterwise
 - 不同文件系统的 inode
 - 文件系统没有 inode 号，但还有存储空间，也不能新建文件
 - inode 部分看深入理解计算机系统页表
-- cp mv inde 是否在同一个文件系统
 - 不同分区 inode: df -i (查看多少分区，当前文件在哪个分区)
 - 不同分区的 inode，不同分区有相同一个 inode 号
-
-
-
 
 # 输入输出重定向
 > [第十一章、认识与学习 BASH](http://cn.linux.vbird.org/linux_basic/0320bash_5.php)
@@ -3576,8 +3981,6 @@ reverse lines charaterwise
 ![1](https://img-blog.csdnimg.cn/842126740b034ae1a1a7cbaff933172a.png)
 
 
-
-
 ## 丢弃标准输出或错误
 ![1](https://img-blog.csdnimg.cn/5cb9e3c6e48d48518c7a40fb20a84de1.png)
 
@@ -3613,7 +4016,6 @@ reverse lines charaterwise
 ## 输入重定向
 ![1](https://img-blog.csdnimg.cn/61b2d44cea54478990e419567528f334.png)
 
-
 - 用文件内容作为输入代替键盘输入
 - 注意命令是否支持标准输入，不支持则不能用输入重定向
 - 直接输入命令后回车，支持标准输入的则会等待输入，如 `cat`，`bc` 
@@ -3628,8 +4030,6 @@ reverse lines charaterwise
 ![](img/2023-03-19-17-54-03.png)
 
 
-
-
 # tr 字符转换或删除
 > [Linux tr Command with Examples](https://phoenixnap.com/kb/linux-tr)
 > [Tr Command in Linux with Examples](https://linuxize.com/post/linux-tr-command/)
@@ -3637,7 +4037,6 @@ reverse lines charaterwise
 
 ![1](https://img-blog.csdnimg.cn/9cfe2d005be44547b4564d7f7743d594.png)
 
-&nbsp;
 
 ## tr 替换
 
