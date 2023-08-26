@@ -2978,9 +2978,12 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 - 使用 /ext2、/ext3、/ext4 文件系统格式会产生的目录
 - 当文件it发生错误时，将一些遗失的片段放置到该目录下
 
-### /proc
+### /proc 查看内存数据
 - 虚拟文件系统
-- 放置的数在内存中，如 /proc/cpuinfo
+- 内存的数据写入到 `/proc` 目录下，如 /proc/cpuinfo
+- 主机上各程序的 PID 以目录的形式在 `/proc` 目录中，目录的名为 PID
+- 开机的第一个程序 `systemd` 的 PID 为 1，因此在 `/proc/1` 目录中
+![](img/2023-04-13-14-11-38.png)
 
 ### /sys
 - 虚拟文件系统
@@ -3181,8 +3184,17 @@ a b c $
 # 查看目录的实际大小
 > [`ls -lS` isn't showing true size of directory](https://unix.stackexchange.com/questions/365369/ls-ls-isnt-showing-true-size-of-directory)
 
-- `ll` 查看的目录大小并非目录的实际大小
-![](img/2023-03-13-18-05-05.png)
+- 目录的内容为文件名，文件的内容记录文件的实际数据
+- 文件系统中创建目录时会分配一个 inode 与至少一个区块给该目录
+因此 `ll` 查看目录时大小为 4k 或其整数倍（块大小为 4k 时，可以用 dumpe2fs 查看某个分区的文件系统信息）
+如果目录中的文件不多，则只占用一个区块，如果文件过多可能占用多个区块
+```bash
+[root@ubuntu22-c0 ~]$ ll snap/
+total 12
+drwx------ 3 root root 4096 Feb 21  2023 ./
+drwx------ 7 root root 4096 Aug 26 22:43 ../
+drwxr-xr-x 4 root root 4096 Feb 21  2023 lxd/
+```
 
 ## du
 > [How to Get the Size of a Directory in Linux](https://linuxize.com/post/how-get-size-of-file-directory-linux/) 
@@ -3333,8 +3345,18 @@ drwxr-xr-x 4 root root  4096 Aug 23 10:28 1/
 > [Why is the size of a directory either 0 or 4096?](https://unix.stackexchange.com/questions/503048/why-is-the-size-of-a-directory-either-0-or-4096)
 > [`ls -lS` isn't showing true size of directory](https://unix.stackexchange.com/questions/365369/ls-ls-isnt-showing-true-size-of-directory)
 
-- 目录的 size 并非目录的实际大小
-![](img/2023-03-13-18-05-05.png)
+- 目录的 size 并非目录的实际大小，而是目录使用数据区块的大小
+- 目录的内容为文件名，文件的内容记录文件的实际数据
+- 文件系统中创建目录时会分配一个 inode 与至少一个区块给该目录
+因此 `ll` 查看目录时大小为 4k 或其整数倍（块大小为 4k 时，可以用 dumpe2fs 查看某个分区的文件系统信息）
+如果目录中的文件不多，则只占用一个区块，如果文件过多可能占用多个区块
+```bash
+[root@ubuntu22-c0 ~]$ ll snap/
+total 12
+drwx------ 3 root root 4096 Feb 21  2023 ./
+drwx------ 7 root root 4096 Aug 26 22:43 ../
+drwxr-xr-x 4 root root 4096 Feb 21  2023 lxd/
+```
 
 ## ls -a 查看全部文件，包含隐藏文件 
 
