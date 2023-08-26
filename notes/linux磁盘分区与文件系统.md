@@ -177,6 +177,8 @@ sr0     1
 
 总而言之，磁盘分区在Linux中具有以下重要的目的和作用：提供逻辑隔离、空间管理、多操作系统支持、文件系统管理以及数据备份和恢复。
 
+硬盘也可以不分区使用
+
 ## 分区方式
 - 不同分区方式的差别
 - 跨分区的文件使用有什么限制
@@ -527,6 +529,7 @@ root@rocky86 firmware $ dmesg | grep efi:
      例如，在一个硬盘上创建一个ext4文件系统的分区用于存储系统文件和应用程序，
 	 然后创建一个XFS文件系统的分区用于存储大量的媒体文件。
 
+- `man fs` 查看文件系统说明
 ## 文件系统的作用
 1. 数据组织：文件系统定义了文件和目录在磁盘上的结构，使得文件可以进行逻辑上的组织和存储。
 
@@ -549,27 +552,268 @@ root@rocky86 firmware $ dmesg | grep efi:
 综上所述，不同文件系统有不同的特性和性能表现，选择合适的文件系统取决于具体的需求和应用场景。
 
 
+## 查看内核支持的文件系统
+```bash
+[root@ubuntu22-c0 ~]$ uname -r
+5.15.0-79-generic
+[root@ubuntu22-c0 ~]$ ls /lib/modules/`uname -r`/kernel/fs
+9p      bfs             coda    f2fs      hfs      ksmbd       nfsd    omfs       quota         ubifs
+adfs    binfmt_misc.ko  cramfs  fat       hfsplus  lockd       nilfs2  orangefs   reiserfs      udf
+affs    btrfs           dlm     freevxfs  hpfs     minix       nls     overlayfs  romfs         ufs
+afs     cachefiles      efs     fscache   isofs    netfs       ntfs    pstore     shiftfs.ko    vboxsf
+autofs  ceph            erofs   fuse      jffs2    nfs         ntfs3   qnx4       smbfs_common  xfs
+befs    cifs            exfat   gfs2      jfs      nfs_common  ocfs2   qnx6       sysv          zonefs
+```
+
+- 支持的文件系统并不一定在当前系统可用，如果编译内核时未选择则不可用
+
+## 查看当前系统可用的文件系统
+```bash
+[root@ubuntu22-c0 ~]$ cat /proc/filesystems
+nodev   sysfs
+nodev   tmpfs
+nodev   bdev
+nodev   proc
+nodev   cgroup
+nodev   cgroup2
+nodev   cpuset
+nodev   devtmpfs
+nodev   configfs
+nodev   debugfs
+nodev   tracefs
+nodev   securityfs
+nodev   sockfs
+nodev   bpf
+nodev   pipefs
+nodev   ramfs
+nodev   hugetlbfs
+nodev   devpts
+        ext3
+        ext2
+        ext4
+        squashfs
+        vfat
+nodev   ecryptfs
+        fuseblk
+nodev   fuse
+nodev   fusectl
+nodev   mqueue
+nodev   pstore
+        btrfs
+nodev   autofs
+nodev   binfmt_misc
+```
 
 ## 文件系统类型
-### ext4 
-- 支持扩容和缩减
-
-### xfs
-
-### swap
+> [File System Comparison: NTFS, FAT32, exFAT, and EXT, Which File System Should I Use](https://www.easeus.com/diskmanager/file-system.html)
 
 
+- linux 常用文件系统
+	- ext2/3/4
+	- xfs
+	- swap
+- Windows 常用文件系统
+	- FAT32
+	- NTFS
+- unix 常用文件系统
+- 网络文件系统
+	- NFS
+- 集群文件系统
+	- GFS2
+- 分布式文件系统
+	- ceph
+- RAW 裸文件系统
+未经处理或未经格式化的文件系统
 
-## 虚拟文件系统 VFS
-- 屏蔽不同文件系统的差异
+
+## 文件系统的组成
+1. 内核中的模块：这是文件系统的核心部分，它们是内核模块，负责在操作系统内核中实现文件系统的功能。
+在Linux中，常见的文件系统模块包括ext4（采用扩展文件系统4）、xfs（专为高性能设计的文件系统）和vfat（用于FAT文件系统）等。
+这些模块负责处理与文件的读写、目录结构管理、磁盘空间分配等相关操作。
+
+2. Linux虚拟文件系统：Linux虚拟文件系统（VFS）是一个抽象层，它为用户空间应用程序提供与不同文件系统的统一接口。
+VFS负责处理文件系统的挂载、文件路径的解析、缓存管理等任务。
+它隐藏了不同文件系统的细节，使应用程序能够以统一的方式进行文件操作，而无需关心底层文件系统的具体实现。
+
+3. 用户空间管理工具：用户空间管理工具用于创建、格式化和管理不同文件系统类型。这些工具通常以"mkfs"开头，后面跟着文件系统类型的名称，比如mkfs.ext4、mkfs.xfs和mkfs.vfat。
+这些工具提供了命令行界面，供用户使用特定的命令和选项来创建文件系统、分配磁盘空间、设置文件系统特性等。
+
+内核模块提供文件系统的核心功能，VFS提供统一的接口，而用户空间工具则用于创建和管理文件系统。
+这些组成部分共同协作，使得操作系统能够有效地管理文件和存储空间。
 
 
-## 创建文件系统
-### mkfs
+## 硬盘格式化
+在Linux中，硬盘格式化是指对硬盘或分区进行特定的操作，以准备其用作文件系统的存储介质。
+硬盘格式化的目的是在存储介质上创建文件系统结构并初始化相关元数据，以使其能够有效地存储和管理文件数据。
 
-## 查看文件系统的属性
+通常，硬盘格式化分为两个主要步骤：分区和格式化。
 
-### clean 状态
+1. 分区：在硬盘上划分分区是指将硬盘分为若干个逻辑区域，每个分区在逻辑上独立，并被视为一个单独的存储设备。分区可以将硬盘划分为不同的区域，方便对文件系统进行管理和分配空间。分区会在硬盘上创建分区表，记录每个分区的起始位置、大小和文件系统类型等信息。通过使用分区，可以将硬盘有效地划分为多个逻辑存储单元，使文件系统的管理更加灵活。
+
+2. 格式化：一旦分区创建完毕，就可以对每个分区进行格式化。格式化是在分区上创建文件系统结构及其相关元数据的过程。在格式化过程中，文件系统会在分区上建立目录结构、元数据表和相应的文件数据结构，以准备文件的存储和管理。格式化还会进行一些必要的初始化操作，如设置文件系统的默认参数、预分配磁盘空间等。
+
+需要注意的是，格式化是一个破坏性操作，它会清空分区上的所有数据。因此，在进行格式化之前，请务必备份重要的数据，以免丢失。
+
+分区和格式化是独立的操作，但通常在创建新分区后进行格式化。这样，文件系统结构和元数据将相应地在分区上创建，以准备文件的存储和管理。
+
+传统的一个分区只能被格式化为一个文件系统
+
+## mkfs 创建文件系统
+```bash
+[root@ubuntu22-c0 ~]$ whatis mkfs
+mkfs (8)             - build a Linux filesystem
+```
+
+```bash
+[root@ubuntu22-c0 ~]$ mkfs.ext4 /dev/sdb1
+mke2fs 1.46.5 (30-Dec-2021)
+Creating filesystem with 524288 4k blocks and 131072 inodes
+Filesystem UUID: 7c1d3234-c920-454a-9940-a280cfd1ac91
+Superblock backups stored on blocks:
+        32768, 98304, 163840, 229376, 294912
+
+Allocating group tables: done
+Writing inode tables: done
+Creating journal (16384 blocks): done
+Writing superblocks and filesystem accounting information: done
+```
+
+- 创建文件系统后用 `lsblk -f` 查看
+- 创建文件系统后不能使用，因为该文件系统的根目录与 Linux 系统根目录独立，无法直接使用该文件系统
+linux 系统支持同时使用多个文件系统，每个文件系统都有自己的根目录
+因此创建文件系统（格式化）后需要挂载，即将文件系统与 linux 系统中特定的目录关联，使得该文件系统在该目录下可见和可访问
+- 创建文件系统后用 `lsblk -f` 查看可看见该文件系统分配一个 UUID，该 UUID 唯一且不会改变，可以用其表示该分区
+MBR 分区方式中创建的逻辑分区的设备名可能改变，随着其他逻辑分区的删除名字动态变化，这种情况下用 UUID 代表该分区更稳定
+
+## blkid 查看块设备属性
+```bash
+[root@ubuntu22-c0 ~]$ whatis blkid
+blkid (8)            - locate/print block device attributes
+[root@ubuntu22-c0 ~]$ blkid
+/dev/mapper/ubuntu--vg-ubuntu--lv: UUID="8ff51380-f669-4ec7-9344-435cc629f026" BLOCK_SIZE="4096" TYPE="ext4"
+/dev/sda2: UUID="f81cc5f3-9189-4a0c-b53a-f67110325cc7" BLOCK_SIZE="4096" TYPE="ext4" PARTUUID="3b07f660-02d5-4564-ace5-88dfb42355f6"
+/dev/sda3: UUID="tdjiqK-EK47-vWMt-8sMA-wIvP-B0Fc-rGXGe1" TYPE="LVM2_member" PARTUUID="73f41d5d-e069-4c48-9ee3-8b258466bbbf"
+/dev/sdb2: UUID="6f48cb0f-ad98-4b95-8de1-897abd770596" BLOCK_SIZE="512" TYPE="xfs" PARTLABEL="Linux filesystem" PARTUUID="36b14776-7ca9-48e6-a4e3-074f269f32ea"
+/dev/sdb1: UUID="7c1d3234-c920-454a-9940-a280cfd1ac91" BLOCK_SIZE="4096" TYPE="ext4" PARTLABEL="Linux filesystem" PARTUUID="961f8f5d-bd97-4549-9423-db7084edf16e"
+/dev/sda1: PARTUUID="3747d8f2-bf73-4d32-9007-983bb39d9867"
+```
+
+## 文件系统的特性
+> [第八章、Linux 磁盘与文件系统管理](http://cn.linux.vbird.org/linux_basic/0230filesystem_1.php)
+
+- 文件系统将文件的权限（rwx）与文件属性（owner,group,timestamp等）放在 inode 中，数据放在数据区块中
+- 文件系统创建时（格式化时）就已经规划好 inode 和数据区块
+
+
+### 超级区块
+记录文件系统的整体信息，包括 inode 与数据区块的总量，使用量，剩余量等
+
+### inode
+- 记录文件系统的属性，一个文件占用一个 inode，同时记录次此文件的数据所在的区块号码
+- 每个 inode 都有一个编号，inode 中有文件数据区块的编号
+- 这种为索引式文件系统
+
+
+### 数据区块
+文件的实际内容，若文件太大，会占用多个区块
+
+
+## linux 的 ext2 文件系统
+> [第八章、Linux 磁盘与文件系统管理](http://cn.linux.vbird.org/linux_basic/0230filesystem_1.php)
+
+- ext2 文件系统格式化时划分了多个区块群组（block group），每个区块群组有独立的 inode，数据区块，超级区块等
+- 文件系统最前面有一个启动扇区（boot sector），该启动扇区可以安装启动引导程序（ext2）
+- 区块群组由六部分组成
+	- 数据区块（data block）
+	有 1k、2k以及 4k 三种，格式化分区时就已经固定
+	不同区块大小对文件系统能支持的最大磁盘容量与最大单一文件容量有影响
+	原则上，区块的大小在格式化完成后不能修改
+	每个区块最多只能放置一个文件的数据
+	如果文件大于区块的大小，则占用多个区块
+	如果文件小于区块的大小，则区块剩余的空间不能被使用，造成浪费
+	- inode table
+    记录文件的读写属性（rwx）
+	文件的 owner 和 group
+	文件的大小
+	文件的 timastamp (mtime, ctime, atime)
+	文件特性的标识（flag），如 SetUID
+	文件真正内容的位置
+	inode 数量与大小在格式化时以及固定
+	每个文件仅占用一个 inode
+	文件系统能建立的文件数量与 inode 数量有关
+	读取文件时需要先找到 inode，查看权限等参数是否符合才能读写
+	ext2 inode 大小为 128B
+	inode 区块号码的区域定义为 12 个直接、一个间接、一个双间接与一个三间接记录区，为了能记录更多区块信息
+	- 超级区块（superblock）
+	整个文件系统的信息，没有超级区块，就没有文件系统
+	记录数据区块与 inode 的总量
+	记录未使用与已使用的 inode 与数据区块数量
+	记录数据区块与 inode 的大小
+	记录文件系统的挂载时间，最近一次写入数据的时间、最近一次检验磁盘的时间等
+	记录有效位数值，已被挂载则为 0
+	每个区块群组都可能含有超级区块，为了备份
+	- 文件系统描述说明（filesystem description）
+	描述每个区块群组的开始与结束区块，以及每个区块介于哪个之间
+	- 区块对照表（block bitmap）
+    查看哪些区块是空的可以使用
+	- inode 对照表（inode bitmap）
+	记录已使用和未使用的 inode 号码
+
+## tune2fs 调整 ext 系列文件系统的参数
+```bash
+[root@ubuntu22-c0 ~]$ whatis tune2fs
+tune2fs (8)          - adjust tunable file system parameters on ext2/ext3/ext4 file systems
+[root@ubuntu22-c0 ~]$ tune2fs -l /dev/sdb1 | less
+```
+
+- 用 tune2fs 查看 ext4 文件系统的属性，如块大小等
+- Reserved blocks，保留块，预留给 root 使用，普通用户无法使用，应急
+
+
+## dumpe2fs 显示 ext 系列文件系统信息
+```bash
+[root@ubuntu22-c0 ~]$ whatis dumpe2fs
+dumpe2fs (8)         - dump ext2/ext3/ext4 file system information
+[root@ubuntu22-c0 ~]$ dumpe2fs /dev/sdb1
+```
+
+- 例如看到该分区文件系统的 block size 大小为 4k
+
+## xfs_info 查看 xfs 文件系统属性
+```bash
+[root@ubuntu22-c0 ~]$ whatis xfs_info
+xfs_info (8)         - display XFS filesystem geometry information
+[root@ubuntu22-c0 ~]$ xfs_info /dev/sdb2
+meta-data=/dev/sdb2              isize=512    agcount=4, agsize=196608 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=0
+         =                       reflink=1    bigtime=0 inobtcount=0
+data     =                       bsize=4096   blocks=786432, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
+log      =internal log           bsize=4096   blocks=2560, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+```
+
+## 文件系统与目录
+- 目录的内容为文件名，文件的内容记录文件的实际数据
+- 文件系统中创建目录时会分配一个 inode 与至少一个区块给该目录
+因此 `ll` 查看目录时大小为 4k 或其整数倍（块大小为 4k 时）
+如果目录中的文件不多，则只占用一个区块，如果文件过多可能占用多个区块
+```bash
+[root@ubuntu22-c0 ~]$ ll snap/
+total 12
+drwx------ 3 root root 4096 Feb 21  2023 ./
+drwx------ 7 root root 4096 Aug 26 22:43 ../
+drwxr-xr-x 4 root root 4096 Feb 21  2023 lxd/
+```
+
+## 文件系统与文件
+linux 中创建文件时，会分配一个 inode 号与相应数量的区块
+如果文件过大，需要超过 12 个区块，则还需要额外的区块来记录区块号码，因为仅有 12 个直接指向区块
+
+
 
 ### block size
 - 跟文件系统的大小有关，如常用的 4KB
@@ -583,14 +827,11 @@ root@rocky86 firmware $ dmesg | grep efi:
 
 
 
-### Reserved blocks
-- 保留块，预留给 root 使用，普通用户无法使用，应急
 
 
 
 ### tune2fs 查看 ext4 文件系统属性
 
-### xfs_info 查看 xfs 文件系统属性
 
 
 
