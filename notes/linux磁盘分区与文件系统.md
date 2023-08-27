@@ -2,6 +2,7 @@ Linux 磁盘分区与文件系统
 
 > 鸟哥的Linux私房菜-基础学习篇 第四版 第2章 主机规划与磁盘分区
 > 鸟哥的Linux私房菜-基础学习篇 第四版 第7章 Linux磁盘与文件系统管理
+> 鸟哥的Linux私房菜-基础学习篇 第四版 第14章 磁盘配额（Quota）与高级文件系统管理
 
 # 设备文件类型
 Both block and character devices provide an interface between the user space applications and the underlying hardware or kernel services. 
@@ -448,6 +449,27 @@ Number  Start (sector)    End (sector)  Size       Code  Name
 partprobe (8)        - inform the OS of partition table changes
 ```
 
+## lsblk 列出磁盘
+```bash
+[root@ubuntu22-c0 ~]$ lsblk
+NAME                      MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+sda                         8:0    0  200G  0 disk
+├─sda1                      8:1    0    1M  0 part
+├─sda2                      8:2    0    2G  0 part /boot
+└─sda3                      8:3    0  198G  0 part
+  └─ubuntu--vg-ubuntu--lv 253:0    0   99G  0 lvm  /
+sdb                         8:16   0   20G  0 disk
+├─sdb1                      8:17   0    2G  0 part
+└─sdb2                      8:18   0    3G  0 part
+sr0                        11:0    1 1024M  0 rom
+```
+- `RM` 表示 removable device，是否可卸载设备
+
+- lsblk -f 显示文件系统信息
+- lsblk -p 显示完整路径
+- lsblk -o 指定输出列
+
+
 # BIOS 和 UEFI
 > [UEFI vs. BIOS: How Do They Differ?](https://phoenixnap.com/kb/uefi-vs-bios)
 
@@ -530,6 +552,7 @@ root@rocky86 firmware $ dmesg | grep efi:
 	 然后创建一个XFS文件系统的分区用于存储大量的媒体文件。
 
 - `man fs` 查看文件系统说明
+
 ## 文件系统的作用
 1. 数据组织：文件系统定义了文件和目录在磁盘上的结构，使得文件可以进行逻辑上的组织和存储。
 
@@ -556,7 +579,7 @@ root@rocky86 firmware $ dmesg | grep efi:
 ```bash
 [root@ubuntu22-c0 ~]$ uname -r
 5.15.0-79-generic
-[root@ubuntu22-c0 ~]$ ls /lib/modules/`uname -r`/kernel/fs
+[root@ubuntu22-c0 ~]$ ls /lib/modules/$(uname -r)/kernel/fs
 9p      bfs             coda    f2fs      hfs      ksmbd       nfsd    omfs       quota         ubifs
 adfs    binfmt_misc.ko  cramfs  fat       hfsplus  lockd       nilfs2  orangefs   reiserfs      udf
 affs    btrfs           dlm     freevxfs  hpfs     minix       nls     overlayfs  romfs         ufs
@@ -796,6 +819,21 @@ log      =internal log           bsize=4096   blocks=2560, version=2
 realtime =none                   extsz=4096   blocks=0, rtextents=0
 ```
 
+## df 查看文件系统的整体使用量
+- df -ah
+- df -ih 查看 inode 的使用量
+
+## du 查看目录所占的磁盘空间
+```bash
+[root@ubuntu22-c0 ~]$ du -h snap/
+4.0K    snap/lxd/common
+4.0K    snap/lxd/22923
+12K     snap/lxd
+16K     snap/
+[root@ubuntu22-c0 ~]$ du -sh snap/
+16K     snap/
+```
+
 ## 文件系统与目录
 - 目录的内容为文件名，文件的内容记录文件的实际数据
 - 文件系统中创建目录时会分配一个 inode 与至少一个区块给该目录
@@ -815,198 +853,919 @@ linux 中创建文件时，会分配一个 inode 号与相应数量的区块
 
 
 
-### block size
-- 跟文件系统的大小有关，如常用的 4KB
-- 存放文件的最小单位
-	- ll 查看目录时显示的大小为 4kB 
-	- df 查看文件的大小和 ll 查看文件的大小
-	- ls -s 查看文件的大小
+## 日志文件系统 (Jounrnaling filesystem)
+如果文件写入到一半时发生故障导致文件元数据内容和实际数据存放区不一致（inconsistent），
+为了后期进行一致性检查方便，因此有了日志文件系统
 
-- mkfs.ext -b 创建文件系统时指定文件大小
-- 一旦文件系统创建完成，不能修改块的大小
+- 在文件系统中规划一个区块，专门记录写入或修改文件时的步骤
 
 
-
-
-
-
-### tune2fs 查看 ext4 文件系统属性
-
-
+## 文件系统的异步（asynchronously）处理
+- 数据必须先加载到内存后 CPU 才能进行处理
+- 文件加载到内存后，内存区段文件数据被设置为 clean
+- 如果文件被修改，则内存中的数据被设置为 dirty，但并未写入到磁盘
+- 系统会不定时将内存中设置为 dirty 的数据写回磁盘，保持磁盘和内存中数据的一致性
+- 可以用 sync 命令强制将内存中数据写入磁盘同步
 
 
 # 挂载
-- 挂载的目录必须先存在
-- 挂载的文件夹最好用空目录，否则挂载后原来的文件看不到，除非解除挂载
+硬盘创建文件系统（格式化）后不能使用，因为该文件系统的根目录与 Linux 系统根目录独立，无法直接使用该文件系统
+linux 系统支持同时使用多个文件系统，每个文件系统都有自己的根目录
+因此创建文件系统（格式化）后需要挂载，即将文件系统与 linux 系统中特定的目录关联，使得该文件系统在该目录下可见和可访问
+
+将设备挂载到 linux 目录树的某个目录上，该目录成为挂载点
+
+- 挂载点的目录必须先存在
+- 挂载点的文件夹最好用空目录，否则挂载后原来的文件看不到，除非解除挂载
 - 一个设备可以同时挂载到多个挂载点
 
-
-## 挂载的定义
-
-## 挂载的目的
-- 为什么要挂载
-
-
-## 查看已挂载的所有设置
-
 ```bash
-
+[root@ubuntu22-c0 ~]$ df -h
+Filesystem                         Size  Used Avail Use% Mounted on
+tmpfs                              193M  1.3M  192M   1% /run
+/dev/mapper/ubuntu--vg-ubuntu--lv   97G  5.8G   87G   7% /
+tmpfs                              965M     0  965M   0% /dev/shm
+tmpfs                              5.0M     0  5.0M   0% /run/lock
+/dev/sda2                          2.0G  253M  1.6G  14% /boot
+tmpfs                              193M     0  193M   0% /run/user/0
 ```
 
+
+## 查看已挂载的所有设备
+- mount
+- cat /etc/mtab
+- cat /proc/mounts
+
+- findmnt 查看系统整个挂载树
+```bash
+[root@ubuntu22-c0 ~]$ findmnt /dev/sda2
+TARGET SOURCE    FSTYPE OPTIONS
+/boot  /dev/sda2 ext4   rw,relatime
+```
+
+
 ## mount 临时挂载
+```bash
+[root@ubuntu22-c0 ~]$ mount /dev/sdb1 /tmp/f1/
+[root@ubuntu22-c0 ~]$ lsblk -f -o name,fstype,mountpoints
+NAME                      FSTYPE      MOUNTPOINTS
+sda
+├─sda1
+├─sda2                    ext4        /boot
+└─sda3                    LVM2_member
+  └─ubuntu--vg-ubuntu--lv ext4        /
+sdb
+├─sdb1                    ext4        /tmp/f1
+└─sdb2                    xfs
+sr0
+```
 
-### -o ro 只读
+### umount 卸载文件系统
+卸载文件系统的挂载
 
-### -a
-
-### unmount 接触挂载
+```bash
+[root@ubuntu22-c0 ~]$ lsblk -pf -o name,fstype,mountpoints
+NAME                                  FSTYPE      MOUNTPOINTS
+/dev/sda
+├─/dev/sda1
+├─/dev/sda2                           ext4        /boot
+└─/dev/sda3                           LVM2_member
+  └─/dev/mapper/ubuntu--vg-ubuntu--lv ext4        /
+/dev/sdb
+├─/dev/sdb1                           ext4        /tmp/f1
+└─/dev/sdb2                           xfs
+/dev/sr0
+[root@ubuntu22-c0 ~]$ umount /dev/sdb1
+[root@ubuntu22-c0 ~]$ lsblk -pf -o name,fstype,mountpoints
+NAME                                  FSTYPE      MOUNTPOINTS
+/dev/sda
+├─/dev/sda1
+├─/dev/sda2                           ext4        /boot
+└─/dev/sda3                           LVM2_member
+  └─/dev/mapper/ubuntu--vg-ubuntu--lv ext4        /
+/dev/sdb
+├─/dev/sdb1                           ext4
+└─/dev/sdb2                           xfs
+/dev/sr0
+```
 
 ## 永久挂载
 ### 写配置文件 `/etc/fstab`
-	- 设备名或UUID
-	UUID 在用 mount 挂载后会生成，可以用 blkid 查看，该方式更好
-	- 挂载点
-	- 文件系统类型
-	- 选项
-	如 `ro` 只读
+> [What does "sw" option mean in /etc/fstab?](https://superuser.com/questions/1057412/what-does-sw-option-mean-in-etc-fstab)
+
+- 根据说明写上挂载信息
+- `man fstab` 查看帮助说明，对每个字段做解释
+```bash
+[root@ubuntu22-c0 ~]$ cat /etc/fstab
+# /etc/fstab: static file system information.
+#
+# Use 'blkid' to print the universally unique identifier for a
+# device; this may be used with UUID= as a more robust way to name devices
+# that works even if disks are added and removed. See fstab(5).
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+# / was on /dev/ubuntu-vg/ubuntu-lv during curtin installation
+/dev/disk/by-id/dm-uuid-LVM-aL2z4qRF6RP6ygmuXVQ89hX7MrChz0jPApnaIZ1WSFWWkEAhejDEX9zi7SrwDOep / ext4 defaults 0 1
+# /boot was on /dev/sda2 during curtin installation
+/dev/disk/by-uuid/f81cc5f3-9189-4a0c-b53a-f67110325cc7 /boot ext4 defaults 0 1
+/swap.img       none    swap    sw      0       0
+```
+
+- 设备名或UUID
+UUID 在用 mount 挂载后会生成，可以用 blkid 查看，该方式更好
+- 挂载点
+- 文件系统类型
+- 选项
+如 `ro` 只读
+- 转储频率
+默认 0 不备份，1 每天备份，2 隔一天备份
+- fsck 检查文件系统的顺序
+检查文件系统是否 clean，默认 0 不自检
+
 
 ### 让配置文件生效
 - mount -a 对配置文件中新增的行可以生效，但修改配置文件或删除不能生效
 - mount -o remount 挂载点名 可以让配置文件生效
 
 
+# swap 交换分区
+> [Chapter 15. Swap Sapce](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/storage_administration_guide/ch-swapspace)
+
+
+swap 空间过大会造成浪费，合适设置见官方说明
+
+```bash
+[root@ubuntu22-c0 ~]$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           1.9Gi       277Mi       1.3Gi       1.0Mi       296Mi       1.5Gi
+Swap:          2.0Gi          0B       2.0Gi
+```
+
+## swapon 启用 swap
+- swapon -a 启用 swap，/etc/fstab 中先有 swap 信息
+- swapon -s 查看 swap 信息
+```bash
+[root@ubuntu22-c0 ~]$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           1.9Gi       307Mi       1.3Gi       1.0Mi       318Mi       1.4Gi
+Swap:          5.0Gi          0B       5.0Gi
+[root@ubuntu22-c0 ~]$ swapon -s
+Filename                                Type            Size            Used            Priority
+/dev/sdb3                               partition       3145724         0               -2
+/swap.img                               file            2097148         0               -3
+```
+显示优先级，数值越高越先使用，如果有多个 swap 空间，可以设置优先级，如设置外圈磁道的 swap 优先级高
+
+## swapoff 禁用 swap 
+有些场景需要禁用 swap 分区，如 k8s
+
+1. /etc/fstab 中将 swap 挂载一行注释
+2. swapoff -a 禁用
+```bash
+[root@ubuntu22-c0 ~]$ swapoff -a
+[root@ubuntu22-c0 ~]$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           1.9Gi       273Mi       1.3Gi       1.0Mi       316Mi       1.5Gi
+Swap:             0B          0B          0B
+```
+
+
+## 利用物理分区创建 swap 分区
+1. 创建分区
+如用 gdisk 创建分区，注意修改文件系统的类型，默认为 8300，改为 8200，即分区类型为 linux swap
+```bash
+Command (? for help): n
+Partition number (3-128, default 3):
+First sector (34-41943006, default = 10487808) or {+-}size{KMGTP}:
+Last sector (10487808-41943006, default = 41943006) or {+-}size{KMGTP}: +3G
+Current type is 8300 (Linux filesystem)
+Hex code or GUID (L to show codes, Enter = 8300): L
+Type search string, or <Enter> to show all codes: swap
+8200 Linux swap                          a502 FreeBSD swap
+a582 Midnight BSD swap                   a901 NetBSD swap
+bf02 Solaris swap
+Hex code or GUID (L to show codes, Enter = 8300):
+```
+
+2. 创建文件系统
+利用 mkswap 将分区格式化为 swap 空间
+```bash
+[root@ubuntu22-c0 ~]$ whatis mkswap
+mkswap (8)           - set up a Linux swap area
+[root@ubuntu22-c0 ~]$ mkswap /dev/sdb3
+Setting up swapspace version 1, size = 3 GiB (3221221376 bytes)
+no label, UUID=71b70e05-4c74-4ad9-a8d1-9598c327b5b0
+```
+会生成一个 UUID
+
+3. 将 swap 分区添加到 /etc/fstab 文件中
+利用生成的 UUID 表示 swap 分区
+挂载点为 none
+```bash
+/dev/sdb3 none swap sw 0 0
+```
+
+保存后通过 `swapon -a` 让其生效
+```bash
+[root@ubuntu22-c0 ~]$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           1.9Gi       308Mi       1.3Gi       1.0Mi       317Mi       1.4Gi
+Swap:          3.0Gi          0B       3.0Gi
+```
+
+swapon -s 查看 swap 空间信息
+```bash
+[root@ubuntu22-c0 ~]$ swapon -s
+Filename                                Type            Size            Used            Priority
+/dev/sdb3                               partition       3145724         0               -2
+```
+
+## 利用文件创建 swap
+1. 利用 dd 创建一个大文件
+```bash
+[root@ubuntu22-c0 ~]$ dd if=/dev/zero of=/tmp/swapfile bs=1M count=2048
+2048+0 records in
+2048+0 records out
+2147483648 bytes (2.1 GB, 2.0 GiB) copied, 6.98492 s, 307 MB/s
+[root@ubuntu22-c0 ~]$ ll -h /tmp/swapfile
+-rw-r--r-- 1 root root 2.0G Aug 27 13:22 /tmp/swapfile
+```
+
+2. 利用 mkswap 将文件格式化为内存交换文件的文件格式
+```bash
+[root@ubuntu22-c0 ~]$ mkswap /tmp/swapfile
+mkswap: /tmp/swapfile: insecure permissions 0644, fix with: chmod 0600 /tmp/swapfile
+Setting up swapspace version 1, size = 2 GiB (2147479552 bytes)
+no label, UUID=27609b3e-6a7e-4ed6-bc6b-b99f7d8d322a
+[root@ubuntu22-c0 ~]$ blkid /tmp/swapfile
+/tmp/swapfile: UUID="27609b3e-6a7e-4ed6-bc6b-b99f7d8d322a" TYPE="swap"
+[root@ubuntu22-c0 ~]$ chmod 644 /tmp/swapfile
+```
+最好对 swap 文件权限修改
+
+
+3. 修改 /etc/fstab 
+用文件名而非 UUID 
+```bash
+ /tmp/swapfile none swap sw 0 0
+```
+
+3. swapon -a 启用 swap
+```bash
+[root@ubuntu22-c0 ~]$ swapon -a
+[root@ubuntu22-c0 ~]$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:           1.9Gi       277Mi        64Mi       1.0Mi       1.5Gi       1.4Gi
+Swap:          4.0Gi          0B       4.0Gi
+[root@ubuntu22-c0 ~]$ swapon -s
+Filename                                Type            Size            Used            Priority
+/swap.img                               file            2097148         0               -2
+/tmp/swapfile                           file            2097148         0               -3
+```
+
+## swap 使用策略
+> [Understanding vm.swappiness](https://linuxhint.com/understanding_vm_swappiness/)
+
+查看下面内核参数：
+```bash
+[root@ubuntu22-c0 shell_scripts]$ cat /proc/sys/vm/swappiness
+60
+```
+默认值为 60 表示空闲内存还有 60% 时就使用 swap 
+
+在 /etc/sysctl.conf 中修改内核参数：
+```bash
+[root@ubuntu22-c0 shell_scripts]$ sysctl -a | grep swappiness
+vm.swappiness = 60
+[root@ubuntu22-c0 shell_scripts]$ vim /etc/sysctl.conf
+[root@ubuntu22-c0 shell_scripts]$ tail -n2 /etc/sysctl.conf
+
+vm.swappiness = 10
+```
+sysctl -p 使其生效
+```bash
+[root@ubuntu22-c0 shell_scripts]$ sysctl -p
+vm.swappiness = 10
+```
+
+# 使用光盘
+- rocky 8.6
+
+```bash
+[root@mysql ~]$ lsblk -p
+NAME                    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+/dev/sda                  8:0    0  200G  0 disk
+├─/dev/sda1               8:1    0    1G  0 part /boot
+└─/dev/sda2               8:2    0  199G  0 part
+  ├─/dev/mapper/rl-root 253:0    0   70G  0 lvm  /
+  ├─/dev/mapper/rl-swap 253:1    0    2G  0 lvm  [SWAP]
+  └─/dev/mapper/rl-home 253:2    0  127G  0 lvm  /home
+/dev/sr0                 11:0    1 10.5G  0 rom
+[root@mysql ~]$ mount /dev/sr0 /mnt/
+mount: /mnt: WARNING: device write-protected, mounted read-only.
+[root@mysql ~]$ ls /mnt/
+AppStream  BaseOS  EFI  images  isolinux  LICENSE  media.repo  TRANS.TBL
+```
+- 上面的 /dev/sr0 为光盘，要使用必须挂载
+
+## mount 挂载
+```bash
+[root@mysql ~]$ mount /dev/sr0 /mnt/
+mount: /mnt: WARNING: device write-protected, mounted read-only.
+[root@mysql ~]$ ls /mnt/
+AppStream  BaseOS  EFI  images  isolinux  LICENSE  media.repo  TRANS.TBL
+```
+
+## autofs 自动挂载
+```bash
+[root@mysql ~]$ umount /dev/sr0
+[root@mysql ~]$ lsblk -p
+NAME                    MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+/dev/sda                  8:0    0  200G  0 disk
+├─/dev/sda1               8:1    0    1G  0 part /boot
+└─/dev/sda2               8:2    0  199G  0 part
+  ├─/dev/mapper/rl-root 253:0    0   70G  0 lvm  /
+  ├─/dev/mapper/rl-swap 253:1    0    2G  0 lvm  [SWAP]
+  └─/dev/mapper/rl-home 253:2    0  127G  0 lvm  /home
+/dev/sr0                 11:0    1 10.5G  0 rom
+[root@mysql ~]$ ls /mnt/
+```
+
+- 安装 autofs
+```bash
+[root@mysql ~]$ yum install -y autofs
+```
+```bash
+[root@mysql ~]$ systemctl enable --now autofs.service
+Created symlink /etc/systemd/system/multi-user.target.wants/autofs.service → /usr/lib/systemd/system/autofs.service.
+```
+
+访问 /misc/cd 即将光盘挂载在该目录下
+```bash
+[root@mysql ~]$ ls /misc/cd
+AppStream  BaseOS  EFI  images  isolinux  LICENSE  media.repo  TRANS.TBL
+```
+
+## eject 弹出光盘
+
+## wodim 刻录光盘
+
+## Rufus 将 IOS 制作为 U 盘工具
+
+
+# 使用 USB
+
+## lsusb 列出 USB 设备
+```bash
+[root@mysql ~]$ whatis lsusb
+lsusb (8)            - list USB devices
+[root@mysql ~]$ lsusb
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 002 Device 004: ID 0e0f:0008 VMware, Inc.
+Bus 002 Device 003: ID 0e0f:0002 VMware, Inc. Virtual USB Hub
+Bus 002 Device 002: ID 0e0f:0003 VMware, Inc. Virtual Mouse
+Bus 002 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+```
+
+# 文件工具 dd
+> [https://www.lanqiao.cn/courses/1/learning/?id=62&compatibility=true](https://www.lanqiao.cn/courses/1/learning/?id=62&compatibility=true)
+
+```bash
+[root@mysql ~]$ whatis dd
+dd (1)               - convert and copy a file
+dd (1p)              - convert and copy a file
+```
+
+## 生成任意大小的文件
+- 文件单位
+![](img/2023-03-19-16-21-58.png)
+![](img/2023-03-19-16-22-38.png)
+![](img/2023-03-19-16-21-08.png)
+
+
+```bash
+[root@ubuntu22 html]$ dd if=/dev/zero of=index.html bs=1M count=10
+10+0 records in
+10+0 records out
+10485760 bytes (10 MB, 10 MiB) copied, 0.0347324 s, 302 MB/s
+[root@ubuntu22 html]$ ll -h
+total 11M
+drwxr-xr-x  2 nginx nginx 4.0K May 18 18:30 ./
+drwxr-xr-x 12 nginx nginx 4.0K May 18 15:57 ../
+-rw-r--r--  1 nginx nginx  497 May 18 14:11 50x.html
+-rw-r--r--  1 nginx nginx  10M May 18 18:31 index.html
+```
+
+# 磁盘配额（Quota）
+> [第十五章、磁碟配额(Quota)与进阶文件系统管理](http://cn.linux.vbird.org/linux_basic/0420quota_1.php)
+
+- 限制用户的硬盘容量，妥善分配系统资源
+
+## 磁盘配额的使用场景
+- 网站服务器
+每个人的网页空间的容量限制
+- 邮件服务器
+每个人的邮件空间限制
+- 文件服务器
+每个人最大可用的网络硬盘空间
+- 限制某个用户组所能使用的最大磁盘配额
+- 限制某个用户的最大磁盘配额
+- 限制某个目录的最大磁盘配额
+
+## 磁盘配额的使用限制
+- ext 文件系统仅能针对整个文件系统做限制，不能针对某个目录做磁盘配额
+- 内核必须支持磁盘配额
+- 只对一般身份用户有效
+- 若启动 SELinux，并非所有目录均可设置磁盘配额
+
+## 磁盘配额的规范设置选项
+- 分别针对用户、用户组或个别目录
+- 容量限制或文件数量限制
+- inode 数量限制
+- block 使用量限制
+- 软限制和硬限制
+	- hard
+	绝对不能超过该限制
+	- soft
+	超过该软限制但低于硬限制，会发出警告，给予一个宽限时间
+	- grace time
+    宽限时间
+
+
+# 磁盘阵列 RAID
+- Redundant arrays of inexpensive disks
+- 通过软件或硬件技术将多个较小的磁盘整合为一个较大的磁盘设备
+- 提升存储和数据保护功能
+
+## RAID 优点
+- 数据安全与可靠性，当有磁盘损坏时，数据还能安全的恢复和使用
+- 读写性能，RAID 0 可以加强读写性能
+- 多块磁盘组合起来增加容量
+
+并非每种模式的 RAID 都有上面全部优点
+
+## RAID 级别
+> [RAID](https://www.prepressure.com/library/technology/raid)
+
+- RAID 5
+有一个磁盘损坏时，能利用校验位恢复算坏的数据，只能容忍一个磁盘损坏
+ 
+
+## 硬件 RAID 和软件 RAID
+- 硬件磁盘阵列在 linux 中看起来是一个大磁盘，设备文件名为 /dev/sd[a-p]
+- 软件磁盘阵列是系统模拟的，设备文件名是系统的设备文件，/dev/md0，/dev/md1 等
+
+## mdadm 实现软件磁盘阵列
+
+
 # 逻辑卷轴管理器 LVM
-## 什么时 LVM
+- Logical Volume Manager 
+- 传统的分区方式一旦完成分区后不能扩缩容，LVM 正是解决这个问题
+LVM 可以灵活地调整文件系统的容量
+- LVM 可以整合多个物理分区，让这些分区看起来就像一个磁盘一样
+后期能灵活的新增或删除分区
+- LVM 将几个物理分区通过软件组合成为一个看起来独立的大磁盘（VG），然后再在该磁盘上划分分区（LV）
+- LVM 的最小存储单位是 PE
 
 
-## 为什么需要逻辑卷
+## 逻辑卷和传统分区方式比较
+> [Difference between LVM and non LVM Volumes](https://kb.biznetgio.com/en_US/perbedaan-volume-lvm-dan-non-lvm-)
 
-## 逻辑卷使用和物理卷区别
+逻辑卷（Logical Volume）是一种在Linux系统中提供更灵活、可调整大小的存储管理方式。相比传统的分区，逻辑卷具有以下优势：
 
-## 能否将全部分区都用逻辑卷
+1. 弹性大小调整：逻辑卷允许在运行时对存储空间进行调整，包括扩展或缩小卷的大小。这使得对存储资源的管理更加灵活，可以根据需要进行动态调整，而无需重新分区或重新格式化磁盘。
+
+2. 简化管理：逻辑卷管理器（LVM）提供了一组命令和工具，简化了对逻辑卷和卷组的创建、删除、调整和监控。它允许管理员使用逻辑卷的抽象层来管理存储，而不需要直接操作磁盘分区。
+
+3. 跨磁盘容量扩展：通过使用逻辑卷，可以将多个物理磁盘组成一个卷组，并将其扩展到跨越多个磁盘的逻辑卷上。这提供了非常灵活的存储解决方案，可以根据需要增加存储容量而无需关注磁盘边界。
+
+尽管逻辑卷提供了很多优势，但并不是所有情况下都适合使用逻辑卷取代传统的分区。以下是一些考虑因素：
+
+1. 简单性：逻辑卷相对于传统分区来说，增加了一些复杂性和学习曲线。对于一些简单的系统或使用场景，传统分区可能更加直观和易于管理。
+
+2. 兼容性：某些软件或操作系统可能对逻辑卷的支持有限。如果涉及到与其他系统或软件的兼容性问题，可能需要谨慎考虑是否使用逻辑卷。
+
+3. 性能：逻辑卷可能会在一定程度上影响系统的性能。逻辑卷管理需要一些计算资源和额外的I/O操作。在某些高性能要求的场景下，可能需要权衡性能和灵活性之间的取舍。
 
 
-## 逻辑卷的性能
+LVM适用于需要灵活管理和扩展存储空间的场景，同时具备高级的快照和备份功能。传统分区方式适用于简单的磁盘管理需求和对性能要求较高的应用程序。
 
 
-## 物理卷
+## 物理卷 (Physical Volume, PV)
+- PV 是 LVM 最底层的物理卷
+- 实际的磁盘在想作为逻辑卷使用则需要在分区时选择类型为 Linux LVM (8e00, 对于 gdisk 进行分区)
+```bash
+Partition number (1-128, default 1):
+First sector (34-41943006, default = 2048) or {+-}size{KMGTP}:
+Last sector (2048-41943006, default = 41943006) or {+-}size{KMGTP}: +10G
+Current type is 8300 (Linux filesystem)
+Hex code or GUID (L to show codes, Enter = 8300): L
+Type search string, or <Enter> to show all codes: lvm
+8e00 Linux LVM
+Hex code or GUID (L to show codes, Enter = 8300): 8e00
+Changed type of partition to 'Linux LVM'
+```
+```bash
+[root@ubuntu22-c0 ~]$ lsblk -p
+NAME                                  MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+/dev/sda                                8:0    0  200G  0 disk
+├─/dev/sda1                             8:1    0    1M  0 part
+├─/dev/sda2                             8:2    0    2G  0 part /boot
+└─/dev/sda3                             8:3    0  198G  0 part
+  └─/dev/mapper/ubuntu--vg-ubuntu--lv 253:0    0   99G  0 lvm  /
+/dev/sdb                                8:16   0   20G  0 disk
+├─/dev/sdb1                             8:17   0   10G  0 part
+└─/dev/sdb2                             8:18   0    3G  0 part
+/dev/sr0                               11:0    1 1024M  0 rom
+```
+
+### pvcreate 创建物理卷 PV
+按照传统方式创建分区后，再利用 pvcreate 命令将分区转化为 PV
+将物理分区变成 PV，可以是同一磁盘的不同分区，或者不同磁盘的分区组合
+```bash
+[root@ubuntu22-c0 ~]$ pvcreate /dev/sdb1 /dev/sdb2
+WARNING: ext4 signature detected on /dev/sdb1 at offset 1080. Wipe it? [y/n]: y
+  Wiping ext4 signature on /dev/sdb1.
+  Physical volume "/dev/sdb1" successfully created.
+  Physical volume "/dev/sdb2" successfully created.
+``` 
+```bash
+[root@ubuntu22-c0 ~]$ lsblk -fp -o name,fstype,fsver
+NAME                                  FSTYPE      FSVER
+/dev/sda
+├─/dev/sda1
+├─/dev/sda2                           ext4        1.0
+└─/dev/sda3                           LVM2_member LVM2 001
+  └─/dev/mapper/ubuntu--vg-ubuntu--lv ext4        1.0
+/dev/sdb
+├─/dev/sdb1                           LVM2_member LVM2 001
+└─/dev/sdb2                           LVM2_member LVM2 001
+/dev/sr0
+```
+
+
 ### 查看物理卷的信息
 #### pvs
-
+```bash
+[root@ubuntu22-c0 ~]$ pvs
+  PV         VG        Fmt  Attr PSize    PFree
+  /dev/sda3  ubuntu-vg lvm2 a--  <198.00g 99.00g
+  /dev/sdb1            lvm2 ---    10.00g 10.00g
+  /dev/sdb2            lvm2 ---     3.00g  3.00g
+[root@ubuntu22-c0 ~]$ whatis pvs
+pvs (8)              - Display information about physical volumes
+```
 
 #### pvdisplay 
 - 更详细
 
+```bash
+[root@ubuntu22-c0 ~]$ whatis pvdisplay
+pvdisplay (8)        - Display various attributes of physical volume(s)
+[root@ubuntu22-c0 ~]$ pvdisplay /dev/sdb1
+  "/dev/sdb1" is a new physical volume of "10.00 GiB"
+  --- NEW Physical volume ---
+  PV Name               /dev/sdb1
+  VG Name
+  PV Size               10.00 GiB
+  Allocatable           NO
+  PE Size               0
+  Total PE              0
+  Free PE               0
+  Allocated PE          0
+  PV UUID               jc0ecn-EoYh-xvU4-uKBJ-cgyd-np7v-gNITVd
+```
 
-## PE
+### pvremove 删除 PV
 
-## VG 卷组
+## 卷组（Volume Group, VG）
 - volumn group
+- LVM 将多个 PV 整合成一个大磁盘，即 VG
 
+### vgcreate 创建卷组 VG
+```bash
+[root@ubuntu22-c0 ~]$ lsblk
+NAME                      MAJ:MIN RM  SIZE RO TYPE MOUNTPOINTS
+sda                         8:0    0  200G  0 disk
+├─sda1                      8:1    0    1M  0 part
+├─sda2                      8:2    0    2G  0 part /boot
+└─sda3                      8:3    0  198G  0 part
+  └─ubuntu--vg-ubuntu--lv 253:0    0   99G  0 lvm  /
+sdb                         8:16   0   20G  0 disk
+├─sdb1                      8:17   0   10G  0 part
+└─sdb2                      8:18   0    3G  0 part
+sr0                        11:0    1 1024M  0 rom
+[root@ubuntu22-c0 ~]$ vgcreate -s 4M testvg /dev/sdb1 /dev/sdb2
+  Volume group "testvg" successfully created
+```
+
+- `-s` 指定 PE 大小
 
 ### 查看卷组信息
 #### vgs 
+```bash
+[root@ubuntu22-c0 ~]$ vgs
+  VG        #PV #LV #SN Attr   VSize    VFree
+  testvg      2   0   0 wz--n-   12.99g 12.99g
+  ubuntu-vg   1   1   0 wz--n- <198.00g 99.00g
+```
 
 #### vgdisplay
+```bash
+[root@ubuntu22-c0 ~]$ vgdisplay testvg
+  --- Volume group ---
+  VG Name               testvg
+  System ID
+  Format                lvm2
+  Metadata Areas        2
+  Metadata Sequence No  1
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                0
+  Open LV               0
+  Max PV                0
+  Cur PV                2
+  Act PV                2
+  VG Size               12.99 GiB
+  PE Size               4.00 MiB
+  Total PE              3326
+  Alloc PE / Size       0 / 0
+  Free  PE / Size       3326 / 12.99 GiB
+  VG UUID               dDsdtF-LEL2-F2Vk-KVwE-ho6Q-A5zd-j3b7K5
+```
+
+## vgremove 删除 VG
+```bash
+[root@ubuntu22-c0 ~]$ vgremove testvg
+  Volume group "testvg" successfully removed
+```
+
+## vgextend 扩展 VG
+- 在 VG 中增加额外的 PV
+
+```bash
+[root@ubuntu22-c0 ~]$ vgextend testvg /dev/sdb3
+  Volume group "testvg" successfully extended
+```
+
+## vgreduce 从 VG 中删除 PV 
+```bash
+[root@ubuntu22-c0 ~]$ vgreduce testvg /dev/sdb2
+  Removed "/dev/sdb2" from volume group "testvg"
+[root@ubuntu22-c0 ~]$ vgdisplay testvg
+  --- Volume group ---
+  VG Name               testvg
+  System ID
+  Format                lvm2
+  Metadata Areas        2
+  Metadata Sequence No  3
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                0
+  Open LV               0
+  Max PV                0
+  Cur PV                2
+  Act PV                2
+  VG Size               11.99 GiB
+  PE Size               4.00 MiB
+  Total PE              3070
+  Alloc PE / Size       0 / 0
+  Free  PE / Size       3070 / 11.99 GiB
+  VG UUID               dDsdtF-LEL2-F2Vk-KVwE-ho6Q-A5zd-j3b7K5
+```
 
 
-## LV 逻辑卷
-- logical volumn
+## 物理扩展块（Physical Extent, PE）
+- PE 是 LVM 最小的存储单位，类似文件系统中的 block 
+- LVM 默认使用 4MB 的PE数据块，调整 PE 会影响 LVM 的最大容量
 
+
+
+## 逻辑卷（Logical Volume, LV）
+- VG 被切割成 LV，LV 就是最后被格式化的类似传统分区的部分
+- LV 是 PE 的整数倍 
+
+需要安装 lvm2 软件包
+- rocky : yum -y install lvm2
+- ubuntu: apt -y install lvm2
 ### lvcreate 创建逻辑卷
-- 创建完的逻辑卷是软连接
-![](img/2023-04-01-20-18-26.png)
+```bash
+[root@ubuntu22-c0 ~]$ lvcreate -n lv_01 -L 2G testvg
+  Logical volume "lv_01" created.
+```
+
+- `-n` 指定逻辑卷名字
+- `-L` 指定逻辑卷的大小
+	- 可以直接指定 size，如 `6G`
+	- 指定的大小不能超过卷组的大小
+- `testvg` 为卷组名字
 
 
+- 指定逻辑卷大小时也可以用 `-l` 指定逻辑卷的大小
+指定 PE 的个数，本例中，PE 大小为 4M，创建 lv 为 100 个 PE 大小，即 400M
+```bash
+[root@ubuntu22-c0 ~]$ lvcreate -n lv_02 -l 100 testvg
+  Logical volume "lv_02" created.
+[root@ubuntu22-c0 ~]$ lvscan
+  ACTIVE            '/dev/testvg/lv_01' [2.00 GiB] inherit
+  ACTIVE            '/dev/testvg/lv_02' [400.00 MiB] inherit
+  ACTIVE            '/dev/ubuntu-vg/ubuntu-lv' [<99.00 GiB] inherit
+```
 
 ### 查看逻辑卷的信息
+#### lvscan
+```bash
+[root@ubuntu22-c0 ~]$ lvscan
+  ACTIVE            '/dev/testvg/lv_01' [2.00 GiB] inherit
+  ACTIVE            '/dev/ubuntu-vg/ubuntu-lv' [<99.00 GiB] inherit
+```
+
+显示的逻辑卷名字为软链接
+```bash
+[root@ubuntu22-c0 ~]$ ll /dev/testvg/lv_01
+lrwxrwxrwx 1 root root 7 Aug 27 21:11 /dev/testvg/lv_01 -> ../dm-1
+```
+
 #### lvs
-
+```bash
+[root@ubuntu22-c0 ~]$ lvs
+  LV        VG        Attr       LSize   Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  lv_01     testvg    -wi-a-----   2.00g
+  ubuntu-lv ubuntu-vg -wi-ao---- <99.00g
+```
 ### lvdisplay
-
 ![](img/2023-04-01-20-20-51.png)
+
+
+### lvextend 扩展逻辑卷
+- 先确定卷组还有空间
+- 先查看卷组是否还有空间进行扩展，用 `vgs` 查看 `VFree` 选项的值即为剩余的空间
+- 用 `lvextend` 命令扩展，`-L` 选项指定大小，如 `lvextend -L +4G` 在原来的基础上增加 `4G`，必须卷组有 `4G` 的空间
+```bash
+[root@ubuntu22-c0 ~]$ vgdisplay testvg
+```
+
+- lvextend -L [+]N[mMgGtT] /dev/VG_NAME/LV_NAME
+```bash
+[root@ubuntu22-c0 ~]$ lvextend -L +1G /dev/testvg/lv_01
+  Size of logical volume testvg/lv_01 changed from 1.00 GiB (256 extents) to 2.00 GiB (512 extents).
+  Logical volume testvg/lv_01 successfully resized.
+[root@ubuntu22-c0 ~]$ lvscan
+  ACTIVE            '/dev/testvg/lv_01' [2.00 GiB] inherit
+  ACTIVE            '/dev/ubuntu-vg/ubuntu-lv' [<99.00 GiB] inherit
+```
+- 如果逻辑卷已经格式化，扩展逻辑卷后还需要扩展文件系统
+	- ext 系列文件系统扩展
+	resize2fs /dev/VG_NAME/LV_NAME
+	```bash
+	[root@ubuntu22-c0 ~]$ whatis resize2fs
+	resize2fs (8)        - ext2/ext3/ext4 file system resizer
+	```
+	- xfs 文件系统扩展
+	xfs_grows MOUNTPOINT
+	```bash
+	[root@ubuntu22-c0 ~]$ whatis xfs_growfs
+	xfs_growfs (8)       - expand an XFS filesystem
+	```
+	- 通用方法，扩展容量同时扩展文件系统
+
+
+### lvreduce 缩减逻辑卷
+```bash
+[root@ubuntu22-c0 ~]$ lvreduce -L 1G /dev/testvg/lv_01
+  WARNING: Reducing active logical volume to 1.00 GiB.
+  THIS MAY DESTROY YOUR DATA (filesystem etc.)
+Do you really want to reduce testvg/lv_01? [y/n]: y
+  Size of logical volume testvg/lv_01 changed from 2.00 GiB (512 extents) to 1.00 GiB (256 extents).
+  Logical volume testvg/lv_01 successfully resized.
+[root@ubuntu22-c0 ~]$ lvscan
+  ACTIVE            '/dev/testvg/lv_01' [1.00 GiB] inherit
+  ACTIVE            '/dev/testvg/lv_02' [400.00 MiB] inherit
+  ACTIVE            '/dev/ubuntu-vg/ubuntu-lv' [<99.00 GiB] inherit
+```
+
+- 如果已经格式化缩减先备份数据，取消挂载，再缩减
+
+### lvresize 调整 LV 容量
+- 加上 -r 选项可以调整 lv 大小同时调整对应的文件系统
+```bash
+[root@ubuntu22-c0 ~]$ lvresize -r -L 2G /dev/testvg/lv_01
+  Size of logical volume testvg/lv_01 changed from 1.00 GiB (256 extents) to 2.00 GiB (512 extents).
+  Logical volume testvg/lv_01 successfully resized.
+resize2fs 1.46.5 (30-Dec-2021)
+Filesystem at /dev/mapper/testvg-lv_01 is mounted on /tmp/lv_01; on-line resizing required
+old_desc_blocks = 1, new_desc_blocks = 1
+The filesystem on /dev/mapper/testvg-lv_01 is now 524288 (4k) blocks long.
+[root@ubuntu22-c0 ~]$ lsblk -fp -o name,fsavail,mountpoint
+NAME                                  FSAVAIL MOUNTPOINT
+/dev/sda
+├─/dev/sda1
+├─/dev/sda2                              1.5G /boot
+└─/dev/sda3
+  └─/dev/mapper/ubuntu--vg-ubuntu--lv   84.1G /
+/dev/sdb
+├─/dev/sdb1
+│ └─/dev/mapper/testvg-lv_01             1.8G /tmp/lv_01
+├─/dev/sdb2
+└─/dev/sdb3
+/dev/sr0
+```
+
+- 可以扩容和缩容
+下面从 2G 缩减到 1G
+没数据时操作，有数据不能直接这样缩减
+```bash
+[root@ubuntu22-c0 ~]$ lvresize -r -L 1G /dev/testvg/lv_01
+Do you want to unmount "/tmp/lv_01" ? [Y|n] y
+fsck from util-linux 2.37.2
+/dev/mapper/testvg-lv_01: 11/131072 files (0.0% non-contiguous), 26156/524288 blocks
+resize2fs 1.46.5 (30-Dec-2021)
+Resizing the filesystem on /dev/mapper/testvg-lv_01 to 262144 (4k) blocks.
+The filesystem on /dev/mapper/testvg-lv_01 is now 262144 (4k) blocks long.
+
+  Size of logical volume testvg/lv_01 changed from 2.00 GiB (512 extents) to 1.00 GiB (256 extents).
+  Logical volume testvg/lv_01 successfully resized.
+[root@ubuntu22-c0 ~]$
+[root@ubuntu22-c0 ~]$ lsblk -fp -o name,fsavail,mountpoint
+NAME                                  FSAVAIL MOUNTPOINT
+/dev/sda
+├─/dev/sda1
+├─/dev/sda2                              1.5G /boot
+└─/dev/sda3
+  └─/dev/mapper/ubuntu--vg-ubuntu--lv   84.1G /
+/dev/sdb
+├─/dev/sdb1
+│ └─/dev/mapper/testvg-lv_01           876.8M /tmp/lv_01
+├─/dev/sdb2
+└─/dev/sdb3
+/dev/sr0
+```
+
+### lvremove 删除 LV
+```bash
+[root@ubuntu22-c0 ~]$ lvremove /dev/testvg/lv_02
+Do you really want to remove and DISCARD active logical volume testvg/lv_02? [y/n]: y
+  Logical volume "lv_02" successfully removed
+[root@ubuntu22-c0 ~]$ lvscan
+  ACTIVE            '/dev/testvg/lv_01' [1.00 GiB] inherit
+  ACTIVE            '/dev/ubuntu-vg/ubuntu-lv' [<99.00 GiB] inherit
+```
 
 
 
 ## 创建逻辑卷的过程
-### 创建分区
+- 创建分区
+修改分区的类型为 Linux LVM
 
-### 修改分区的类型为 LVM
-	- MBR 类型
-	- GPT 类型
+- 创建 PV
+- 创建 VG
+- 创建 LV
+- 为逻辑卷创建文件系统
+逻辑卷的路径可通过 lvscan 或 lvdisplay 查看
+```bash
+[root@ubuntu22-c0 ~]$ mkfs.ext4 /dev/testvg/lv_01
+mke2fs 1.46.5 (30-Dec-2021)
+Creating filesystem with 524288 4k blocks and 131072 inodes
+Filesystem UUID: a6988753-019d-4f76-a280-29225fd3d7cc
+Superblock backups stored on blocks:
+        32768, 98304, 163840, 229376, 294912
 
-### 安装 lvm2 软件包
-	- rocky : yum -y install lvm2
-	- ubuntu: apt -y install lvm2
-
-### pvcreate 创建物理卷
-- 如 `pvcreate /dev/sdb{1..3}
-- 
-
-
-### vgcreate 创建卷组
-- 如 `vgcreate vg_demo /dev/sdb{1..3}`
-- 可以指定 PE 大小，加上 `-s` 选项，不指定则使用默认值
-
-
-### lvcreate 创建逻辑卷
-- `lvcreate  `
-
-![](img/2023-04-02-09-43-42.png)
-#### -n 指定逻辑卷名字
-
-#### -L 指定逻辑卷的大小
-- 可以直接指定 size，如 `6G`
-- 如果指定的大小不是 PE 的整数倍怎么处理？
-- 指定的大小不能超过卷组的大小
-
-#### -l 指定逻辑卷的大小
-- 指定 PE 的个数
-
-#### 指明逻辑卷的卷组
-- 一个逻辑卷能否能否从多个卷组组合？
-- 能否不指明卷组
+Allocating group tables: done
+Writing inode tables: done
+Creating journal (16384 blocks): done
+Writing superblocks and filesystem accounting information: done
+```
+- 挂载
+利用 UUID，挂载点的目录先创建
+```bash
+UUID=a6988753-019d-4f76-a280-29225fd3d7cc /tmp/lv_01 ext4 defaults 0 0
+```
+mount -a 使设置生效
+lsblk -pf 或 df 查看挂载情况
 
 
-### 为逻辑卷创建文件系统
-- 如 `mkfs.xfs /dev/vg_demo/lv1`
+## 删除逻辑卷过程
+- 卸载逻辑卷的文件系统
+- lvremove 删除 LV
+- vgchange -a n VGname 让卷组不具有 Active 标识
+- vgremove 删除 VG
+- pvremove 删除 PV
+- fdisk 或 gdisk 修改分区类型
 
-![](img/2023-04-01-20-27-21.png)
+## 逻辑卷快照
+快照即将当时的系统信息记录下来，如果未来数据有修改，则原始数据移到快照区，
+未修改的区域则由快照区和文件系统共享
 
+- 初始快照区和系统区一样，共享所有 PE
+- 快照也是逻辑卷
+用 lvcreate 创建逻辑卷时加上 `-s` 表示创建的为快照（snapshot）
+创建逻辑卷后同样挂载到一个目录
+- 快照区与被快照的 LV 必须在同一 VG 上
+- 如果要利用快照来恢复数据，则要恢复的数据量不能超过快照区所能负载的容量
 
-### 挂载
-- 创建一个空目录如 `/log` 作为挂载点，如果该目录已存在，则换一个名字
-- 用 `lsblk -f` 或者 `blkid` 查看逻辑卷的 UUID
-- 修改 `/etc/fstab` 配置文件，注意挂载点必须存在，且最好是空目录，否则原来目录的内容会被覆盖
-![](img/2023-04-01-20-48-47.png)
-- 让配置文件生效 
-	- `mount -a`，该命令对配置文件中新增或删除的项有效
-	- 如果修改配置项后需要生效，用 `mount -o remount mountpoint` 
-- 用 `lsblk` 可以查看逻辑卷有了挂载点的信息
-![](img/2023-04-02-10-05-27.png)
-
-
-
-## lvextend 扩展逻辑卷
-- 在卷组的多余空间中扩容
-- 先查看卷组是否还有空间进行扩展，用 `vgs` 查看 `VFree` 选项的值即为剩余的空间
-- 用 `lvextend` 命令扩展，`-L` 选项指定大小，如 `lvextend -L +4G` 在原来的基础上增加 `4G`，必须卷组有 `4G` 的空间
-![](img/2023-04-02-10-22-10.png)
-
-### 扩展条件
-- 已经有文件系统，已经有数据，能否扩容
-- 先看卷组是否还有空间
-![](img/2023-04-01-21-00-02.png)
-
-
-### -L 指定大小
-- 如 `lvextend -L +4G` 原来的基础上增加 `4G`，必须卷组有 `4G` 的空间
-![](img/2023-04-01-21-06-39.png)
-
-
-
-### -l 指定 PE 个数
-
-### -r 自动重置文件系统大小
-
-
+利用快照恢复过程：
+- 取消挂载数据逻辑卷和快照
+- lvconvert --merge LV_SNAPSHOT 恢复快照
+- 重新挂载
