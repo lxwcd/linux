@@ -1,6 +1,4 @@
-﻿# 操作系统
-> 计算机的心智操作系统之哲学原理 1.3
-
+﻿
 - 操作系统是一个软件系统
 - 替用户及其应用管理计算机上的软硬件资源
 - 保证对计算机资源的公平竞争和使用
@@ -1295,9 +1293,6 @@ echo "Time difference: $days days, $hours hours, $minutes minutes, $seconds seco
 
 - 在 `~/.bashrc` 中加上 `set -o vi` 后，用 `source ~/.bashrc` 使配置生效
 
-
-# hexdump 查看二进制文件
-> [Linux命令学习总结：hexdump](https://www.cnblogs.com/kerrycode/p/5077687.html)
 
 # dos2unix windows格式文件转换为Linux 格式文件
 > [Linux命令 dos2unix - 将DOS格式文本文件转换成Unix格式](https://www.w3cschool.cn/linuxc/linuxc-gvjq3lbf.html)
@@ -3295,6 +3290,23 @@ a b c $
 > [文件与目录的检视： ls](http://cn.linux.vbird.org/linux_basic/0220filemanager_2.php#ls)
 
 
+## ls -t 按照修改时间排序
+默认按照文件名排序
+
+```bash
+[root@ubuntu22-c0 shell_scripts]$ ll
+total 48
+drwxr-xr-x 3 root root  4096 Aug 23 19:19 ./
+drwx------ 7 root root  4096 Aug 23 19:16 ../
+drwxr-xr-x 4 root root  4096 Aug 23 10:28 1/
+-rw-r--r-- 1 root root     0 Aug 23 19:19 a
+-rw-r--r-- 1 root root     0 Aug 23 19:19 A
+-rw-r--r-- 1 root root     0 Aug 23 19:19 b
+-rw-r--r-- 1 root root     0 Aug 23 19:19 B
+-rw-r--r-- 1 root root   375 Aug 19 16:08 cal
+```
+
+`ls -t` 按照修改时间排序，最新的时间最先显示
 ## ls -l 查看文件属性 
 显示的时间为修改时间（modification time）mtime。
 
@@ -3895,9 +3907,10 @@ reverse lines charaterwise
 > [非纯文字档： od](http://cn.linux.vbird.org/linux_basic/0220filemanager_3.php#od)
 > [Linux od命令](https://www.runoob.com/linux/linux-comm-od.html)
 
-### hexdump
+### hexdump 查看二进制文件
 > [Linux命令学习总结：hexdump](https://www.cnblogs.com/kerrycode/p/5077687.html)
 
+### jq 查看 json 格式文件
 
 # inode
 > [理解inode](http://www.ruanyifeng.com/blog/2011/12/inode.html)
@@ -4133,8 +4146,8 @@ reverse lines charaterwise
 ## 将标准输入内容保存到文件
 利用 here document 在终端输入多行内容并保存到文件
 ```bash
-➜  test ls
-➜  test tee 1.txt <<EOF
+➜  ls
+➜  tee 1.txt <<EOF
 heredoc> a
 heredoc> b
 heredoc> c
@@ -4142,11 +4155,11 @@ heredoc> EOF
 a
 b
 c
-➜  test cat 1.txt
+➜  cat 1.txt
 a
 b
 c
-➜  test cat /etc/issue
+➜  cat /etc/issue
 Ubuntu 20.04.5 LTS \n \l
 ```
 
@@ -4159,7 +4172,6 @@ Ubuntu 20.04.5 LTS \n \l
 后面的 `> /dev/null` 将标准输出的内容不显示，因为 `tee` 命令会将当前 vim buffer 的内容显示到标准输出
 
 `%` 表示当前的文档名
-
 
 
 # getent 命令
@@ -4767,13 +4779,6 @@ dir1-3
 
 - `cmp` 可查看二进制文件的差异
 
-# tree
-
-```bash
-
-```
-
-
 # seq
 
 ![1](https://img-blog.csdnimg.cn/a4ca5c30e1934af5bb82290a9ff23add.png)
@@ -4837,8 +4842,6 @@ dir1-3
 > [Linux命令学习总结：hexdump](https://www.cnblogs.com/kerrycode/p/5077687.html)
 
 
-
-
 ## windows格式文件转换为 Unix 格式文件
 ### vim 中转换
 - `:set ff=dos` 转换为 Windows 格式
@@ -4854,8 +4857,6 @@ dir1-3
 ## cat -A 显示出制表符、结束符等非打印字符
 ![1](https://img-blog.csdnimg.cn/9087369b700547318d3f23431b3412ef.png)
 
-<br/>
-
 - `cat -v` 
 Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 ![](img/2023-03-17-09-58-44.png)
@@ -4868,11 +4869,8 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 ![1](https://img-blog.csdnimg.cn/4a66d80b7db847a295f69a4c46dd005e.png)
 ![2](https://img-blog.csdnimg.cn/ab4cc700bebd4648a896364af42241dd.png)
 
-<br/>
-
 - 能方便识别空格和制表符
 - 能识别出行结尾位置
-
 
 # grep 
 > [20 grep command examples in Linux](https://www.golinuxcloud.com/grep-command-in-linux/)
@@ -5053,9 +5051,6 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 - 接着开始重复的处理下面一行内容。
 
 
-
-
-
 ## sed 使用的正则表达式语法
 > [Regular Expressions: selecting text](https://www.gnu.org/software/sed/manual/sed.html#sed-regular-expressions)
 
@@ -5065,7 +5060,6 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 
 ### 基本正则表达式
 > [5.3 Overview of basic regular expression syntax](https://www.gnu.org/software/sed/manual/sed.html#BRE-syntax)
-
 
 #### `.` 
 - Matched any character, including newline.
@@ -5100,16 +5094,13 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 - `\t` 不能匹配制表符，只匹配 `t`
 ![](img/2023-04-01-09-34-04.png)
 - `\$` 匹配一个 `$` 符号
-- ``\\$` 匹配以 `\` 结尾的字符串
+- `\\$` 匹配以 `\` 结尾的字符串
 
 #### `[a-zA-Z0-9]` 匹配字母和数字
 - 数字和字母
 
-
-
 ### 扩展正则表达式
 > [5.4 Overview of extended regular expression syntax](https://www.gnu.org/software/sed/manual/sed.html#ERE-syntax)
-
 
 #### 特殊字符匹配本身需要转义
 - ?
@@ -5268,6 +5259,11 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 > [4 Addresses:selecting lines](https://www.gnu.org/software/sed/manual/sed.html#sed-addresses)
 
 
+- `$` 表示最后一行
+- `1,3` 表示第 1 行到第 3 行
+- `1,+2` 表示第 1 行到第 1 行再加 2 行的位置
+- `1,/pattern/` 起始为第 1 行，结束根据模式匹配到的行
+
 ##### 指定特定一行
 - 直接输入行号
 - `$` 表示最后一行
@@ -5298,128 +5294,115 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 ![](img/2023-04-01-11-19-37.png)
 
 
-### sed 命令
+#### 命令
 > [sed commands summary](https://www.gnu.org/software/sed/manual/sed.html#sed-scripts)
 
 
-#### p 打印模式空间的内容
+##### p 打印模式空间的内容
 - 默认区分大小写
 - `IP` 忽略大小写
 ![](img/2023-04-01-12-16-00.png)
 
 
-#### P 打印模式空间的内容直到第一个换行符
+##### P 打印模式空间的内容直到第一个换行符
 - Print the pattern space, up to the first <newline>.
 
-#### a\ 在行后添加内容
+##### a\ 在行后添加内容
 - 用 `a\` 后面写要添加的内容
 ![](img/2023-04-01-11-49-32.png)  
 - 可以用 `\n` 添加多行
 ![](img/2023-04-01-11-50-48.png)
 
-#### d 删除内容
+##### d 删除内容
 - 直到范围后删除匹配的行
 ![](img/2023-04-01-11-51-43.png)
 
-#### c\ 替换行
+##### c\ 替换行
 - change lines with text
 - 在 `\c` 后写入替换的文本，可以用 `\n` 换行
 ![](img/2023-04-01-11-53-30.png)
 
-#### e command 执行命令替换输出内容
+##### e command 执行命令替换输出内容
 - Executes command and sends its output to the output stream. The command can run across multiple lines, all but the last ending with a back-slash.
-![](img/2023-04-01-11-57-55.png)
 
+```bash
+[root@ubuntu22-c0 shell_scripts]$ seq 5 | sed -n '1,3e echo "hello"'
+hello
+hello
+hello
+[root@ubuntu22-c0 shell_scripts]$ seq 5 | sed  '1,3e echo "hello"'
+hello
+1
+hello
+2
+hello
+3
+4
+5
+```
 
-#### i\ text 在行前插入内容
+##### i\ text 在行前插入内容
 ![](img/2023-04-01-11-59-50.png)
 
-#### r filename 读取文件内容到匹配的行后
+##### r filename 读取文件内容到匹配的行后
 ![](img/2023-04-01-12-20-14.png)
 
-#### w filename 保存模式空间的内容到指定文件
+##### w filename 保存模式空间的内容到指定文件
 ![](img/2023-04-01-12-23-58.png)
 
-#### = 为输出的内容打印行号
+##### = 为输出的内容打印行号
 - 行号后带换行符，即行号单独占一行，在实际行的上面
 - 空行也有行号
 ![](img/2023-04-01-12-26-33.png)
 
-#### { cmd ; cmd ... } 组合多个命令
-![](img/2023-04-01-12-59-15.png)
-
-
-#### q[exit-code] 退出
+##### q[exit-code] 退出
 - 下面的例子不执行后面的 `5d`，但输出不是 `2 4 5 6` 而是 `2`
 ![](img/2023-04-01-13-03-25.png)
 
-#### s/regexp/replacement/[flags] 查找替换
+##### s/regexp/replacement/[flags] 查找替换
 > [The s Command](https://www.gnu.org/software/sed/manual/sed.html#The-_0022s_0022-Command)
 
+- 不改变源文件的内容，仅将修改输出显示
+- 类似 vim 中的查找替换
+- 不加标志则，默认只替换一行中的第一个符合的字符
+- 标志位类似 vim 中替换的标志位，但不是全都支持
+- 分隔符 `/` 可以换成其他符号，如 `#` 或 `@` 等，当搜索的内容有 `/` 符号时，可以换成其他分隔符
+- 和其他命令一样，前面可以指明地址范围
 
-- 和 vim 中使用语法类似
-
-##### flags
+###### flags
 - g
+将**一行**中全部符合条件的均替换，而不是只替换第一个符合之处
 ![](img/2023-04-01-13-12-21.png)
 
 - p
 打印替换后模式空间的结果
 
 - i|I 忽略大小写
-默认区分大小写
+大写和小写的 i 均是忽略大小写，和 vim 不同，不加则区分大小写
 
 - m|M 多行匹配
-
-
-## 处理多个命令
-> [Multiple commands syntax](https://www.gnu.org/software/sed/manual/sed.html#Multiple-commands-syntax)
-
-
-### `sed` 命令用 newlines 分隔
-
-![](img/2023-03-31-20-47-55.png)
-
-### 用 `;` 分隔一些命令
-
-![](img/2023-03-31-20-49-33.png)
-
-### 用 `-e` 选项
-
-
-
-
-## 处理标准输入的内容
-
-
-## s/regexp/replacement/ 查找替换
-- 不改变源文件的内容，仅将修改输出显示
-- 类似 vim 中的查找替换
-- 不加标志则，默认只替换一行中的第一个符合的字符
-- 标志位类似 vim 中替换的标志位，但不是全都支持
-- 可用标志位
-	- g
-	将**一行**中全部符合条件的均替换，而不是只替换第一个符合之处
-	- i 和 I
-    大写和小写的 i 均是忽略大小写，和 vim 不同，不加则区分大小写
-- 分隔符 `/` 可以换成其他符号，如 `#` 或 `@` 等，当搜索的内容有 `/` 符号时，可以换成其他分隔符
 
 
 ![](img/2023-03-16-20-01-49.png)
 ![](img/2023-03-16-20-03-39.png)
 ![](img/2023-03-16-20-34-38.png)
-
-### 指明行范围
-- `$` 表示最后一行
-- `1,3` 表示第 1 行到第 3 行
-- `1,+2` 表示第 1 行到第 1 行再加 2 行的位置
-- `1,/pattern/` 起始为第 1 行，结束根据模式匹配到的行
-
 ![](img/2023-03-16-20-37-53.png)
 ![](img/2023-03-16-21-13-27.png)
 
-### 处理一行中其中一个匹配内容
+## 处理一行中其中一个匹配内容
 ![](img/2023-03-16-20-45-45.png)
+
+## 处理多个命令
+> [Multiple commands syntax](https://www.gnu.org/software/sed/manual/sed.html#Multiple-commands-syntax)
+
+### `sed` 命令用 newlines 分隔
+![](img/2023-03-31-20-47-55.png)
+
+### 用 `;` 分隔一些命令
+![](img/2023-03-31-20-49-33.png)
+![](img/2023-04-01-12-59-15.png)
+
+### 用 `-e` 选项
 
 
 ## 例子
@@ -6725,236 +6708,7 @@ net.ipv4.ip_nonlocal_bind = 0
 
 **********************
 
-# 计划任务（crontab）
-- 一次性任务
-- 例行性任务
 
-## Linux 常见的例行性任务
-- 日志文件轮循 logrotate
-- 日志文件分析 logwatch
-- 建立 locate 数据库
-- manpage 查询数据库的建立
-- RPM 软件日志文件的建立
-- 删除缓存
-- 与网络服务有关的分析操作
-
-
-
-## at 执行突发性的计划任务
-- 执行一次就结束
-- 执行 `at` 需要有 `atd` 这个服务
-```bash
-[root@rocky8-2 sysctl.d]$ systemctl status atd.service
-● atd.service - Job spooling tools
-   Loaded: loaded (/usr/lib/systemd/system/atd.service; enabled; vendor preset: enabled)
-   Active: active (running) since Wed 2023-05-03 09:05:48 CST; 11h ago
- Main PID: 1377 (atd)
-    Tasks: 1 (limit: 11045)
-   Memory: 400.0K
-   CGroup: /system.slice/atd.service
-           └─1377 /usr/sbin/atd -f
-
-May 03 09:05:48 rocky8-2 systemd[1]: Started Job spooling tools.
-```
-
-
-### at 运行相关文件
-- `man at` 查看
-```bash
-FILES
-    /var/spool/at
-    /var/spool/at/spool
-    /proc/loadavg
-    /var/run/utmp
-    /etc/at.allow
-    /etc/at.deny
-```
-
-- 可以将要执行的计划任务以文本的方式写入 `/var/spool/at` 目录中
-该目录只有 root 有权限操作
-```bash
-[root@rocky8-2 sysctl.d]$ cd /var/spool/at
-[root@rocky8-2 at]$ ll -d .
-drwx------. 3 root root 31 Apr 22 21:36 .
-[root@rocky8-2 at]$ ls
-spool
-```
-
-- 更安全的方式，写白名单和黑名单
-
-### at 的运行过程
-1. 从 `/etc/at.allow` 查看白名单用户，位于此文件中的用户才能使用 at，其他用户不能使用
-2. 如果白名单文件不存在，则从 `/etc/at.deny` 文件中查看黑名单用户
-3. 两个文件都不存在，则只有 root 能执行 at 命令
-4. 如果一个用户同时在白名单和黑名单中，则先看白名单，存在则可以使用 at
-
-注意优先级，有了白名单，黑名单就没有意义
-系统通常带一个空的黑名单，默认没有白名单，因此初始所有人都可以使用 at
-如果不想某个账号使用 at，则将其写入黑名单，一个账号占一行
-
-
-### at 命令语法
-> [仅运行一次的工作排程](http://cn.linux.vbird.org/linux_basic/0430cron_2.php)
-
-- `-m` 即使没有输出也给用户发送邮件
-- `-M` 从不法邮件
-- `-l` 相当于 `atq` 列出该使用者的 at 计划，如果是 root，则列出全部用户的 at 计划
-- `-d` 相当于 `atrm` 后面接 job number，删除该任务计划
-- `-v` 显示更详细的信息，将任务计划的时间显示出来
-- `-c` 后面接 job number，将具体某个任务计划内容输出到标准输出
-该内容中指明了 shell 类型等很多变量参数
-- `-f` 后面接文件，从指定文件中读取任务而非从标准输入读取
-- `-t` 指定时间
-```bash
--t time run the job at time, given in the format [[CC]YY]MMDDhhmm[.ss]
-```
-
-- 时间格式
-  - HH:MM YYYY-MM-DD 绝对时间
-  不指定后面的年月日则默认在当天执行
-  如果时间超过当前时间，不指定年月日，则在第二天执行
-
-  - HH:MM[am|pm] + number [minutes|hours|days|weeks] 相对时间
-  如 04pm + 3 days 表示三天后的下午 4 点
-  - now + number [minutes|hours|days|weeks] 相对时间
-  now + 3 minutes 表示 3 分钟后执行
-
-### 创建 at 任务的方式
-- at 的执行与终端环境无关，如
-如果命令为 `echo "hello"` 这种，不会在屏幕输出，而是发送邮件到 mailbox 中
-如果想在屏幕输出，则用 `echo 1 > /dev/tty1` 这种，指定终端
-
-- at 后台执行任务，独立出当前 shell 环境，可以脱机继续执行任务
-如远程连接服务器执行某个任务，时间还没到但当前客户端宕机，此时服务器依旧能执行该任务
-#### 交互式创建
-- 进入 at shell 的环境让用户执行任务命令
-- 路径最好使用绝对路径而非相对路径，避免出问题
-- ctrl-d 退出输出
-
-```bash
-[root@rocky8-3 ~]$ at now + 2 minutes
-warning: commands will be executed using /bin/sh
-at> echo "test at" > at_job1.txt
-at> <EOT>
-job 2 at Thu May  4 10:40:00 2023
-[root@rocky8-3 ~]$
-[root@rocky8-3 ~]$ at -l
-2       Thu May  4 10:40:00 2023 a root
-[root@rocky8-3 ~]$ atq
-2       Thu May  4 10:40:00 2023 a root
-```
-
-#### 重定向
-
-```bash
-[root@rocky8-3 ~]$ echo "test" | at now +1 minutes
-warning: commands will be executed using /bin/sh
-job 5 at Thu May  4 11:08:00 2023
-[root@rocky8-3 ~]$ atq
-5       Thu May  4 11:08:00 2023 a root
-```
-
-#### 从文件中读取任务执行
-- `-f` 指定文件
-- `-t` 指定时间
-
-```bash
-[root@rocky8-3 ~]$ cat at_job.txt
-for i in {1..5}; do
-    echo ${i} > ~/at_job_${i}.txt
-done
-[root@rocky8-3 ~]$
-[root@rocky8-3 ~]$ at -f at_job.txt -t 202305041121
-warning: commands will be executed using /bin/sh
-job 7 at Thu May  4 11:21:00 2023
-[root@rocky8-3 ~]$ atq
-7       Thu May  4 11:21:00 2023 a root
-```
-- `at -c 7` 可以查看具体执行命令，其中定义了很多环境变量，指定了 shell 类型为 `/bin/sh`
-
-
-## batch 系统空闲时执行后台任务
-- batch 是利用 at 来执行命令，增加一些控制参数
-- CPU 任务负载小于 0.8 才执行工作任务
-任务负载不是 CPU 的使用率，是单一时间点 CPU 负责的任务数量
-- batch 不支持参数
-```bash
-batch executes commands when system load levels permit; 
-      in other words, when the load average drops below 0.8, 
-      or the value specified in the invocation of atd.
-```
-
-
-
-## crontab 执行例行性计划任务
-> [循环运行的例行性工作排程](http://cn.linux.vbird.org/linux_basic/0430cron_3.php)
-
-
-
-- 例行性任务，会循环一直执行
-- 需要开启服务 crond
-```bash
-[root@rocky8-2 sysctl.d]$ systemctl status crond.service
-● crond.service - Command Scheduler
-   Loaded: loaded (/usr/lib/systemd/system/crond.service; enabled; vendor preset: enabled)
-   Active: active (running) since Wed 2023-05-03 09:05:48 CST; 11h ago
- Main PID: 1382 (crond)
-    Tasks: 1 (limit: 11045)
-   Memory: 5.9M
-   CGroup: /system.slice/crond.service
-           └─1382 /usr/sbin/crond -n
-
-May 03 09:05:49 rocky8-2 crond[1382]: (CRON) INFO (running with inotify support)
-May 03 10:01:01 rocky8-2 CROND[3784]: (root) CMD (run-parts /etc/cron.hourly)
-May 03 10:01:01 rocky8-2 anacron[3793]: Anacron started on 2023-05-03
-May 03 10:01:01 rocky8-2 anacron[3793]: Will run job `cron.daily' in 33 min.
-May 03 10:01:01 rocky8-2 anacron[3793]: Jobs will be executed sequentially
-May 03 10:34:01 rocky8-2 anacron[3793]: Job `cron.daily' started
-May 03 10:34:01 rocky8-2 run-parts[4085]: (/etc/cron.daily) finished logrotate
-May 03 10:34:01 rocky8-2 anacron[3793]: Job `cron.daily' terminated
-May 03 10:34:01 rocky8-2 anacron[3793]: Normal exit (1 job run)
-May 03 21:01:01 rocky8-2 CROND[6658]: (root) CMD (run-parts /etc/cron.hourly)
-```
-
-### 设置用户
-- 同 at 相同，为了安全，可以能使用限制 crontab 的用户账号
-
-# dd
-> [https://www.lanqiao.cn/courses/1/learning/?id=62&compatibility=true](https://www.lanqiao.cn/courses/1/learning/?id=62&compatibility=true)
-
-
-## 生成任意大小的文件
-- 文件单位
-![](img/2023-03-19-16-21-58.png)
-
-
-![](img/2023-03-19-16-22-38.png)
-![](img/2023-03-19-16-21-08.png)
-
-
-```bash
-[root@ubuntu22 html]$ dd if=/dev/zero of=index.html bs=1M count=10
-10+0 records in
-10+0 records out
-10485760 bytes (10 MB, 10 MiB) copied, 0.0347324 s, 302 MB/s
-[root@ubuntu22 html]$ ll -h
-total 11M
-drwxr-xr-x  2 nginx nginx 4.0K May 18 18:30 ./
-drwxr-xr-x 12 nginx nginx 4.0K May 18 15:57 ../
--rw-r--r--  1 nginx nginx  497 May 18 14:11 50x.html
--rw-r--r--  1 nginx nginx  10M May 18 18:31 index.html
-[root@ubuntu22 html]$
-i
-[root@ubuntu22 html]$ sed -i '1i\nginx 22' index.html
-[root@ubuntu22 html]$ head -n3 index.html
-nginx 22
-[root@ubuntu22 html]$ ll -h
-total 11M
-drwxr-xr-x  2 nginx nginx 4.0K May 18 19:25 ./
-drwxr-xr-x 12 nginx nginx 4.0K May 18 15:57 ../
--rw-r--r--  1 nginx nginx  497 May 18 14:11 50x.html
--rw-r--r--  1 nginx nginx  11M May 18 19:25 index.html
-```
 # lsof
 ```bash
 [root@ubuntu22 ~]$ lsof -i :80
@@ -6963,7 +6717,6 @@ nginx   92778  root    6u  IPv4 239792      0t0  TCP *:http (LISTEN)
 nginx   92779 nginx    6u  IPv4 239792      0t0  TCP *:http (LISTEN)
 nginx   92780 nginx    6u  IPv4 239792      0t0  TCP *:http (LISTEN)
 ```
-
 # watch
 
 
@@ -6994,456 +6747,6 @@ apt install apache2-utils
 ```
 
 *********************************
-//LABEL: 软件管理
-# 软件管理
-> [鸟哥的 Linux 私房菜](http://cn.linux.vbird.org/linux_basic/linux_basic.php)
-
-## 软件包管理
-- 为了更好安装、卸载软件等，不用每次都要通过源码编译安装软件
-- 将软件所有相关文件打包成一个特殊格式的文件
-- 打包的文件包含**预先侦测系统**和**相依赖的脚本**
-- 打包的文件会记录软件提供的所有文件信息等
-- 安装软件时会进行环境检查，查看当前环境是否满足
-- 安装软件时会进行属性依赖检查，即安装某个软件可能需要依赖其它一些软件，不安装依赖则无法安装该软件
-
-
-## 软件包的分类
-> [What are *-devel packages?](https://stackoverflow.com/questions/2358801/what-are-devel-packages)
-
-- 一般软件内容分为一般使用和开发使用（devel package）
-- 很多软件会以函数库的方式释放出部分功能以供其他软件调用
-
-![](img/2023-03-21-15-41-06.png)
-- 如安装 httpd 时有如下几个包
-![](img/2023-03-21-16-30-44.png)
-![](img/2023-03-21-16-32-10.png)
-![](img/2023-03-21-16-32-40.png)
-
-
-## 软件源
-### AppStream
-> [RHEL 8 - RHEL自带AppStream应用模块管理](https://blog.csdn.net/weixin_43902588/article/details/117589073)
-> [Chapter 1. Using AppStream](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/8/html/installing_managing_and_removing_user-space_components/using-appstream_using-appstream)
-> [Chapter 9. 使用AppStream](https://xy2401.com/local-docs/redhat/8.zh-Hans/installing-managing-and-removing-user-space-components/OEBPS/using-appstream_using-appstream.html)
-
-
-### BaseOS
-
-
-## 获取软件包的途径
-
-- 官方网站
-
-
-## RPM 包管理器
-- 环境：rocky 8.6
-- 最早由 Red Hat 开发的包管理器
-- Package Manager
-- 软件已经事先被编译过，因此软件安装时对主机环境有要求
-- 安装软件前检查硬盘容量、操作系统版本等环境
-- RPM 文件提供软件版本信息、相关依赖、软件用途、所含文件等信息
-- RPM 文件使用数据库记录软件安装时必须具备的依赖属性软件以及其他参数等，便于软件升级、移除、验证、查询等
-- 通常不同的 distribution 所释出的 RPM 文件不能用在其他的 distributions 上
-
-![](img/2023-03-21-17-46-43.png)
-
-### RPM 包文件命令
-> [Package filename and label](https://en.wikipedia.org/wiki/RPM_Package_Manager#Package_filename_and_label)
-
-
-![](img/2023-03-21-11-45-30.png)
-
-
-- 版本号后面的 release 第一个数字为相同的版本 rebuilt 的次数，可能是修复一些小 bug 或重设一些编译参数等
-- release 中的 `el` 时 `Red Hat Enterprise Linux` 的缩写，`8.7.0` 是适配 red hat 以及 centos 8.7.0 以上的版本 
-- 硬件操作平台常用种类
-  - i386
-  - i686
-  - x86_64
-  - noarch
-  没有硬件平台的限制
-
-
-### RPM 仓库
-> [The Origin of RPM Content](https://docs.pulpproject.org/en/2.19/plugins/pulp_rpm/tech-reference/rpm.html#)
-
-
-![](img/2023-03-21-18-04-01.png)
-![](img/2023-03-21-18-07-30.png)
-
-- 根据功能不同将软件放在不同的仓库中，如 `AppStream` 和 `BaseOS`
-- 仓库中，如 `AppStrem` 中有两个目录
-	- Packages
-	rpm 安装包
-	- repodata
-	存放元数据，用来描述 RPM 包的信息
-
-
-### RPM 数据库目录 /var/lib/rpm
-> [What is the purpose of the '/var/lib/rpm' directory?](https://access.redhat.com/solutions/439953)
-
-- `/var/lib/rpm` 目录中包含 RPM 数据库
-- RPM 数据库包含系统中安装的 RPM 包的信息
-- 当使用 rpm 命令时会用到 RPM 数据库
-- 当安装或移除 rpm 包时会修改数据库
-- 但软guanguan其释放的软件内的文件放在其他目录中，如软件的使用手册说明放在 `/usr/share/doc` 目录中
-
-
-![](img/2023-03-21-15-32-45.png)
-
-
-### 安装软件包
-环境
-- rocky 8.6
-- 虚拟机
-
-#### 从光盘安装包
-- rocky 8.6
-- 从系统的光盘中获取 rpm 包
-![](img/2023-03-21-17-00-05.png)
-![](img/2023-03-21-17-01-17.png)
-
-- 将光盘挂载到一个空目录
-	- `lsblk` 查看光盘的文件
-	
-	- 光盘文件在 `/dev/cdrom` （`/dev/sr0` 软连接）
-	
-	- 新建一个目录 `/mnt/cdrom`，利用 `mount /dev/sr0 /mnt/cdrom` 挂载光盘 
-	![](img/2023-03-21-17-13-02.png)
-	![](img/2023-03-21-17-15-31.png)
-	
-	- 查看光盘的内容，包主要在两个仓库中：BaseOS 和 AppStream
-		- BaseOS 放操作系统核心安装包
-		- AppStream 仓库放用户常用的安装包
-
-- 利用 rpm 安装，需要指定安装包的完整路径和文件名
-![](img/2023-03-21-18-13-14.png)
-![](img/2023-03-21-18-14-36.png)
-
-- 如果安装的包需要依赖，则 rpm 不能装成功
-![](img/2023-03-21-18-16-01.png)
-  
-
-### rpm -i 安装软件
-- 如果安装包需要依赖则安装不成功
-
-- 从本地仓库安装需要写明完整路径
-![](img/2023-03-21-18-14-36.png)
-
-- rpm -i 安装软件包
-
-- 加上 `-v` 选项显示 
-![](img/2023-03-21-20-01-34.png)
-
-- 加上 `-h` 选项显示安装进度条
-![](img/2023-03-21-20-03-15.png)
-
-- 安装选项
-![](img/2023-03-21-20-12-51.png)
-
-#### --test 安装前检查
-- `-i` 选项后可以加一些选项，`--test` 可以不安装，仅检查能否安装
-![](img/2023-03-21-20-12-22.png)
-![](img/2023-03-21-20-14-35.png)
-
-#### --replacepkgs 安装已经装过的软件
-![](img/2023-03-21-20-18-50.png)
-
-#### --replacefiles 覆盖文件
-![](img/2023-03-21-20-20-30.png)
-
-
-#### --justdb 更新数据库
-- 如果 RPM 数据库破损或产生错误时，该选项可更新软件在数据库中的信息
-![](img/2023-03-21-20-21-31.png)
-
-
-#### --nosignature 跳过数字签名检查
-
-#### --noscripts 不执行某些脚本
-- RPM 在软件安装过程中会自动执行一些操作，可加该选项禁止执行
-![](img/2023-03-21-20-26-22.png)
-
-
-### 升级与更新
-![](img/2023-03-21-20-33-50.png)
-
-- rpm -Uvh 
-	- 如果软件没安装过，则安装，和 `-i` 相同，除了安装后会删除其他版本
-
-- rpm -Fvh
-	- freshen
-	- 只有软件安装过才更新，不会安装未安装的软件
-
-### 安装旧版本
-- rpm -Uvh --oldpackage packageName.rpm
-
-### rpm -q 查询 RPM 包
-- 查询是在 `/var/lib/rpm` 目录中查找数据库文件
-![](img/2023-03-21-20-40-36.png)
-![](img/2023-03-21-20-41-43.png)
-
-#### rpm -qa 查询已安装的全部软件
-- `rpm -qa` 不加文件名则查找全部已安装的软件
-- 支持通配符查找某个软件
-- 查找软件安装包时只用写包名字，不用写路径
-
-![](img/2023-03-21-20-47-04.png)
-
-#### rpm -q 查询某个软件是否已安装
-- 后面接软件包的名字，不用写全路径
-- 软件包的名字必须写对，不用写后面的版本号，只用写包名
-![](img/2023-03-21-20-44-44.png)
-![](img/2023-03-21-20-57-40.png)
-
-#### rpm -qi 列出软件的详细信息
-- `--info` 
-![](img/2023-03-21-21-00-25.png)
-
-#### rpm -ql 列出软件中的全部文件
-- 列出软件安装完后释放出的文件列表以及完整的路径
-![](img/2023-03-21-21-05-29.png)
-
-#### rpm -qc 列出软件中的配置文件
-- `--configfiles` 仅列出配置文件，即 `/etc/`目录下的文件
-![](img/2023-03-21-21-06-17.png)
-
-#### rpm -qd 列出说明文档
-- `--artifactfiles` 仅列出说明文档，`/usr/share/doc` 和 `/usr/share/man` 目录中的文档
-
-![](img/2023-03-21-21-09-58.png)
-
-#### rpm -qR 列出软件依赖
-- `--requires` 
-![](img/2023-03-21-21-11-49.png)
-
-
-
-
-### Verify 校验文件
-- `man rpm` 搜索 `Verify`
-- 校验功能用于检查文件是否修改过
-- 软件安装包中的文件修改后卸载后会备份
-  
-![](img/2023-03-20-14-29-12.png)
-![](img/2023-03-20-14-30-20.png)
-
-
-
-
-## SRPM
-- Source RPM，即 RPM 文件里含的未编译的源代码
-- 文件的扩展名为 `*.src.rpm`
-- SRPM 中包含了软件所需的相关依赖性说明以及 RPM 文件提供的数据
-- 提供了参数配置文件，如 configure 与 makefile
-- 要以 RPM 管理的方式编译成 RPM 文件再安装
-- SRPM 可以通过修改配置参数来编译生成适合自己的 RPM 文件
-
-
-## YUM
-> [yum](https://en.wikipedia.org/wiki/Yum_(software))
-
-
-- Yellow Dog Updater, Modified
-- The YUM is a free and open-source command-line package-management utility for computers running the Linux operating system using the **RPM Package Manager**.
-- 为了解决 RPM 属性相依的问题
-- 安装软件时可自动装上需要的依赖
-
-
-### rocky 配置私有 yum 仓库
-环境：rocky 8.6
-
-- 安装 httpd
-```bash
-sudo yum install -y httpd
-```
-- 开启 httpd 服务
-```bash
-systemctl restart httpd.service
-```
-- 关闭防火墙
-```bash
-sudo systemctl stop firewalld.service
-```
-
-### yum info 查看软件包的信息
-仓库中有但还未安装的软件包也能查询
-
-```bash
-root@Rocky8 ~ $ yum search virt-manager
-Last metadata expiration check: 1:00:22 ago on Tue 06 Jun 2023 01:59:45 PM CST.
-======================================== Name Exactly Matched: virt-manager ========================================
-virt-manager.noarch : Desktop tool for managing virtual machines via libvirt
-============================================ Name Matched: virt-manager ============================================
-virt-manager-common.noarch : Common files used by the different Virtual Machine Manager interfaces
-root@Rocky8 ~ $
-root@Rocky8 ~ $ rpm -q virt-manager
-package virt-manager is not installed
-root@Rocky8 ~ $
-root@Rocky8 ~ $ yum info virt-manager
-Last metadata expiration check: 1:01:00 ago on Tue 06 Jun 2023 01:59:45 PM CST.
-Available Packages
-Name         : virt-manager
-Version      : 3.2.0
-Release      : 4.el8
-Architecture : noarch
-Size         : 620 k
-Source       : virt-manager-3.2.0-4.el8.src.rpm
-Repository   : appstream
-Summary      : Desktop tool for managing virtual machines via libvirt
-URL          : https://virt-manager.org/
-License      : GPLv2+
-Description  : Virtual Machine Manager provides a graphical tool for administering virtual
-             : machines for KVM, Xen, and LXC. Start, stop, add or remove virtual devices,
-             : connect to a graphical or serial console, and see resource usage statistics
-             : for existing VMs on local or remote machines. Uses libvirt as the backend
-             : management API.
-```
-
-
-
-
-
-## dpkg 包管理器
-- Debian 社区开发的包管理器
-- Debian Package
-- 软件包后缀为 .deb
-
-
-### 仓库种类
-#### Ubuntu 仓库种类
-> [Repositories](https://help.ubuntu.com/community/Repositories)
-> [What are Repositories](https://help.ubuntu.com/community/Repositories/Ubuntu)
-
-
-ubuntu 仓库分成 4 种类：
-- main
-包含大多数需要使用的开源应用程序，包括安装 Ubuntu 时默认装上的软件
-- restricted
-- universe
-- multiverse
-
-### 安装软件
-#### 从光盘安装包
-- ubuntu 22.04 虚拟机
-- 将光盘挂载到一个空目录
-![](img/2023-03-21-19-22-16.png) 
-- 软件安装包在 pool 目录中
-
-
-### dpkg-query 查询 dpkg 包
-- `dpkg-query --help | less` 简要查看命令帮助
-- `man dpkg-query`
-
-#### dpkg-query -l 查询已安装的包
-- `dpkg-query -l` 或 `dpkg-query --list` 显示全部已安装的包
-- `dpkg-query -l | less` 搜索安装包
-- `dpkg -l packageName` 查询具体某个安装包的简要说明
-指明具体包名时查询会忽略包的状态？如未安装的包？
-
-```bash
-[root@ubunut22:~]$ dpkg-query -l mysql
-dpkg-query: no packages found matching mysql
-```
-```bash
-[root@ubunut22:~]$ dpkg-query -l mysql*
-Desired=Unknown/Install/Remove/Purge/Hold
-| Status=Not/Inst/Conf-files/Unpacked/halF-conf/Half-inst/trig-aWait/Trig-pend
-|/ Err?=(none)/Reinst-required (Status,Err: uppercase=bad)
-||/ Name                  Version                 Architecture Description
-+++-=====================-=======================-============-===================================================================
-un  mysql-client-5.7      <none>                  <none>       (no description available)
-ii  mysql-client-8.0      8.0.32-0ubuntu0.22.04.2 amd64        MySQL database client binaries
-un  mysql-client-core-5.7 <none>                  <none>       (no description available)
-ii  mysql-client-core-8.0 8.0.32-0ubuntu0.22.04.2 amd64        MySQL database core client binaries
-ii  mysql-common          5.8+1.0.8               all          MySQL database common files, e.g. /etc/mysql/my.cnf
-un  mysql-common-5.6      <none>                  <none>       (no description available)
-ii  mysql-server          8.0.32-0ubuntu0.22.04.2 all          MySQL database server (metapackage depending on the latest version)
-un  mysql-server-5.5      <none>                  <none>       (no description available)
-un  mysql-server-5.7      <none>                  <none>       (no description available)
-ii  mysql-server-8.0      8.0.32-0ubuntu0.22.04.2 amd64        MySQL database server binaries and system database setup
-un  mysql-server-core-5.7 <none>                  <none>       (no description available)
-ii  mysql-server-core-8.0 8.0.32-0ubuntu0.22.04.2 amd64        MySQL database server binaries
-```
-```bash
-[root@ubunut22:~]$ dpkg-query -l | grep -E "\bmysql"
-ii  mysql-client-8.0                           8.0.32-0ubuntu0.22.04.2                 amd64        MySQL database client binaries
-ii  mysql-client-core-8.0                      8.0.32-0ubuntu0.22.04.2                 amd64        MySQL database core client binaries
-ii  mysql-common                               5.8+1.0.8                               all          MySQL database common files, e.g. /etc/mysql/my.cnf
-ii  mysql-server                               8.0.32-0ubuntu0.22.04.2                 all          MySQL database server (metapackage depending on the latest version)
-ii  mysql-server-8.0                           8.0.32-0ubuntu0.22.04.2                 amd64        MySQL database server binaries and system database setup
-ii  mysql-server-core-8.0                      8.0.32-0ubuntu0.22.04.2                 amd64        MySQL database server binaries
-```
-
-
-
-#### dpkg-query -s 列出包的状态 
-
-> -s, --status [<package>...]      Display package status details.
-
-
-```bash
-[root@ubunut22:~]$ dpkg-query -s mysql-common 
-Package: mysql-common
-Status: install ok installed
-Priority: optional
-Section: database
-Installed-Size: 34
-Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
-Architecture: all
-Multi-Arch: foreign
-Source: mysql-defaults (1.0.8)
-Version: 5.8+1.0.8
-Replaces: mariadb-server-5.5, mysql-common-5.6, mysql-server-5.5, percona-xtradb-cluster-common-5.5
-Provides: mysql-common-5.6
-Breaks: mariadb-common (<< 10.0.20-3~)
-Conflicts: mariadb-server-5.5, mysql-common-5.6, mysql-server-5.5, percona-xtradb-cluster-common-5.5
-Conffiles:
- /etc/mysql/conf.d/mysql.cnf 61e0993270966cc6bc96b46c01ade21f
- /etc/mysql/conf.d/mysqldump.cnf 20890decb4486ce539753193908fb356
- /etc/mysql/my.cnf.fallback cfe2bc1819d5e200eca8ca6912f714af
-Description: MySQL database common files, e.g. /etc/mysql/my.cnf
- MySQL is a fast, stable and true multi-user, multi-threaded SQL database
- server. SQL (Structured Query Language) is the most popular database query
- language in the world. The main goals of MySQL are speed, robustness and
- ease of use.
- .
- This package includes files needed by all versions of the client library,
- e.g. /etc/mysql/my.cnf.
-Original-Maintainer: Debian MySQL Maintainers <pkg-mysql-maint@lists.alioth.debian.org>
-```
-
-#### dpkg-query -L 列出包中全部文件
-
->  -L, --listfiles <package>...     List files 'owned' by package(s).
-
-```bash
-[root@ubunut22:~]$ dpkg -L mysql-common 
-/.
-/etc
-/etc/mysql
-/etc/mysql/conf.d
-/etc/mysql/conf.d/mysql.cnf
-/etc/mysql/conf.d/mysqldump.cnf
-/etc/mysql/my.cnf.fallback
-/usr
-/usr/share
-/usr/share/doc
-/usr/share/doc/mysql-common
-/usr/share/doc/mysql-common/changelog.gz
-/usr/share/doc/mysql-common/copyright
-/usr/share/doc/mysql-common/frozen-mode
-/usr/share/doc/mysql-common/frozen-mode/README
-/usr/share/doc/mysql-common/frozen-mode/downgrade
-/usr/share/lintian
-/usr/share/lintian/overrides
-/usr/share/lintian/overrides/mysql-common
-/usr/share/mysql-common
-/usr/share/mysql-common/configure-symlinks
-```
-
-
-
 
 # curl
 
@@ -7473,77 +6776,6 @@ Original-Maintainer: Debian MySQL Maintainers <pkg-mysql-maint@lists.alioth.debi
 - 只能看正在挂载的文件系统
 
 # blkid 查看文件的 UUID
-
-# 磁盘分区
-操作环境：虚拟机
-
-## 分区的目的
-- 为什么要分区
-
-
-## 分区方式
-- 不同分区方式的差别
-- 一个硬盘能否有不同分区方式
-- 跨分区的文件使用有什么限制
-	- 硬链接
-### MBR 分区
-- 有主分区和扩展分区组成，最多 4 个
-- 扩展分区只能 1 个，或者没有，即 4 个主分区
-- 扩展分区不能直接使用，必须在扩展分区中划分逻辑分区来使用
-
-
-#### 主分区
-- 主分区是否可以扩展和缩减
-- 一个主分区的大小是否有限制
-- 设备名不会因为其他设备删除而动态变化
-
-#### 逻辑分区
-- 在扩展分区中划分
-- 为什么叫逻辑分区
-- 逻辑分区的个数和容量是否有限制
-- 主分区和逻辑分区在使用上的区别
-- 逻辑分区是否可以扩容和缩减
-- 逻辑分区的设备名至少从  5 开始，如 `sda5`，前面的 4 个数字是留给主分区和扩展分区使用
-- 设备名可能变化，如果删除 `sda5`，则原来的设备 `sda6` 变为 `sda5`，因此表示设备时用 `UUID` 更好
-
-### GPT 分区
-
-## 新增磁盘
-> [ Virtual Hard Disk is added, but not showing using lsblk -d command](https://www.linuxquestions.org/questions/linux-newbie-8/virtual-hard-disk-is-added-but-not-showing-using-lsblk-d-command-4175645367/)
-> [How to detect new hard disk attached without rebooting?](https://unix.stackexchange.com/questions/404405/how-to-detect-new-hard-disk-attached-without-rebooting)
-> [How to Scan Newly added Disks in Linux Easily](https://www.learnitguide.net/2016/02/how-to-scan-newly-added-disks-in-linux.html)
-> [How to Scan\Detect new LUN’s & SCSI disks in Linux](https://www.2daygeek.com/scan-detect-luns-scsi-disks-on-redhat-centos-oracle-linux/)
-
-- 是否需要关机状态新增硬盘
-- 新增硬盘后让系统识别到新硬盘
-	- 重启系统
-	- 重新扫描硬盘
-	![](img/2023-04-01-21-31-47.png)
-
-
-
-
-- 需要 root 权限
-
-### fdisk -l device 查看设备分区
-### fdisk device 为设备创建分区
-
-#### m 查看帮助
-
-
-#### 查看内核是否识别新的分区
-- 用 `lsblk` 命令查看是否有新分区信息
-- `cat /proc/partitions` 查看内核是否识别新的分区
-- 上面两种方式区别？
-
-#### partprobe 分区后同步分区表
-- 内核中的分区表信息和硬盘分区表同步
-- CentOS 7，8 同步分区表
-
-## gdisk 创建 GPT 分区
-
-![](img/2023-04-01-17-48-07.png)
-
 
 # 查询已打开文件
 ## fuser
@@ -7736,248 +6968,6 @@ Permissive
 
 
 //LABEL：文件系统
-# 文件系统
-
-
-## 目录结构
-### /proc 查看内存数据
-- 程序在内存中，内存的数据写入到 `/proc` 目录下
-- 主机上各程序的 PID 以目录的形式在 `/proc` 目录中，目录的名为 PID
-- 开机的第一个程序 `systemd` 的 PID 为 1，因此在 `/proc/1` 目录中
-
-![](img/2023-04-13-14-11-38.png)
-
-
-
-## 文件系统的定义
-- 什么是文件系统
-
-
-## 文件系统的作用
-- 为什么需要文件系统
-## 文件系统类型
-- 为什么有不同类型的文件系统
-- 不同类型的文件系统有什么区别
-- 不同类型的文件系统上的文件使用有什么区别
-- 一个分区上能否有多个不同的文件系统
-- 
-### ext4 
-- 支持扩容和缩减
-
-### xfs
-
-### swap
-
-
-
-## 虚拟文件系统 VFS
-- 屏蔽不同文件系统的差异
-
-
-## 创建文件系统
-### mkfs
-
-## 查看文件系统的属性
-
-### clean 状态
-
-### block size
-- 跟文件系统的大小有关，如常用的 4KB
-- 存放文件的最小单位
-	- ll 查看目录时显示的大小为 4kB 
-	- df 查看文件的大小和 ll 查看文件的大小
-	- ls -s 查看文件的大小
-
-- mkfs.ext -b 创建文件系统时指定文件大小
-- 一旦文件系统创建完成，不能修改块的大小
-
-
-
-### Reserved blocks
-- 保留块，预留给 root 使用，普通用户无法使用，应急
-
-
-
-### tune2fs 查看 ext4 文件系统属性
-
-### xfs_info 查看 xfs 文件系统属性
-
-
-
-# 挂载
-- 挂载的目录必须先存在
-- 挂载的文件夹最好用空目录，否则挂载后原来的文件看不到，除非解除挂载
-- 一个设备可以同时挂载到多个挂载点
-
-
-## 挂载的定义
-
-## 挂载的目的
-- 为什么要挂载
-
-
-## 查看已挂载的所有设置
-
-```bash
-
-```
-
-## mount 临时挂载
-
-### -o ro 只读
-
-### -a
-
-### unmount 接触挂载
-
-## 永久挂载
-### 写配置文件 `/etc/fstab`
-	- 设备名或UUID
-	UUID 在用 mount 挂载后会生成，可以用 blkid 查看，该方式更好
-	- 挂载点
-	- 文件系统类型
-	- 选项
-	如 `ro` 只读
-
-### 让配置文件生效
-- mount -a 对配置文件中新增的行可以生效，但修改配置文件或删除不能生效
-- mount -o remount 挂载点名 可以让配置文件生效
-
-
-# 逻辑卷轴管理器 LVM
-## 什么时 LVM
-
-
-## 为什么需要逻辑卷
-
-## 逻辑卷使用和物理卷区别
-
-## 能否将全部分区都用逻辑卷
-
-
-## 逻辑卷的性能
-
-
-## 物理卷
-### 查看物理卷的信息
-#### pvs
-
-
-#### pvdisplay 
-- 更详细
-
-
-## PE
-
-## VG 卷组
-- volumn group
-
-
-### 查看卷组信息
-#### vgs 
-
-#### vgdisplay
-
-
-## LV 逻辑卷
-- logical volumn
-
-### lvcreate 创建逻辑卷
-- 创建完的逻辑卷是软连接
-![](img/2023-04-01-20-18-26.png)
-
-
-
-### 查看逻辑卷的信息
-#### lvs
-
-### lvdisplay
-
-![](img/2023-04-01-20-20-51.png)
-
-
-
-## 创建逻辑卷的过程
-### 创建分区
-
-### 修改分区的类型为 LVM
-	- MBR 类型
-	- GPT 类型
-
-### 安装 lvm2 软件包
-	- rocky : yum -y install lvm2
-	- ubuntu: apt -y install lvm2
-
-### pvcreate 创建物理卷
-- 如 `pvcreate /dev/sdb{1..3}
-- 
-
-
-### vgcreate 创建卷组
-- 如 `vgcreate vg_demo /dev/sdb{1..3}`
-- 可以指定 PE 大小，加上 `-s` 选项，不指定则使用默认值
-
-
-### lvcreate 创建逻辑卷
-- `lvcreate  `
-
-![](img/2023-04-02-09-43-42.png)
-#### -n 指定逻辑卷名字
-
-#### -L 指定逻辑卷的大小
-- 可以直接指定 size，如 `6G`
-- 如果指定的大小不是 PE 的整数倍怎么处理？
-- 指定的大小不能超过卷组的大小
-
-#### -l 指定逻辑卷的大小
-- 指定 PE 的个数
-
-#### 指明逻辑卷的卷组
-- 一个逻辑卷能否能否从多个卷组组合？
-- 能否不指明卷组
-
-
-### 为逻辑卷创建文件系统
-- 如 `mkfs.xfs /dev/vg_demo/lv1`
-
-![](img/2023-04-01-20-27-21.png)
-
-
-### 挂载
-- 创建一个空目录如 `/log` 作为挂载点，如果该目录已存在，则换一个名字
-- 用 `lsblk -f` 或者 `blkid` 查看逻辑卷的 UUID
-- 修改 `/etc/fstab` 配置文件，注意挂载点必须存在，且最好是空目录，否则原来目录的内容会被覆盖
-![](img/2023-04-01-20-48-47.png)
-- 让配置文件生效 
-	- `mount -a`，该命令对配置文件中新增或删除的项有效
-	- 如果修改配置项后需要生效，用 `mount -o remount mountpoint` 
-- 用 `lsblk` 可以查看逻辑卷有了挂载点的信息
-![](img/2023-04-02-10-05-27.png)
-
-
-
-## lvextend 扩展逻辑卷
-- 在卷组的多余空间中扩容
-- 先查看卷组是否还有空间进行扩展，用 `vgs` 查看 `VFree` 选项的值即为剩余的空间
-- 用 `lvextend` 命令扩展，`-L` 选项指定大小，如 `lvextend -L +4G` 在原来的基础上增加 `4G`，必须卷组有 `4G` 的空间
-![](img/2023-04-02-10-22-10.png)
-
-### 扩展条件
-- 已经有文件系统，已经有数据，能否扩容
-- 先看卷组是否还有空间
-![](img/2023-04-01-21-00-02.png)
-
-
-### -L 指定大小
-- 如 `lvextend -L +4G` 原来的基础上增加 `4G`，必须卷组有 `4G` 的空间
-![](img/2023-04-01-21-06-39.png)
-
-
-
-### -l 指定 PE 个数
-
-### -r 自动重置文件系统大小
-
 
 
 # 信号（Signals）

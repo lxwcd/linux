@@ -111,27 +111,13 @@ wheel:x:10:lx
   最后加上 `\e[0m` 表示颜色结束
   最后的格式如下：
 ```bash
-[root@rocky8 lx]# echo -e "\n\nPS1=\"\e[36m${PS1}\e[0m\"" 
-
-
-PS1="[\u@\h \W]\$ "
+[root@ubuntu22-c0 ~]$ echo $PS1
+\[\e[36m\][\u@\h \W]$ \[\e[0m\]
 ```
 
 - 将修改后的 `PS1` 变量放到用户家目录的 `~/.bashrc` 文件最后
-```bash
-[root@rocky8 lx]# echo -e "\n\nPS1=\"\e[36m${PS1}\e[0m\""  >> ~lx/.bashrc 
-[root@rocky8 lx]# echo -e "\n\nPS1=\"\e[36m${PS1}\e[0m\""  >> ~root/.bashrc 
-[root@rocky8 lx]# 
-[root@rocky8 lx]# tail -n3 ~/.bashrc 
-
-
-PS1="[\u@\h \W]\$ "
-```
 
 - 将修改后的 `PS1` 变量放到 `/etc/skel/.bashrc` 文件最后，这样后面创建的登录用户提示符都会修改
-```bash
-[root@rocky8 lx]# echo -e "\n\nPS1=\"\e[36m${PS1}\e[0m\""  >> /etc/skel/.bashrc 
-```
  
 - 利用 `source(.)` 让配置文件生效
 ```bash
@@ -155,7 +141,10 @@ PS1="[\u@\h \W]\$ "
 ![3](https://img-blog.csdnimg.cn/5fb00cec78d54535ba7f7a31f42ce3ee.png)
 
 - 示例
-![3](https://img-blog.csdnimg.cn/7dd9cc7760b949aabb89c0877902cd49.png)
+```bash
+[root@ubuntu22-c0 ~]$ echo $PS1
+\[\e[36m\][\u@\h \W]$ \[\e[0m\]
+```
 
 - 注意该变量设置最好在 `~/.bashrc` 中，如果在 `/etc/profile` 中设置，可能被覆盖
 Ubuntu22.04 中 `~/.bashrc` 中会设置 `PS1`，因此覆盖之前的设置
