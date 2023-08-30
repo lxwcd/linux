@@ -234,7 +234,6 @@ PermitEmptyPasswords yes
 
 # 命令放后台执行
 ## &
-> [Linux 命令中的 & 符号](https://blog.csdn.net/weixin_45505313/article/details/103749523)
 
 
 
@@ -1651,8 +1650,7 @@ ls: cannot access 'a': No such file or directory
  29 #       See default PAM configuration files provided for
  30 #       login, su, etc.
  31 #
- 32 # This is a temporary situation: setting these variables will soon
- 33 # move to /etc/default/useradd and the variables will then be
+ 32 # This is a temporary situation: setting these variables will soo # move to /etc/default/useradd and the variables will then be
  34 # no more supported
  35 MAIL_DIR        /var/mail
  36 #MAIL_FILE      .mail
@@ -7038,7 +7036,6 @@ HUP
 [lx@Rocky8 ~]$ 
 ```
 
-## nohup 后台执行，与终端无关
 
 
 ## kill -signal %jobnumber 处理背景中工作
@@ -7084,273 +7081,10 @@ KILL
 
 
 //LABEL: 进程
-# 进程管理
-结合 **深入理解计算机系统——第八章 Exceptional Control Flow ** 看，理解进程和信号的概念
-
-## 进程介绍
-
-
-## 进程的状态
-> [Process state](https://en.wikipedia.org/wiki/Process_state)
-> [States of a Process in Operating Systems](https://www.geeksforgeeks.org/states-of-a-process-in-operating-systems/)
-
-> These distinct states may not be recognized as such by the operating system kernel. However, they are a useful abstraction for the understanding of processes.
-> &nbsp;
-> ![](img/2023-04-12-20-41-10.png)
-
-### Created
-- The process awaits admission to the "ready" state.
-- Admission will be approved or delayed by a long-term, or admission, scheduler.
-
-- 需要申请一个空白的 PCB，完成资源分配
-
-### Ready
-- A "ready" or "waiting" process has been loaded into main memory and is awaiting execution on a CPU. 
-
-### Running
-- A process moves into the running state when it is chosen for execution.
-- There is at most one running process per CPU or core.
-- A process can run in either of the two modes, namely kernel mode or user mode.
-
-### Blocked
-- A process transitions to a blocked state when it cannot carry on without an external change in state or event occurring.
-- For example, a process may block on a call to an I/O device such as a printer, if the printer is not available.
-- Processes also commonly block when they require user input,
-- or require access to a critical section which must be executed [atomically](https://stackoverflow.com/questions/15054086/what-does-atomic-mean-in-programming).
-- Such critical sections are protected using a synchronization object such as a semaphore or mutex.
-
-
-### Terminated
-- A process may be terminated, either from the "running" state by completing its execution or by explicitly being killed.
-- The terminated process remains in the process table as a zombie process until its parent process calls the `wait` system call to read its exit status, at which point the process is removed from the process table, finally ending the process's lifetime.
-- If the parent failes to call `wait`, this process continues to consume the process table entry (concretely the process identifier or PID), and causes a resource leak.
-
-
-### Additional process states
-> Two additional states are available for processes in systems that support virtual memory. 
-> In both of these states, processes are "stored" on secondary memory (typically a hard disk).
-
-#### stoped
-- 进程被**挂起**（suspended）且**不会被调度**。
-A process **stops** as a result of receiving a **SIGSTOP**, **SIGTSTP**, **SIGTTIN**, or **SIGTTOU** signal, 
-and it **remains** **stopped** **until** it receives a **SIGCONT** signal, at which point it becomes running again.
-
-- 按 `Ctrl z` 可以让进程处于 suspended 的状态，相当于发送信号 `SIGSTOP` 
-
-
-##### Swapped out and waiting
-- suspended and waiting
-- The process is removed from main memory and placed on external storage by the scheduler.
-- It may be swapped back into the waiting state.
-##### Swapped out and blocked
-- suspended and blocked
-- The process is both blocked and swapped out
-- It may be swapped back in again under the same circumstances as a swapped out and waiting process.
-
-
-## 进程执行优先级 Priority 和 NICE
-- Linux 给予一个进程的 Priority，即 PRI，该值越优先级越高，即更快被执行
-- PRI 由 CPU 动态调整，使用者无法直接调整 PRI 的值
-- 使用者可以通过调整 NICE 的值来修改优先级，PRI (new) = PRI (old) + NICE
-
-### NICE 值的范围
-- -20 ~ 19
-- root 可以随意调整自己或他人程序的 NICE 值，且范围 -20 ~ 19
-- 一般使用者仅可调整自己程序的 NICE 值，范围为 0 ~ 19，避免一般用户抢占系统资源
-- 一般使用者仅可将 NICE 值调高，即降低优先级，不能调低
-
-### 设置 NICE 值
-#### 执行程序时设置 NICE 值
-- `nice [-n num] command`，普通用户数值 num 为 0 ~ 19，不在该范围会设置失败
-![](img/2023-04-13-10-55-15.png)
-
-
-#### 调整某个已存在的 PID 的 NICE 值
-- renice 
-`renice [num] PID`
-可通过 `ps -l` 查看 PID
-
-- top
-`top -p PID` 查看进程信息，按 `r` 后根据指示调整 NICE，只能调高不能调低
-
-## 查看进程的状态
-### ps 查看某个时间点进程的状态
-- report a snapshot of the current process
-
-#### ps 显示和当前用户相同 UID 且相同终端的进程
-
-> By default, ps selects all processes with the same effective user ID (euid=EUID) as the
-> current user and associated with the same terminal as the invoker.  
-
-
-- 如果用 `su -l` 切换到另一个用户，用 `ps -l` 看不到之前用户所在 bash 的进程，
-  只看到进程 UID 和当前用户 UID 相同的进程 
-- 用 `sudo` 命令以 root 身份执行一个命令，`ps` 也看不到，因为 UID 不同
-- 当前 bash 相关，如果在当前终端 bash 中又输入 bash 打开一个子进程，也会显示出来，
-  后面的为当前 bash 的子进程，同属于一个终端
-
-
-#### ps -l 查询当前 bash 相关程序
-- `ps` 命令的长格式
-
-```bash
-[lx@Rocky8 ~]$ vim 1.txt &
-[1] 5212
-[lx@Rocky8 ~]$ ps -l
-F S   UID     PID    PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
-0 S  1004    4461    4456  0  80   0 - 58874 -      pts/1    00:00:00 bash
-0 S  1004    5170    4461  0  80   0 - 58447 -      pts/1    00:00:00 sh
-0 S  1004    5171    5170  0  80   0 - 58813 -      pts/1    00:00:00 bash
-0 T  1004    5212    5171  5  80   0 - 60829 -      pts/1    00:00:00 vim
-0 R  1004    5213    5171  0  80   0 - 63823 -      pts/1    00:00:00 ps
-
-[1]+  Stopped                 vim 1.txt
-[lx@Rocky8 ~]$ 
-```
-
-- F
-进程标志，process flags
-	- 4：表示进程的权限为 root
-	- 1：forked but didn't exec
-
-- S
-process stat codes
-```bash
-D    uninterruptible sleep (usually IO)
-I    Idle kernel thread
-R    running or runnable (on run queue)
-S    interruptible sleep (waiting for an event to complete)
-T    stopped by job control signal
-t    stopped by debugger during the tracing
-W    paging (not valid since the 2.6.xx kernel)
-X    dead (should never be seen)
-Z    defunct ("zombie") process, terminated but not reaped by its parent
-```
-
-
-- UID
-该进程被该 UID 拥有，如果执行的文件有 SUID，权限有可能和执行的用户不同，
-
-- PID
-进程 ID
-
-- PPID
-父进程 PID
-
-- C
-CPU 使用率，百分比
-
-- PRI/NI
-Priority/Nice，表示进程被 CPU 调度的优先顺序，数值越小则优先级越高，越快被 CPU 执行
-
-- ADDR
-kernel function，指出程序在内存的哪个部分
-running 的程序，显示 `-`
-
-- SZ
-表示程序用掉多少内存
-
-
-- WCHAN
-表示目前程序是否运行中，`-` 表示在运行中
-
-- TTY
-登陆者终端机的位置，用 `tty` 命令看到的结果
-
-- TIME
-进程实际使用 CPU 的时间
-
--CMD
-造成次进程的触发指令
-
-
-#### ps -A 显示所有进程
-
-#### ps -a 不与 terminal 有关的所有 process
-
-#### ps -u 有效使用者（effective user）相关进程
-
-#### ps aux 查看系统所有进程
-
-
-### top 动态观察进程的变化
-- 相比 ps 只能查看此刻的进程状态，top 可以动态持续的查看进程状态
-
-
-#### ?|h 查看帮助
-- `top` 进入页面后按 `?` 或 `h` 查看帮助
-
-
-#### top -d 指定刷新的秒数
-- 指定以多少秒刷新一次，rocky8.6 默认 3 秒，可以通过最上面一行第一个当前时间看到刷新频率
-
-
-#### top -p PID 查看指定进程的数据
-- `echo $$` 可以查看当前 bash 的PID
-
-#### 实时修改排序
-- 默认排序是 CPU 使用率
-- `P` 大写，以 CPU 使用率排序，%CPU 字段
-- `M` 大写，以内存使用率排序，%MEM 字段
-- `T` 大写，以 CPU 使用时长排序，TIME+ 字段
-
-#### 实时修改 NI 数值
-- 在数据显示界面，按 `r` 修改 NI 值，即 renice
-- 需要先输入要修改的 PID，不输入则默认修改第一个进程
-- 然后输入要改的 NI 值
-
-
-### pstree 进程树显示程序的相关性
-
-
-#### pstree -A 以 ASCII 字符 
-- 不同语系可能出现乱码问题，用 `-A` 克服线段乱码问题
-
-
-
-#### pstree -u 列出 uid 
-- 只有和父进程 uid 不同时才会列出，在小括号中显示
-- 如果同时指定了 `-p` 选项，即显示 PID，则和父进程 uid 不同时列在 PID 后面
-
-![](img/2023-04-12-19-58-00.png)
-
-
-#### pstree -sp 列出 PID
-- `pstree -p` 列出进程树时显示 PID
-- `pstree -sp PID` 列出某个指定进程的信息，加上 `-s` 可以列出其父进程信息
-
-![](img/2023-04-12-20-00-00.png)
-![](img/2023-04-12-20-12-21.png)
-
-#### pstree -T 不显示线程
-- `--hide-threads`
-- 默认显示线程，用 `{}` 显示
-
-![](img/2023-04-12-20-16-32.png)
-
-
-
-
-
-
-## kill -signal PID
-The **/bin/kill** program **sends** an **arbitrary signal** to another **process**. 
-
-下面命令发送信号 9（SIGKILL）到进程 15213：
-```bash
-linux> /bin/kill -9 15213
-```
-
-**PID为负数时**：下面命令发送信号 9（SIGKILL）到进程组 15213 中的每个信号：
-```bash
-linux> /bin/kill -9 -15213
-```
-
-
 
 ****************************************
 
-# 观察系统资源
+#a 观察系统资源
 ## free 观察内存使用
 ```bash
 Usage:

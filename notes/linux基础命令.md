@@ -5441,19 +5441,44 @@ hello
 注意在 `sed` 中使用变量，用双引号而非单引号包围，单引号会无法识别变量 
 
 
-# UID, EUID, RUID and SUID
+# UID, EUID, RUID 
 > [euid,ruid,suid](https://book.hacktricks.xyz/linux-hardening/privilege-escalation/euid-ruid-suid)
 
-## UID
+Consider a program named "example" that performs sensitive operations and is owned by User A with UID 1000. This program needs root privileges to execute certain actions, but running it with root privileges all the time can introduce security risks. 
 
-## EUID
+1. UID (User ID): The UID identifies the user who runs the program. For instance, if User B logs in and runs the "example" program, the UID associated with that process will be 1001 (assuming User B has UID 1001).
 
-## RUID
+2. EUID (Effective User ID): The EUID determines the privileges granted to the process during its execution. If the "example" program has the SUID permission and it's owned by User A, whenever User B runs the program, the EUID will temporarily change to 1000 (owner's UID) during the execution. This allows the program to access resources or perform actions that require User A's privileges. Once the execution is complete, the EUID will return to User B's UID.
 
-## SUID
+3. RUID (Real User ID): The RUID represents the actual user who initiated the program. In our example, no matter who runs the "example" program, the RUID will always be the UID of the user who executed it. So, if User B runs the program, the RUID remains as 1001 (User B's UID).
 
 
 # chroot
 > [chroot](https://wiki.archlinux.org/title/chroot)
 > [How to Use the chroot Command on Linux](https://www.howtogeek.com/441534/how-to-use-the-chroot-command-on-linux/)
 > [chroot command in Linux with examples](https://www.geeksforgeeks.org/chroot-command-in-linux-with-examples/)
+
+# watch
+> [What Is the Linux watch Command, How to Use It + Examples](https://www.hostinger.com/tutorials/linux-watch-command/)
+
+# time
+> [How to Use Linux Time Command: All You Need to Know](https://www.hostinger.com/tutorials/linux-time-command/)
+
+```bash
+[root@ubuntu22-c0 ~]$ time ls
+shell_scripts  snap
+
+real    0m0.002s
+user    0m0.002s
+sys     0m0.000s
+```
+
+# lsof
+> [How to use the lsof command to troubleshoot Linux](https://www.redhat.com/sysadmin/analyze-processes-lsof)
+
+
+# jq 查看 json 文件
+
+
+# dd
+> [Linux DD Command – 18 Examples with All Options](https://linuxopsys.com/topics/linux-dd-command-with-examples)
