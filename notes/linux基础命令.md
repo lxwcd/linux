@@ -699,6 +699,18 @@ whatis (1)           - display one-line manual page descriptions
 - 相当于 `whatis` 
 ![](img/2023-03-07-09-40-46.png)
 
+## manpath 查看帮助文档路径
+```bash
+[root@ubuntu22-c0 ~]$ whatis manpath
+manpath (1)          - determine search path for manual pages
+manpath (5)          - format of the /etc/manpath.config file
+[root@ubuntu22-c0 ~]$ manpath
+/usr/local/man:/usr/local/share/man:/usr/share/man
+```
+
+在配置文件 `/etc/manpath.config` 中定义了帮助文档的查询路径
+如果修改查询路径，需要用 mandb 更新
+
 ## info
 帮助文档比 man 更详细。
 
