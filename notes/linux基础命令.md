@@ -5470,6 +5470,12 @@ Consider a program named "example" that performs sensitive operations and is own
 > [How to Use the chroot Command on Linux](https://www.howtogeek.com/441534/how-to-use-the-chroot-command-on-linux/)
 > [chroot command in Linux with examples](https://www.geeksforgeeks.org/chroot-command-in-linux-with-examples/)
 
+
+# wall 
+> [Wall Command in Linux with Examples](https://linuxhint.com/wall-command-in-linux-with-examples/)
+
+给当前全部登录的用户发消息
+
 # watch
 > [What Is the Linux watch Command, How to Use It + Examples](https://www.hostinger.com/tutorials/linux-watch-command/)
 
@@ -5494,3 +5500,4 @@ sys     0m0.000s
 
 # dd
 > [Linux DD Command – 18 Examples with All Options](https://linuxopsys.com/topics/linux-dd-command-with-examples)
+
