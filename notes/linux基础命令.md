@@ -268,6 +268,50 @@ PermitEmptyPasswords yes
 
 可以不改字体，用 MobaXterm 远程登录，修改和操作更方便
 
+## localectl 设置语言环境
+- 查看当前的语言环境
+```bash
+[root@ubuntu22-c0 ~]$ localectl
+   System Locale: LANG=en_US.UTF-8
+       VC Keymap: n/a
+      X11 Layout: us
+       X11 Model: pc105
+```
+```bash
+[root@ubuntu2204 ~]#echo $LANG
+en_US.UTF-8
+```
+- 查看当前支持语言列表
+```bash
+[root@ubunut22:~]$ localectl list-locales
+C.UTF-8
+en_AG.UTF-8
+en_AU.UTF-8
+en_BW.UTF-8
+en_CA.UTF-8
+en_DK.UTF-8
+en_GB.UTF-8
+en_HK.UTF-8
+en_IE.UTF-8
+en_IL.UTF-8
+en_IN.UTF-8
+en_NG.UTF-8
+en_NZ.UTF-8
+en_PH.UTF-8
+en_SG.UTF-8
+en_US.UTF-8
+en_ZA.UTF-8
+en_ZM.UTF-8
+en_ZW.UTF-8
+zh_CN.UTF-8
+```
+
+- 修改语言环境
+```bash
+[root@ubunut22:~]$ localectl set-locale LANG=en_US.UTF-8
+```
+
+- 修改完后重启
 
 ## 设置时区
 ### 利用 timedatectl 修改时区
@@ -5521,3 +5565,21 @@ sys     0m0.000s
 # dd
 > [Linux DD Command – 18 Examples with All Options](https://linuxopsys.com/topics/linux-dd-command-with-examples)
 
+# 硬件资源的收集与分析工具
+系统硬件由操作系统内核管理
+内核所检测到的硬件设备会被记录在 /proc 和 /sys 目录中
+
+## dmesg
+查看内核运行过程中所显示的各项信息记录
+
+## vmstat
+分析系统目前状态
+
+## lspci
+列出 PC 系统的 PCI 接口设备
+
+## lsusb
+列出 USB 端口的状态
+
+## iostat
+实时列出 CPU 与接口设备的输入输出状态
