@@ -541,6 +541,15 @@ Aug 29 10:45:45 ubuntu2204c12 sendemail[4918]: Email was sent successfully!
 
 查看接收邮箱 15521168075@163.com 可以看到发送的邮件即成功
 
+
+
+## 安全设置
+- 可以设置 `set -u` 当使用错误变量时认为出错
+```bash
+ -u  Treat unset variables as an error when substituting.
+```
+
+
 ## ssh 远程登录设置
 ### 查看 ssh 配置文件
 `dpkg` 找到 ssh 服务端包名
@@ -990,5 +999,3 @@ sudo apt update && apt install -y git
 
 ## 安装 iputils-ping 来用 ping 探测网络
 
-
-## 安装 

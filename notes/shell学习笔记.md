@@ -64,8 +64,7 @@
 > All of the single-character shell options documented in the description of the `set` builtin command, including `-o`, can be used as options when shell is invlked.
 
 
-
-### shell 内置但不能用 set 设置的一些选项
+### shell 内置的一些选项
 - `echo $-` 可以查看这些选项中哪些设置了
 ![](img/2023-04-07-15-39-19.png)
 
@@ -127,6 +126,7 @@
 > any arguments after the `--` are treated as filenames and arguments.
 > an argument of `-` is equivalent to `--`.
 
+加上 `--` 可以放置后面的参数或文件名被当成 option
 
 ### set options
 > [4.3.1 the set builtin](https://www.gnu.org/software/bash/manual/bash.html#the-set-builtin)
@@ -138,7 +138,7 @@
 - `set --help | less` 查看帮助说明
 - `-` 设置选项
 - `+` 取消设置选项
-- 在 `shell` 中用 `set` 命令设置的选项只是临时生效，除非写道配置文件中
+- 在 `shell` 中用 `set` 命令设置的选项只是临时生效，除非写到配置文件中
 
 #### set -|+ o 查看全部的选项
 - `set -o` 和 `set +o` 都可以查看全部选项的设置状态，只是结果显示格式不同
@@ -154,7 +154,6 @@
 > [set(1p) — linux manual page](https://man7.org/linux/man-pages/man1/set.1p.html)
 
 > each variable or function that is created or modified is given the export attribute and marked for export to the environment of subsequent commands.
-
 
 - 创建的变量自动变为环境变量，相当于加上 `export` 属性
 - `man bash` 查看的帮助中没有提到 `functin`，`gnu.org` 文档中提到 `funtion` 也适用，未测试
@@ -172,6 +171,7 @@
 
 ![](img/2023-04-07-17-44-55.png)
 
+如果命令出错则退出
 
 #### -f | -o noglob
 > disable filename expansion(globbing)
@@ -201,7 +201,6 @@
 
 #### -m | -o monitor
 > job control is enabled
-
 
 - 默认开启该设置
 
@@ -364,6 +363,7 @@
 # 修改当前默认 shell
 
 ![](img/2023-04-08-11-12-24.png)
+
 ## usermod -s 
 - 需要 root 权限
 
@@ -381,7 +381,6 @@
 > [The role of shells in the Linux environment](https://bash.cyberciti.biz/guide/The_role_of_shells_in_the_Linux_environment)
 
 
-**********************
 ## 查看当前 shell 是 login shell 还是 non-login shell 
 > a login shell is one whose first character of argument zero is `-`, or one inviked whith `--login` optin.
 
@@ -390,7 +389,6 @@
 
 - 或者用 `shopt login_shell` 查看，状态为 `on` 则为 login shell
 ![](img/2023-04-08-11-36-43.png)
-
 
 
 ## 查看当前 shell 是 interactive shell 还是 non-interactive shell
@@ -428,11 +426,9 @@
 
 - 在一个图形界面用 `init 3` 进入 cli 命令行界面后，此时用 `tty` 查看其设备，`f1` ~ `f6` 分别对应的变为 `tty1` ~ `tty6`？
 
-
 - `su -` 即 `su -l` 创建的也是 login shell，但 `tty` 查看仍是一个终端设备
 ![](img/2023-04-04-20-54-19.png)
 ![](img/2023-04-05-21-00-44.png)
-
 
 - ssh 登录的用户创建 login shell
 
@@ -565,7 +561,6 @@ if [ -n "$BASH_ENV" ]; then . "$BASH_ENV"; fi
 > [6.2 Bash Startup Files](https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html)
 
 
-
 # Bash 环境配置文件的用途说明
 ## /etc/profile
 
@@ -612,7 +607,6 @@ if [ -n "$BASH_ENV" ]; then . "$BASH_ENV"; fi
 
 
 ### rocky8.6
-
 - rocky 8.6 `/etc/profile` 文件中内容更多
 - 注释中写明最好不要修改该文件，而是将自定义设置放在 `/etc/profile.d` 目录中以 `.sh` 为后缀
 
@@ -755,17 +749,15 @@ if [ -n "$BASH_ENV" ]; then . "$BASH_ENV"; fi
   4 esac
 ```
 
-2. 注意脚本中执行其他脚本的顺序，显示 `/etc/profile.d`，再到 `/etc/bashrc`
+2. 注意脚本中执行其他脚本的顺序，先调用 `/etc/profile.d`，再到 `/etc/bashrc`
 
 
 ## /etc/profile.d 目录
-
 - 默认会有一些文件存在，被 `/etc/profile` 调用
 - 可以自定义加上一些文件放改目录中，见 `/etc/profile` 脚本中说明
 - ubuntu 22.04 目录内容如下：
 ![](img/2023-04-08-19-41-51.png)
 - rocky8.6 中该目录的文件更多
-
 
 ## ~/bash_profile
 - ubuntu 22.04, ubuntu 20.04 无该文件
@@ -983,7 +975,6 @@ fi
 - 调用 `/etc/bash_completion` 文件
 
 ### rocky8.6
-
 ```bash
   1 # rocky8.6 .bashrc
   2 
@@ -1029,7 +1020,6 @@ fi
 > When a `login` shell exits, bash reads and executes commands from the file $HOME/.bash_log, if it exists.
 
 ### ubunut 22.04
-
 ```bash
   1 # ~/.bash_logout: executed by bash(1) when login shell exits.                                                                                
   2 
@@ -1053,19 +1043,18 @@ fi
    - /bin/ls
 
 
-
 # 脚本规范
 ## Shebang
 > [Shebang](https://bash.cyberciti.biz/guide/Shebang)
 - 脚本第一行
 - 以 `#!` 开头，后面跟 shell 类型，且为完整路径，如 `#!/bin/bash`
 
-***********
 
 //TODO: 未看#!/usr/bin/env bash
 ### `#!/usr/bin/env bash` 和 `#!/bin/bash`
 > [Make Linux/Unix Script Portable With #!/usr/bin/env As a Shebang](https://www.cyberciti.biz/tips/finding-bash-perl-python-portably-using-env.html)
 > [What is the difference between "#!/usr/bin/env bash" and "#!/usr/bin/bash"?](https://stackoverflow.com/questions/16365130/what-is-the-difference-between-usr-bin-env-bash-and-usr-bin-bash)
+
 
 ## 注释
 - 以 `#` 开头单行注释
@@ -1163,15 +1152,17 @@ bash <<< $(cat test.sh)
 - ubuntu 22.04 的 `~/.bashrc` 文件中没有环境变量的设置，在 `~/.profile` 文件中，而该文件 `non-login shell` 不会执行，需要将 PATH 添加到 `~/.bashrc` 文件中
 
 
-//TODO:远程脚本执行
-# 本地执行远程脚本
-## curl
+# 执行远程主机的脚本
+ubuntu22.04 中利用 ssh 执行远程主机 rocky8 上的脚本
+```bash
+[root@ubuntu22-c0 ~]$ ssh root@10.0.0.82 "cat /root/shell_scripts/test.sh"
+#!/bin/bash
 
-## wget
-
-# 远程主机执行本地脚本
-## ssh
-
+. /etc/os-release
+echo $PRETTY_NAME
+[root@ubuntu22-c0 ~]$ ssh root@10.0.0.82 "bash /root/shell_scripts/test.sh"
+Rocky Linux 8.7 (Green Obsidian)
+```
 
 # 调试脚本
 > [Debug a script](https://bash.cyberciti.biz/guide/Debug_a_script)
@@ -1193,7 +1184,7 @@ bash <<< $(cat test.sh)
 - `set --help | less` 可以看到 `-n` 的作用
 - Read commands but do not execute them
 - 只读命令但不执行，该选项写到脚本中不起作用
-- 用 `bash -n script_name` 方式可以起作用，检查语法
+- 用 `bash -n script_name` 方式可以起作用，检查语法错误，不检查命令错误
 - 如果没有问题，不输出，有错误则提示错误
 
 ```bash
@@ -1235,18 +1226,10 @@ end
 如果用 `bash -n test.sh`，则不输出任何内容
 
 
-# shell 变量
-
-
-
-
 # 引号和转义
 > [引号和转义](https://wangdoc.com/bash/quotation)
-
-# bash Quoting
 > 在线帮助文档：[3.1.2 Quoting](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Quoting)
 > [Quoting](https://bash.cyberciti.biz/guide/Quoting)
-
 
 - `man bash` 搜索 `QUOTING` 查看帮助文档
 ![1](https://img-blog.csdnimg.cn/1d297bc8e8e1415c81a5bf3e6acfd7e4.png)
@@ -1320,7 +1303,6 @@ end
 > 在线官方文档：[3.5 Shell Expansions](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Expansions)
 > [Bash 的模式扩展](https://wangdoc.com/bash/expansion)
 
-
 - shell 先将命令分成 tokens
 - 然后进行扩展，**按照一定顺序**，注意扩展的顺序
 ![1](https://img-blog.csdnimg.cn/dd0ee2039e5c41afbe79f69f3325f87e.png)
@@ -1329,13 +1311,12 @@ end
 - 扩展完成后再执行命令
 
 
-
 ## { } brace expansion 
 > [3.5.1 Brace Expansion](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Brace-Expansion)
 > [大括号扩展](https://wangdoc.com/bash/expansion#大括号扩展)
 
 
-- 花括号扩展是第一个扩展的，在其他扩展之前，因此，花括号中不能放其他扩展格式
+- 花括号扩展是第一个扩展的，在其他扩展之前
 ![](img/2023-03-29-14-57-46.png)
 
 
@@ -1347,16 +1328,12 @@ end
 ### {x..y[..incr]}
 - {x..y[..incr]} x，y 可以是整型或字母
 ![](img/2023-03-29-14-41-54.png)
-- 
+- 数字前加 0 进行对齐
 ![](img/2023-03-29-14-47-24.png)
-
-
 
 ![1](https://img-blog.csdnimg.cn/e4f85bf49b264dc0832a533828ea659b.png)
 ![2](https://img-blog.csdnimg.cn/2534c660a0844aef926dab4c03237ccf.png)
 ![3](https://img-blog.csdnimg.cn/1c3b613167c2401eb7b032ad71408930.png)
-
-
 
 ## ~ tilde expansion 
 > [3.5.2 Tilde Expansion](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Tilde-Expansion)
@@ -1367,7 +1344,7 @@ Error loading webview: Error: Could not register service worker: InvalidStateErr
 ![2](https://img-blog.csdnimg.cn/653f160259864e90affed81714f000a7.png)
 
 
-//NOTE: 参数扩展
+//LABEL: 参数扩展
 ## ${ } shell parameter expansion
 > [3.5.3 Shell Parameter Expansion](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Parameter-Expansion)
 > [变量扩展](https://wangdoc.com/bash/expansion#变量扩展)
@@ -1402,7 +1379,6 @@ Error loading webview: Error: Could not register service worker: InvalidStateErr
 - `parameter` unset，输出 `word`
 ![](img/2023-04-05-21-28-45.png)
 
-******************
 #### ${parameter-} 和 ${parameter} 区别
 > [Is "${PS1-}" valid syntax and how does it differ from plain "$PS1"?](https://unix.stackexchange.com/questions/352110/is-ps1-valid-syntax-and-how-does-it-differ-from-plain-ps1)
 > [2.6.2 Parameter Expansion](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_02)
@@ -1435,21 +1411,17 @@ ubuntu 22.04 中的 `/etc/profile` 配置文件中使用 `${PS1-}` 的用法，�
 ### ${parameter:+word} 变量存在则用默认值替换
 - 和 `${parameter:-word}` 的效果相反
 
-
 ![1](https://img-blog.csdnimg.cn/35d7b10120ef40fcaef51a0f7223e7be.png)
 ![2](https://img-blog.csdnimg.cn/defaa9dcee0a48199de532102b1a9547.png)
 
 ### ${parameter:offset:length} 截取部分内容
 ![1](https://img-blog.csdnimg.cn/2d39d228bce3459ba01c6d7d6d9812bb.png)
 
-
-
 - substring expansion
 - `offset` 定义偏移量，如果为 0，则从第一个字符开始截取
 - `length` 定义截取的长度，不指定则截取到最后
 - `offset` 是负数则从最后开始数偏移量，最后一个字符是 `-1`，不指定长度，则默认到最后
 - `offset` 是负数时，负数要与分隔符 `:` 至少间隔一个空格
-
 
 ![1](https://img-blog.csdnimg.cn/45c27819f10b4d27a91ff8035234e3f1.png)
 
@@ -1470,7 +1442,6 @@ aabcd-efffffg
 efffffg
 ```
 上面中 `*-` 为匹配模式，如果写成 `str1=${str-}` 则只匹配以 `-` 开头  
-
 
 
 ### ${parameter##word} 
@@ -1499,8 +1470,6 @@ a-abcd-efffffg-123
 bcd-efffffg-123
 ```
 
-
-
 ### ${parameter%word} 按模式匹配移除部分字符串
 从尾部匹配开始移除字符串，最短匹配
 
@@ -1514,7 +1483,6 @@ test.txt
 
 ### ${parameter%%word} 按模式匹配移除部分字符串
 从尾部匹配开始移除字符串，最长匹配
-
 
 ```bash
 [root@docker nginx]$ str="test.txt.txt"
@@ -1534,11 +1502,8 @@ test
 > [3.5.4 Command Substitution](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Substitution)
 > [子命令扩展](https://wangdoc.com/bash/expansion#子命令扩展)
 
-
 - 注意区分 `$()` 和 `()`，前者将命令展开成字符串，后者将多个命令组合成一个 group 执行
 ![](img/2023-03-30-11-25-18.png)
-
-- subshell 中执行命令，和 () 相似
 ![](img/2023-03-30-11-33-12.png)
 
 - Replace the command substitution with the standard output of the command, with any trailing newlines deleted.
@@ -1557,7 +1522,6 @@ test
 > [6.5 Shell Arithmetic](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Arithmetic)
 > [Bash 的算术运算](https://wangdoc.com/bash/arithmetic)
 > [Perform arithmetic operations](https://bash.cyberciti.biz/guide/Perform_arithmetic_operations)
-
 
 ![](img/2023-03-30-11-49-03.png)
 
@@ -1580,7 +1544,6 @@ test
 
 
 ## Word Splitting
-
 > [3.5.7 Word Splitting](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Word-Splitting)
 > [What is word splitting? Why is it important in shell programming?](https://unix.stackexchange.com/questions/26661/what-is-word-splitting-why-is-it-important-in-shell-programming)
 
@@ -1647,7 +1610,6 @@ test
 ![3](https://img-blog.csdnimg.cn/6989c544af7f4b38b219baab1884d792.png)
 
 
-
 #### ?(pattern-list)  匹配 0 到 1 个匹配的模式
 ![1](https://img-blog.csdnimg.cn/c52f6dbcf08141dd8f87e7a4f0a9fbdb.png)
 
@@ -1664,26 +1626,47 @@ test
 ![1](https://img-blog.csdnimg.cn/9c007468175443ab808f7e9782edea0f.png)
 
 
-
-
 ## Quote Removal
 > [3.5.9 Quote Removal](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Quote-Removal)
-
-
 
 
 # 特殊参数
 ![1](https://img-blog.csdnimg.cn/3af7e751006b48c7b75e44ba9712a17f.png)
 
+- $? 查看上条命令的退出状态
+```bash
+[root@mysql shell_scripts]$ ls > /dev/null ; echo $?
+0
+```
+
+- $$ 查看当前进程的 PID
+```bash
+[root@mysql shell_scripts]$ echo $$
+6126
+[root@mysql shell_scripts]$  ps -l
+F S   UID     PID    PPID  C PRI  NI ADDR SZ WCHAN  TTY          TIME CMD
+0 S     0    6126    6117  0  80   0 - 56617 -      pts/2    00:00:00 bash
+0 R     0    7881    6126  0  80   0 - 63826 -      pts/2    00:00:00 ps
+```
+
+- $0 
+```bash
+[root@mysql shell_scripts]$ echo $0
+-bash
+```
+
+- $-
+```bash
+[root@mysql shell_scripts]$ echo $-
+himBHs
+```
 
 //LABEL: 变量
 # 变量
-- MAIL 是什么变量?
 ## 变量名
 - 区分大小写
 - 字母、数字和下划线，不以数字开头
 - 不与保留变量名相同
-
 
 ## set 查看全部变量和函数
 > [Variables](https://bash.cyberciti.biz/guide/Variables)
