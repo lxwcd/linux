@@ -3427,6 +3427,26 @@ drwxr-xr-x 4 root root 4096 Feb 21  2023 lxd/
 - `ls -s` 列出的不是文件的真是大小
 ![](img/2023-03-19-11-59-59.png)
 
+
+## ls --format=single-column 单列形式列出文件
+```bash
+[root@ubuntu22-c0 ~]$ ls --format=single-column -F /boot/
+config-5.15.0-79-generic
+config-5.15.0-82-generic
+grub/
+initrd.img@
+initrd.img-5.15.0-79-generic
+initrd.img-5.15.0-82-generic
+initrd.img.old@
+lost+found/
+System.map-5.15.0-79-generic
+System.map-5.15.0-82-generic
+vmlinuz@
+vmlinuz-5.15.0-79-generic
+vmlinuz-5.15.0-82-generic
+vmlinuz.old@
+```
+
 ## ll 常用组合 
 ![1](https://img-blog.csdnimg.cn/161e9d543c264b43bfb419ddd6cf9aa3.png)
 
