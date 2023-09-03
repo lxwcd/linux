@@ -1831,6 +1831,17 @@ $
 3143
 ```
 
+### RANDOM
+随机数
+
+```bash
+[root@ubuntu22-c0 ~]$ echo $RANDOM
+25582
+[root@ubuntu22-c0 ~]$ env | grep RANDOM
+[root@ubuntu22-c0 ~]$ echo $RANDOM
+20700
+```
+
 //LABEL: 环境变量
 ## 环境变量
 
@@ -2932,6 +2943,239 @@ Output:
 Name: John, Age: 25, Gender: Male
 ```
 
-
 # Shell Functions
 > [Shell Functions](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Functions)
+
+## 环境函数
+类似环境变量，也可以定义环境函数，让子进程使用父进程的函数
+
+- declare -xf function_name
+- export -f function_name 
+
+
+## 查看函数
+### declare -F 查看当前已定义的函数名
+```bash
+[root@ubuntu22-c0 ~]$ declare -F | head -n5
+declare -f __expand_tilde_by_ref
+declare -f __get_cword_at_cursor_by_ref
+declare -f __git_eread
+declare -f __git_ps1
+declare -f __git_ps1_colorize_gitstring
+```
+
+### declare -f 查看当前已定义的函数定义
+```bash
+[root@ubuntu22-c0 ~]$ declare -f | head
+__expand_tilde_by_ref ()
+{
+    if [[ ${!1-} == \~* ]]; then
+        eval $1="$(printf ~%q "${!1#\~}")";
+    fi
+}
+__get_cword_at_cursor_by_ref ()
+{
+    local cword words=();
+    __reassemble_comp_words_by_ref "$1" words cword;
+[root@ubuntu22-c0 ~]$
+```
+
+## unset -f 取消函数定义
+
+## 函数调用
+- 在交互式环境下定义函数
+- 将函数和脚本文件放在一起
+- 在文件中只定义函数
+
+函数在被调用时创建，返回时终止
+
+
+## 函数参数
+- func arg1 arg2 ... 
+函数名后面以空白分隔参数列表
+
+- 函数体中用位置变量 $1, $2 等调用参数，或使用 $@, $*, $# 等
+
+## 函数变量
+### 普通变量
+函数外定义，仅在当前 shell 中有效，可在函数内修改
+
+### 环境变量
+当前 shell 和子 shell 中有效
+
+### 局部变量
+使用 local 定义，仅能在函数体内定义，仅在函数体内有效
+
+如果函数外有变量和函数内的同名，则在函数内使用变量时用的是函数内定义的变量
+
+## 函数返回值
+- 默认返回值为函数体最后一条命令的退出状态码
+- 可以用 return 自定义函数返回值，return 之后的语句不再执行
+   - return 
+   返回值为前一条语句的退出状态码
+   - return 0
+   无错误返回
+   - return 1-255
+   有错误返回
+
+- exit 也可以结束函数执行并自定义返回值，但 exit 会中断整个脚本的执行，return 只会中断函数执行
+如果在当前 shell 执行一个脚本用 exit 退出，如用 source 命令执行脚本，则当前终端也会退出
+
+
+# 数组 array
+- 数值索引编号从 0 开始，可支持自定义索引，及关联索引
+- 支持稀疏格式数组，即索引不连续
+
+## 数组声明
+- declare -a 声明为 indexted array
+- declare -A 声明为 associated array
+
+## 数组赋值
+
+```bash
+[root@ubuntu22-c0 ~]$ declare -a arr_0
+[root@ubuntu22-c0 ~]$ arr_0[0]="a"
+[root@ubuntu22-c0 ~]$ arr_0[2]="c"
+```
+
+```bash
+[root@ubuntu22-c0 ~]$ declare -a arr_1
+[root@ubuntu22-c0 ~]$ arr_1=("1" "2" "3")
+```
+
+```bash
+[root@ubuntu22-c0 ~]$ declare -a arr_2
+[root@ubuntu22-c0 ~]$ arr_2=([0]="1" [3]="3")
+```
+
+```bash
+[root@ubuntu22-c0 ~]$ declare -a arr_3
+[root@ubuntu22-c0 ~]$ read -a arr_3
+a0 a1 a2
+```
+
+```bash
+[root@ubuntu22-c0 ~]$ arr=({a..e})
+[root@ubuntu22-c0 ~]$ echo ${arr[*]}
+a b c d e
+```
+## 查看全部数组
+- declare -a
+
+
+## 引用数组
+- 引用特定数组元素
+```bash
+[root@ubuntu22-c0 ~]$ echo ${arr_0[0]}
+a
+[root@ubuntu22-c0 ~]$ echo ${arr_0[1]}
+
+[root@ubuntu22-c0 ~]$ echo ${arr_0[2]}
+c
+```
+不写下标则显示第一个元素
+```bash
+[root@ubuntu22-c0 ~]$ echo $arr_0
+a
+```
+
+- 引用全部数组元素
+```bash
+[root@ubuntu22-c0 ~]$ echo ${arr_1[*]}
+1 2 3
+[root@ubuntu22-c0 ~]$ echo ${arr_1[@]}
+1 2 3
+```
+
+${arr_1[*]} treats the array as a single string
+${arr_1[@]} treats each element of the array as a separate word
+
+## 显示所有数组下标
+```bash
+[root@ubuntu22-c0 ~]$ echo ${!arr[*]}
+0 1 2 3 4
+```
+
+## 查看数组长度
+```bash
+[root@ubuntu22-c0 ~]$ echo ${arr_0[0]}
+a
+[root@ubuntu22-c0 ~]$ echo ${arr_0[1]}
+
+[root@ubuntu22-c0 ~]$ echo ${arr_0[2]}
+c
+```
+```bash
+[root@ubuntu22-c0 ~]$ echo ${#arr_1[*]}
+3
+[root@ubuntu22-c0 ~]$ echo ${#arr_1[@]}
+3
+```
+
+## 删除数组元素
+```bash
+[root@ubuntu22-c0 ~]$ echo ${arr_1[@]}
+1 2 3
+[root@ubuntu22-c0 ~]$ echo ${#arr_1[@]}
+3
+[root@ubuntu22-c0 ~]$ echo ${!arr_1[@]}
+0 1 2
+```
+
+```bash
+[root@ubuntu22-c0 ~]$ unset arr_1[1]
+```
+
+```bash
+[root@ubuntu22-c0 ~]$ echo ${arr_1[@]}
+1 3
+[root@ubuntu22-c0 ~]$ echo ${#arr_1[@]}
+2
+[root@ubuntu22-c0 ~]$ echo ${!arr_1[@]}
+0 2
+```
+
+## 取部分数组元素
+- ${array[@]:offset:number}
+- ${array[*]:offset:number}
+
+offset: 要跳过的元素个数
+number: 要取出的元素个数，不写则取偏移量后的全部元素
+
+```bash
+[root@ubuntu22-c0 ~]$ num=({0..10})
+[root@ubuntu22-c0 ~]$ echo ${num[*]}
+0 1 2 3 4 5 6 7 8 9 10
+[root@ubuntu22-c0 ~]$ echo ${num[*]:3:4}
+3 4 5 6
+```
+
+
+## 关联数组
+- 关联数组必须先声明再使用，declare -A 声明
+- 关联数组可以自定义下标
+
+```bash
+[root@ubuntu22-c0 ~]$ declare -A arr_4
+[root@ubuntu22-c0 ~]$ arr_4=([a]=1 [b]=2 [c]=3)
+[root@ubuntu22-c0 ~]$ echo ${arr_4[*]}
+3 2 1
+[root@ubuntu22-c0 ~]$ echo ${!arr_4[*]}
+c b a
+[root@ubuntu22-c0 ~]$ arr_4[d]=5
+[root@ubuntu22-c0 ~]$ echo ${!arr_4[*]}
+d c b a
+```
+
+```bash
+[root@ubuntu22-c0 ~]$ for i in ${!arr_4[*]}; do
+> echo ${arr_4[$i]};
+> done
+5
+3
+2
+1
+```
+
+
+# 信号捕捉工具 trap

@@ -5583,3 +5583,54 @@ sys     0m0.000s
 
 ## iostat
 实时列出 CPU 与接口设备的输入输出状态
+
+# mktemp 创建临时文件
+```bash
+[root@ubuntu22-c0 ~]$ mktemp --help
+Usage: mktemp [OPTION]... [TEMPLATE]
+Create a temporary file or directory, safely, and print its name.
+TEMPLATE must contain at least 3 consecutive 'X's in last component.
+If TEMPLATE is not specified, use tmp.XXXXXXXXXX, and --tmpdir is implied.
+Files are created u+rw, and directories u+rwx, minus umask restrictions.
+
+  -d, --directory     create a directory, not a file
+  -u, --dry-run       do not create anything; merely print a name (unsafe)
+  -q, --quiet         suppress diagnostics about file/dir-creation failure
+      --suffix=SUFF   append SUFF to TEMPLATE; SUFF must not contain a slash.
+                        This option is implied if TEMPLATE does not end in X
+  -p DIR, --tmpdir[=DIR]  interpret TEMPLATE relative to DIR; if DIR is not
+                        specified, use $TMPDIR if set, else /tmp.  With
+                        this option, TEMPLATE must not be an absolute name;
+                        unlike with -t, TEMPLATE may contain slashes, but
+                        mktemp creates only the final component
+  -t                  interpret TEMPLATE as a single file name component,
+                        relative to a directory: $TMPDIR, if set; else the
+                        directory specified via -p; else /tmp [deprecated]
+      --help     display this help and exit
+      --version  output version information and exit
+```
+
+```bash
+[root@ubuntu22-c0 ~]$ mktemp -u
+/tmp/tmp.7COl8xwQaB
+```
+
+```bash
+[root@ubuntu22-c0 ~]$ mktemp -u aXXX
+aEt8
+[root@ubuntu22-c0 ~]$ mktemp -u aXX
+mktemp: too few X's in template ‘aXX’
+```
+
+```bash
+[root@ubuntu22-c0 ~]$ mktemp -u -d
+/tmp/tmp.y6wgdnTZsM
+```
+
+# install 复制文件设置属性
+```bash
+[root@ubuntu22-c0 ~]$ whatis install
+install (1)          - copy files and set attributes
+```
+
+# 信号捕捉工具 trap
