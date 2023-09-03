@@ -1534,6 +1534,21 @@ test
 ![1](https://img-blog.csdnimg.cn/91c31ba1f75e4e9e8a92daa2800be5f7.png)
 ![2](https://img-blog.csdnimg.cn/d48f8c492d144ce7b713d10645393e28.png)
 
+
+区分 `(( ))` 和 `[ ]` 用于条件测试：
+```bash
+[root@ubuntu22-c0 ~]$ a=3; until (( a < 0 )); do echo "Bye!"; let a-=1; done
+Bye!
+Bye!
+Bye!
+Bye!
+[root@ubuntu22-c0 ~]$ a=3; until [ $a -lt 0 ]; do echo "Bye!"; let a-=1; done
+Bye!
+Bye!
+Bye!
+Bye!
+```
+
 ## <(list) 或 >(list) Process Substitution
 > [3.5.6 Process Substitution](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Process-Substitution)
 > [Process substitution](https://en.wikipedia.org/wiki/Process_substitution)
@@ -1543,13 +1558,112 @@ test
 ![1](https://img-blog.csdnimg.cn/ccd5b75c60e04f74a9548d3eaba03e29.png)
 
 
+Process substitution is a feature available in many Unix-like shells, including Bash, that allows you to treat the output of a command or commands as a file-like object. It is represented by `<(...)` or `>(...)` syntax.
+
+With process substitution, you can easily pass the output of one command as input to another command, or even as the argument to a command that expects a file as input. 
+This can be useful in various scenarios, such as comparing the output of two commands, redirecting output to a command that doesn't accept standard input, or passing command output as a filename argument.
+
+1. Comparing command output:
+```bash
+diff <(command1) <(command2)
+```
+This compares the output of `command1` and `command2` and shows the differences between them using the `diff` command.
+
+2. Redirecting output to a command:
+```bash
+command1 >(command2)
+```
+This redirects the output of `command1` as input to `command2`. `command2` can be any command that accepts input from a file. For example, you can use it to gzip the output of a command directly:
+
+
+```bash
+echo "Hello, world!" >(gzip > output.gz)
+```
+This gzips the output of `echo "Hello, world!"` and saves it to the file `output.gz`.
+
+```bash
+[root@ubuntu22-c0 ~]$ bc < <(echo "1+2")
+3
+```
+
+3. Passing command output as a filename argument:
+```bash
+command1 <(command2)
+```
+This passes the output of `command2` as a filename argument to `command1`. For instance, you can use it to count the number of lines in the output of a command:
+
+```bash
+wc -l <(ls)
+```
+This counts the number of lines in the output of the `ls` command.
+
+
+```bash
+[root@ubuntu22-c0 ~]$ ll <(id)
+lr-x------ 1 root root 64 Sep  3 17:07 /dev/fd/63 -> 'pipe:[57258]'
+```
+
+
+Overall, process substitution provides a powerful and convenient method for manipulating command output in various ways. It allows you to treat command output as if it were a file, enabling more flexibility and efficiency in your shell scripts.
+
 ## Word Splitting
 > [3.5.7 Word Splitting](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Word-Splitting)
 > [What is word splitting? Why is it important in shell programming?](https://unix.stackexchange.com/questions/26661/what-is-word-splitting-why-is-it-important-in-shell-programming)
 
 
-![1](https://img-blog.csdnimg.cn/cf37dc4cb209407eafd2b9fd21bacd0e.png)
+Word splitting is a process in shell scripting where a string is broken down into individual words or tokens, based on a set of delimiters. 
+The shell by default splits the command line into words using a set of characters known as the Internal Field Separator (`IFS`). 
+The default value of `IFS` includes whitespace characters such as space, tab, and newline.
 
+1. Basic Word Splitting:
+When you enter a command in the shell, the shell splits it into words based on the `IFS` value, and then performs certain expansions and substitutions. For example:
+
+```bash
+[root@ubuntu22-c0 ~]$ echo hello    world
+hello world
+```
+
+In this case, the shell splits the command based on the whitespace characters present, and it treats multiple spaces as a single delimiter. So, the output will be: `Hello World`.
+
+2. Command Substitution:
+Word splitting also takes place during command substitution, which occurs when a command is enclosed within `$(...)` or backticks (`...`). The output of the enclosed command is substituted as a single word, even if it contains spaces. For example:
+
+```bash
+[root@ubuntu22-c0 ~]$ echo "Today is $(date)"
+Today is Sun Sep  3 05:45:55 PM CST 2023
+```
+
+The shell executes the `date` command and substitutes its output within the double quotes. 
+
+3. Explicit Disabling of Word Splitting:
+You can disable word splitting for specific variables by enclosing them in double quotes (`"..."`). 
+This prevents the value of the variable from being split into multiple words, preserving spaces. For example:
+
+```bash
+[root@ubuntu22-c0 ~]$ myvar="hello    world"
+[root@ubuntu22-c0 ~]$ echo $myvar
+hello world
+```
+
+In this case, the variable `myvar` contains multiple consecutive spaces. 
+But when we use `echo "$myvar"`, the shell treats it as a single word and preserves the spaces. 
+
+4. Customizing IFS:
+You can customize the `IFS` variable to define your own set of delimiters for word splitting. For example, setting `IFS` to a colon (`:`) allows splitting based on colons. Here's an example:
+
+```bash
+[root@ubuntu22-c0 ~]$  myvar="one:two:three"
+[root@ubuntu22-c0 ~]$ IFS=":"
+[root@ubuntu22-c0 ~]$ for word in $myvar; do
+> echo "$word";
+> done
+one
+two
+three
+```
+
+In this example, we set `IFS` to a colon (`:`) and then loop through the words in `myvar` using a `for` loop. 
+The shell splits the value of `myvar` based on the colon delimiter we specified.
 
 ## Filename Expansion
 > [3.5.8 Filename Expansion](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Filename-Expansion)
@@ -1676,23 +1790,6 @@ himBHs
 - 包括内置变量，自定义变量和导出的环境变量
 - 也会输出函数
 
-## env 查看当前的环境变量
-- `env | less` 查看
-- 导出的结果针对当前的 shell 环境
-- 导出的仅环境变量
-- 有些可能变化，如进入到不同的目录中，环境变量 `PWD` 会变化
-
-## printenv 查看当前全部环境变量
-- `printenv | less` 查看
-- 和 `env` 看到的区别？
-
-
-## export 查看当前的环境变量
-> [What's the difference between set, export and env and when should I use each?](https://askubuntu.com/questions/205688/whats-the-difference-between-set-export-and-env-and-when-should-i-use-each)
-
-
-- `export | less` 查看
-- 和 `env` 看到的区别？
 
 
 ## 内置变量
@@ -1714,47 +1811,203 @@ $
 
 但用 `echo $IFS | cat -A` 输出为 `$`
 
-### MAIL
-
-### PATH
-- 也是环境变量
-
-
 ### PS1
 - 内置变量，不是环境变量
 
 ### PS2
 
+### UID
 
+### BASHPID
+- 当前进程 PID
+```bash
+[root@ubuntu22-c0 ~]$ echo $BASHPID
+3143
+[root@ubuntu22-c0 ~]$ ps
+    PID TTY          TIME CMD
+   3143 pts/1    00:00:00 bash
+   3257 pts/1    00:00:00 ps
+[root@ubuntu22-c0 ~]$ echo $$
+3143
+```
 
 //LABEL: 环境变量
 ## 环境变量
-### $TERM 
+
+### 内置环境变量
+#### $TERM 
 > [$TERM variable](https://bash.cyberciti.biz/guide/%24TERM_variable)
 
+#### MAIL
 
+#### PATH
+
+#### 下划线 
+下划线表示前一个命令的最后一个参数 
+```bash
+[root@ubuntu22-c0 ~]$ whatis printenv
+printenv (1)         - print all or part of environment
+[root@ubuntu22-c0 ~]$ echo $_
+printenv
+```
+
+#### LANG 
+```bash
+[root@ubuntu22-c0 ~]$ echo $LANG
+en_US.UTF-8
+```
+
+#### PWD 当前工作目录
+#### OLDPWD 上次的工作目录
+```bash
+[root@ubuntu22-c0 ~]$ cd /etc
+[root@ubuntu22-c0 etc]$ cd -
+/root
+[root@ubuntu22-c0 ~]$ echo $OLDPWD
+/etc
+```
+
+### USER
+
+### SHLVL 显示 shell 嵌套深度
+```bash
+[root@ubuntu22-c0 ~]$ echo $SHLVL
+1
+[root@ubuntu22-c0 ~]$ bash
+[root@ubuntu22-c0 ~]$ bash
+[root@ubuntu22-c0 ~]$ echo $SHLVL
+3
+[root@ubuntu22-c0 ~]$ w
+ 10:24:13 up 16 min,  1 user,  load average: 0.15, 0.17, 0.11
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+root     pts/0    10.0.0.1         10:11    1.00s  0.22s  0.00s w
+[root@ubuntu22-c0 ~]$ ps
+    PID TTY          TIME CMD
+   1687 pts/0    00:00:00 bash
+   1884 pts/0    00:00:00 bash
+   1894 pts/0    00:00:00 bash
+   1905 pts/0    00:00:00 ps
+```
+
+## env 查看当前的环境变量
+- `env | less` 查看
+- 导出的结果针对当前的 shell 环境
+- 导出的仅环境变量
+- 有些可能变化，如进入到不同的目录中，环境变量 `PWD` 会变化
+
+## printenv 查看当前全部环境变量
+- `printenv | less` 查看
+- 和 `env` 看到的相同
+
+
+## export 查看当前的环境变量
+> [What's the difference between set, export and env and when should I use each?](https://askubuntu.com/questions/205688/whats-the-difference-between-set-export-and-env-and-when-should-i-use-each)
+
+
+- `export | less` 查看
+### 查看进程的环境变量
+查看当前进程的 PID
+```bash
+[root@ubuntu22-c0 ~]$ echo $$
+1687
+[root@ubuntu22-c0 ~]$ ps
+    PID TTY          TIME CMD
+   1687 pts/0    00:00:00 bash
+   2027 pts/0    00:00:00 ps
+```
+
+查看进程的环境变量
+```bash
+[root@ubuntu22-c0 ~]$ cat /proc/$$/environ
+USER=rootLOGNAME=rootHOME=/rootPATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/binSHELL=/bin/bashTERM=xtermDISPLAY=localhost:10.0XDG_SESSION_ID=1XDG_RUNTIME_DIR=/run/user/0DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/0/busXDG_SESSION_TYPE=ttyXDG_SESSION_CLASS=userMOTD_SHOWN=pamLANG=en_US.UTF-8SSH_CLIENT=10.0.0.1 56669 22SSH_CONNECTION=10.0.0.1 56669 10.0.0.200 22SSH_TTY=/dev/pts/0[root@ubuntu22-c0 ~]$
+```
 
 ## declare 指定变量类型
-
 - `help declare`
 
 ### -i
-
+- interget
 ### -a
+- array
 
 ### -A
+- associative array
 ### -x
+- 将变量导出为环境变量
 
 
 ## 变量赋值
 ### 双引号
 - `$` 有特殊含义
-![](img/2023-04-03-19-27-42.png)
+```bash
+[root@ubuntu22-c0 ~]$ a="$PWD"
+[root@ubuntu22-c0 ~]$ echo $a
+/root
+[root@ubuntu22-c0 ~]$ b="\$PWD"
+[root@ubuntu22-c0 ~]$ echo $b
+$PWD
+```
 
 ### 单引号
-
+```bash
+[root@ubuntu22-c0 ~]$ a='$PWD'
+[root@ubuntu22-c0 ~]$ echo $a
+$PWD
+```
 
 ### read 从标准输入赋值给变量
+> [read](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-read)
+> [read Command Syntax](https://bash.cyberciti.biz/guide/Getting_User_Input_Via_Keyboard)
+
+
+![](img/2023-03-28-19-58-29.png)
+
+- read [options] [name ...]
+- read 将输入值分配给一个或多个变量，从标准输入读值，每个 word 分配给一个变量，剩余的全部内容分配给最后一个变量
+- $IFS 作为默认 word delimiters
+- 如果没有变量名，则将读入内容保存到 REPLY 变量中
+
+
+```bash
+[root@ubuntu22-c0 ~]$ read
+a1
+[root@ubuntu22-c0 ~]$ echo $REPLY
+a1
+[root@ubuntu22-c0 ~]$ read
+a b c
+[root@ubuntu22-c0 ~]$ echo $REPLY
+a b c
+```
+```bash
+[root@ubuntu22-c0 ~]$ read -p "> " var1 var2
+> a1 a2 a3
+[root@ubuntu22-c0 ~]$ echo $var1
+a1
+[root@ubuntu22-c0 ~]$ echo $var2
+a2 a3
+```
+```bash
+[root@ubuntu22-c0 ~]$ read -p "> " var1
+> a b c
+[root@ubuntu22-c0 ~]$ echo $var1
+a b c
+```
+
+#### read -p 指定输入内容时的提示
+```bash
+[root@ubuntu22-c0 ~]$ read -p "input number: "
+input number: 1 2 3
+[root@ubuntu22-c0 ~]$ echo $REPLY
+1 2 3
+```
+
+#### read -s 不显示输入内容
+如用于输入密码
+
+#### read -n 指定输入长度
+
+#### read -d 指定结束符
+默认为换行符
 
 ### 设置空变量
 ```bash
@@ -1764,8 +2017,6 @@ var=""
 
 ## 为变量设置默认值
 - 见 `${ } shell parameter expansion`
-
-
 
 
 
@@ -1785,12 +2036,11 @@ var=""
 > Unset the variable itself rather than the variable it references.
 
 
-
-
 # Bash Conditional Expressions
 > [Bash Conditional Expressions](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Bash-Conditional-Expressions)
 
-- When used with `[[`, the `<` and `>` operators sort lexicographically using the current locale. The `test` command uses ASCII ordering.
+> When used with `[[`, the `<` and `>` operators sort lexicographically using the current locale. 
+> The `test` command uses ASCII ordering.
 
 
 
@@ -1918,7 +2168,6 @@ var=""
 - string1 < string2 
 - string1 > string2
 
-
 ![](img/2023-03-29-15-48-46.png)
 
 ## 整型数值比较
@@ -1934,8 +2183,6 @@ var=""
 
 
 ![](img/2023-03-29-16-27-32.png)
-
-
 
 
 
@@ -1963,7 +2210,6 @@ done
 - 最后的退出状态为最后一条指令的执行结果
 
 ## while
-
 ```bash
 while [ condition ]
 do
@@ -1973,30 +2219,65 @@ done
 
 - 满足条件则执行循环
 
-
 ### while read
+> [Bash: while read line](https://linuxhint.com/while_read_line_bash/)
+
 - 从标准输入读写入变量中
-- 
+- 遍历文件或文本的每一行
 
+```bash
+[root@ubuntu22-c0 ~]$ echo $PS2
+read:
+[root@ubuntu22-c0 ~]$ cat <<EOF > test.txt
+read: a b c
+read: 1
+read: 2 3
+read: EOF
+[root@ubuntu22-c0 ~]$ cat test.txt
+a b c
+1
+2 3
+```
+```bash
+[root@ubuntu22-c0 ~]$ n=1; while read line; do echo line$n: $line; let n+=1;  done < test.txt
+line1: a b c
+line2: 1
+line3: 2 3
+```
+```bash
+[root@ubuntu22-c0 ~]$ n=1; while read l1 l2; do echo line$n: $l1, $l2; let n+=1;  done < test.txt
+line1: a, b c
+line2: 1,
+line3: 2, 3
+```
 
-//TODO: 补充脚本
-### 脚本示例
-#### 判断一个网站能否访问
-- `curl www.baidu.com` 可以测试写的网站能否访问
-- 能访问则返回 0，不能访问返回非0
+### 示例
+- 判断一个网站能否访问
+```bash
+[root@ubuntu22-c0 ~]$ cat site.txt
+www.baidu.com
+www.jd.com
+www.google.com
+[root@ubuntu22-c0 ~]$ while read url; do
+read: curl -s --connect-timeout 1 $url &> /dev/null || echo "access $url failed"
+read: done < site.txt
+access www.google.com failed
+```
 
-![](img/2023-03-28-20-04-43.png)
-
-#### 监控分区利用率
-- 设置一个阈值，最大的分区利用率超过阈值则报警并发邮件
-- 报警时提示超过阈值的设备文件
-- `df` 命令查看分区利用率，`sed` 取出利用率数值，`sort` 排序
-- ubuntu 22.04 虚拟机中设备 `/dev/sda` 等格式，ubuntu 20.04 物理机不是该名字
-
+- 查看 shell 为 /sbin/nologin 的用户和 UID
+```bash
+[root@ubuntu22-c0 ~]$ while read line; do
+read:    if [[ "$line" =~ /sbin/nologin$ ]]; then
+read:        echo $line | cut -d":" -f1,3
+read:    fi
+read: done < /etc/passwd
+```
+```bash
+[root@ubuntu22-c0 ~]$ grep "/sbin/nologin" /etc/passwd | cut -d":" -f1,3
+```
 
 
 ## for
-
 ### for ... do ... done
 ```bash
 for arg in [list]
@@ -2014,12 +2295,31 @@ done
 ### for ((exp1; expr2; exper3))
 > [Syntax error: Bad for loop variable](https://stackoverflow.com/questions/30358065/syntax-error-bad-for-loop-variable)
 
-
 - 用这种格式，执行时可以正常执行，但 `sh -n` 检查时提示 `bad for loop variable`，改用 `bash -n` 无错误
 
 ![](img/2023-03-18-11-28-35.png)
 
-## continue
+## 循环控制语句 continue
+> [continue](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-continue)
+
+
+- `continue [n]`
+- Resume the next iteration of an enclosing `for, while, or select` loop.
+- 同 `break` 相同，当层循环的 n 为 1，默认的 n 为 1 
+
+
+## 循环控制语句 break
+> [break](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-break)
+
+- break [n] 
+
+- Exit from a `for, while, until, or select` loop
+
+- 后面可以指定一个数字，最小为 1，表名当层的循环
+
+- 不指定则退出最当层循环，即 n 为 1
+  
+- 如果 n 为 2，则退出当层，和该层外面一层的循环
 
 # Conditional Constructs
 ## if
@@ -2039,7 +2339,6 @@ fi
 ```
 
 ## case
-
 ```bash
 case "$var" in
     "$con1")
@@ -2078,24 +2377,53 @@ done
 # Operators
 > [Shell Basic Operators](https://www.tutorialspoint.com/unix/unix-basic-operators.htm#)
 
-
-
-
 ## Boolean Operators
 - `!` logical negation
 - `-o` logical **OR**
 - `-a` logical **AND**
 
-
 ![](img/2023-03-29-19-08-55.png)
-
-
 
 ## [ expression ] Test Expression
 - 方括号的两边要有空格
 - 字符串比较时最好用双引号包围
 
+### 区分 (( )) 和 [ ]
+In shell scripting, both `(( ))` and `[ ]` (or its equivalent `test` command) can be used for conditional tests. However, they differ in terms of syntax and functionality.
 
+1. `(( ))`:
+   - Syntax: `(( expression ))`
+   - Functionality: `(( ))` is primarily used for arithmetic expressions and performs numerical comparisons.
+   - Example:
+     ```bash
+     if (( 5 > 3 )); then
+         echo "5 is greater than 3"
+     fi
+     ```
+
+2. `[ ]` or `test` command:
+   - Syntax: `[ expression ]` or `test expression`
+   - Functionality: `[ ]` or `test` command is used for various types of conditional tests, including string comparisons, file existence checks, and numerical comparisons.
+   - Example:
+     ```bash
+     if [ "$var1" = "$var2" ]; then
+         echo "var1 is equal to var2"
+     fi
+     ```
+
+Here are some key differences between `(( ))` and `[ ]`:
+
+- Expression Type: `(( ))` deals with arithmetic expressions, while `[ ]` handles various types of expressions, such as string comparisons, file checks, and numerical comparisons.
+
+- Comparison Operators: `(( ))` uses arithmetic comparison operators like `<`, `>`, `<=`, `>=`, `==`, `!=`, etc., whereas `[ ]` uses string-specific comparison operators such as `=`, `!=`, `-eq`, `-ne`, `-lt`, `-gt`, `-le`, `-ge`, etc.
+
+- Variable Expansion: `(( ))` automatically expands variables, so you don't need to use the dollar sign `$` to reference variables. On the other hand, `[ ]` requires variable expansion using the dollar sign `$`, like `[ "$var" = "value" ]`.
+
+- True/False Values: In `(( ))`, a value of 0 is considered false, and any non-zero value is considered true. In `[ ]`, an exit status of 0 indicates true, and a non-zero exit status indicates false.
+
+- And/Or Operations: `(( ))` uses `&&` and `||` for logical AND and OR operations, respectively. `[ ]` uses `-a` and `-o` for AND and OR operations, respectively, or you can also use `&&` and `||` within `[ ]` in some shells.
+
+Overall, `(( ))` is mainly used for arithmetic comparisons, while `[ ]` or `test` command is more versatile and can handle a wider range of conditional tests.
 
 ## [[ expression ]] Test Expression
 > [conditional expression](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_005b_005b)
@@ -2106,8 +2434,6 @@ done
 - Conditional operators such as `-f` must be unquoted to be recognized as primaries.
 
 
-
-
 ### == 和 !=
 - 右边的字符串被认为是 [Pattern Matching](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Pattern-Matching)
 ![](img/2023-03-29-17-08-52.png)
@@ -2116,18 +2442,13 @@ done
 ![](img/2023-03-29-17-42-47.png)
 ![](img/2023-03-29-17-48-40.png)
 
-### =~ 
+### =~ 模式匹配
+- 左侧的字符串能否被右侧的正则表达式的模式匹配
+- 表达式位于 `[[ ]]` 为扩展的正则表达式
 - 右侧的字符串会被认为是 POSIX extended regular expression pattern and matched accordingly.
+
 ![](img/2023-03-29-17-52-44.png)
-
-### 判断文件后缀
-
 ![](img/2023-03-29-18-00-37.png)
-
-### 判断合法 IPv4 地址
-
-
-
 
 ## , comma operator
 - 逗号连接多个算术操作，返回最后一个的值
@@ -2142,14 +2463,12 @@ done
 # Positional Parameters
 > [Positional Parameters](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Positional-Parameters)
 
-
 ## ?
 - `$?` 查看上个命令的退出状态值
 
 ## $
 - `$$` expands to the process ID of the shell
 - In a subshell, it expands to the process ID of the **invoking shell, not the subshell** 
-
 
 # Command Execution Environment
 > [Command Execution Environment](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Execution-Environment)
@@ -2158,28 +2477,62 @@ done
 # subprocess
 > [8.6. Shell Subprocesses and Subshells](https://docstore.mik.ua/orelly/unix3/korn/ch08_06.htm)
 
-
 - 直接执行 `bash` 会开启一个子进程，但该子进程不继承父进程的自定义变量，别名和 `set -o` 设置等
 - 执行一个 shell 脚本时，不同的调用脚本方式可以在当前进程执行（继承父进程的自定义变量，别名，set -o 等的临时设置）或者在一个 subprocess 中执行（不继承父进程的自定义变量等）
 
+A subprocess refers to the execution of an external command or script within the current shell script or command. It creates a separate process to run the command and communicates with it through input/output streams or by using command-line arguments.
+
+```bash
+#!/bin/bash
+
+# Execute an external command using subprocess
+output=$(ls -l)
+
+# Print the output
+echo "$output"
+```
 
 # subshell
 > [Command Execution Environment](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Execution-Environment)
 > [8.6. Shell Subprocesses and Subshells](https://docstore.mik.ua/orelly/unix3/korn/ch08_06.htm)
 
 
-- A subshell is a copy of the shell process.
-- 区分 subshell 和 subprocess
+A subshell refers to creating a child shell environment within the current shell, 
+which operates as a separate instance with its own set of variables and environment. 
 
+Any changes made within the subshell do not affect the parent shell. 
+The subshell is useful for executing multiple commands together while keeping their environment isolated.
+
+例如通过 `( )` 创建一个 subshell
+```bash
+[root@ubuntu22-c0 ~]$ cat subshell.sh
+#!/bin/bash
+
+# Perform operations within a subshell
+(
+    # Assign a value to a variable within the subshell
+    count=10
+
+    # Print the variable value within the subshell
+    echo "Inside subshell: count = $count"
+)
+
+# Print the variable value outside the subshell
+echo "Outside subshell: count = $count"
+[root@ubuntu22-c0 ~]$ . subshell.sh
+Inside subshell: count = 10
+Outside subshell: count =
+```
+
+A 'subprocess' refers to executing an external command as a separate process, 
+while a 'subshell' refers to creating an isolated shell environment within the current shell script.
 
 
 # 多个命令组合为一个整体 Grouping Commands
 > [Grouping Commands](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Grouping)
 
-
 - Bash 提供两种方法将多个命令组合成一个 group，因此执行时作为一个 unit。
 - When commands are grouped, redirections may be applied to the entire command list.
-
 
 ## (list)
 > [Command Execution Environment](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Execution-Environment)
@@ -2187,18 +2540,15 @@ done
 
 
 - 圆括号中的命令会在 subshell 中执行
-
 - 圆括号中的变量赋值不会影响父进程
-
 - Commands grouped with parentheses are invoked in a subshell environment that is a duplicate of the shell environment, except that traps caught by the shell are reset to the values that the shell inherited from its parent at invocation.
-
 - shell 调用 fork 函数来创建的子进程，因此子进程继承父进程的自定义的变量，别名，用 `set -o` 临时设置的参数等环境
+
 ![](img/2023-03-29-20-32-39.png)
 ![](img/2023-03-29-20-34-35.png)
 ![](img/2023-03-29-20-37-00.png)
 
 - 圆括号创建了子进程后，子进程和父进程用独立的虚拟内存空间，因此子进程中的临时设置和自定义变量等不会影响父进程
-
 
 
 用途：
@@ -2210,7 +2560,7 @@ done
 ![](img/2023-03-29-20-49-39.png)
 ![](img/2023-03-29-20-51-11.png)
 
-## {}
+## { list; }
 > [{ list; }](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-_007b)
 
 - 当前进程中执行命令
@@ -2223,29 +2573,14 @@ done
 # | pipeline
 > [pipeline](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Pipelines)
 
-
 - 管道的左边必须要有标准输出，管道的右边要能支持标准输入（仅输入命令后回车，终端会等待输入）
 - 管道的两边都会开启子进程
 ![](img/2023-03-29-21-10-08.png)
 - 管道的退出状态（exit status）是管道中最后一个命令执行的退出状态
-- If the lastpipe option is enabled using the **shopt** builtin (see (The Shopt Builtin)[https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#The-Shopt-Builtin]), the last element of a pipeline may be run by the shell process when job control is not active.
+- If the lastpipe option is enabled using the **shopt** builtin [The Shopt Builtin](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#The-Shopt-Builtin), the last element of a pipeline may be run by the shell process when job control is not active.
 
 
 ![](img/2023-03-30-10-36-01.png)
-
-
-# Command Substitution
-
-# Process Substitution 
-> [Chapter 23. Process Substitution](https://tldp.org/LDP/abs/html/process-sub.html)
-
-- `<(list)` 或 `>(list)`
-
-![](img/2023-03-18-15-41-00.png)
-
-
-# word splitting
-> [Word Splitting](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Word-Splitting)
 
 
 # shell 内置命令（builtin commands）
@@ -2268,7 +2603,12 @@ done
 - <font color=red>provide a placeholder where a binary operation is expected</font>，命令开头写 `:` 当占位符，这样 shell 不会将它后面的字符当作命令
 - `: >` 将文件清空，仅适用普通文件
 
-![](img/2023-03-18-16-28-01.png)
+```bash
+[root@ubuntu22-c0 ~]$ :
+[root@ubuntu22-c0 ~]$ echo $?
+0
+```
+
 ![](img/2023-03-18-16-35-11.png)
 ![](img/2023-03-18-16-47-32.png)
 
@@ -2314,7 +2654,6 @@ fi
 ### break
 > [break](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-break)
 
-
 - break [n] 
 
 - Exit from a `for, while, until, or select` loop
@@ -2341,13 +2680,54 @@ fi
 ### eval
 > [eval](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-eval)
 
+- eval 会先扫描命令进行全部的置换，再执行命令
+- 适用于需要多次扫描的变量
+
+```bash
+[root@ubuntu22-c0 ~]$ n=4
+[root@ubuntu22-c0 ~]$ echo {1..$n}
+{1..4}
+[root@ubuntu22-c0 ~]$ eval echo {1..$n}
+1 2 3 4
+```
+
 
 ### exec
 子进程中创建的变量，即使用 export 导出为环境变量，但在父进程中无法使用该变量
 
 可以用 exec 
 
+#### exec $@
+In shell scripting, `exec $@` is a command often used to replace the current shell process with a new command or script, while preserving command-line arguments passed to the script. 
+
+The `exec` command in shell is used to execute a command that replaces the current shell process. When `exec` is used without any command, it replaces the current process with the specified command. `$@` is a special variable that represents all command-line arguments passed to the script or function.
+
+So, when you use `exec $@`, it essentially replaces the current shell with the command and arguments that were passed to the script or function. This is commonly used when you want to execute a command without creating a new process, allowing the command to directly take over the shell process.
+
+
+1. Example with a shell script:
+```bash
+[root@ubuntu22-c0 ~]$ cat test.sh
+#!/bin/bash
+
+echo "Hello, world!"
 exec $@
+[root@ubuntu22-c0 ~]$ . test.sh sh
+Hello, world!
+# ps
+    PID TTY          TIME CMD
+   4038 pts/1    00:00:00 sh
+   4105 pts/1    00:00:00 ps
+# echo $-
+smi
+# echo $0
+sh
+```
+当执行 test.sh 脚本，给脚本传递的参数 `sh` 被 `$@` 捕获，该参数替换当前的 shell 进程，因此执行完当前 shell 变成 sh
+
+In the above example, the `exec $@` line ensures that the executed command takes over the current shell process, effectively replacing it. This can be useful in situations where you want the executed command to have the same environment settings and privileges as the original shell process.
+
+Please note that using `exec` will effectively terminate the script or function at that point, as the control flow will be transferred to the new command. Therefore, any code after `exec` will not be executed.
 
 
 ### export
@@ -2369,7 +2749,6 @@ exec $@
 
 #### -p
 - Display a list of all exported variables and functions
-
 
 
 
@@ -2402,6 +2781,49 @@ exec $@
 > [4.2 Bash Builtin Commands](https://www.gnu.org/software/bash/manual/html_node/Bash-Builtins.html)
 
 ### let
+In shell scripting, the `let` command is used to perform arithmetic operations and update the value of variables. It allows you to easily perform calculations within your shell scripts. 
+
+1. Basic Syntax:
+```bash
+let varname=expression
+```
+
+2. Arithmetic Operations:
+You can use common arithmetic operations, such as addition (+), subtraction (-), multiplication (*), division (/), and modulus (%), within the `let` command. Parentheses can be used to enforce precedence.
+
+Example:
+```bash
+[root@ubuntu22-c0 ~]$ let result="5+3"
+[root@ubuntu22-c0 ~]$ echo $result
+8
+```
+
+3. Increment and Decrement:
+The `let` command can be used to increment or decrement the value of a variable by a specified amount using the `+=` and `-=` operators.
+
+Example:
+```bash
+[root@ubuntu22-c0 ~]$ a=1; let a+=1; echo $a
+2
+```
+
+4. Bitwise Operations:
+The `let` command also supports bitwise operations, such as bitwise AND (`&`), bitwise OR (`|`), bitwise exclusive OR (`^`), bitwise left shift (`<<`), and bitwise right shift (`>>`).
+
+Example:
+```bash
+[root@ubuntu22-c0 ~]$ let "r=10&6"
+[root@ubuntu22-c0 ~]$ echo $r
+2
+[root@ubuntu22-c0 ~]$ let "r=10|6"; echo $r
+14
+[root@ubuntu22-c0 ~]$ let "r=10^6"; echo $r
+12
+[root@ubuntu22-c0 ~]$ let "r=10 << 2"; echo $r
+40
+[root@ubuntu22-c0 ~]$ let "r=10 >> 2"; echo $r
+2
+```
 
 ### read 从标准输入读取一行内容
 > [read](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-read)
@@ -2409,7 +2831,6 @@ exec $@
 
 
 ![](img/2023-03-28-19-58-29.png)
-
 
 - $IFS 作为默认 word delimiters
 - 如果没有变量名，则将读入内容保存到 REPLY 变量中
@@ -2428,7 +2849,6 @@ exec $@
 - 如果输入的内容中有很多 `\` 时可用该选项
 
 
-
 ### shift
 > [shift](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-shift)
 
@@ -2443,19 +2863,74 @@ exec $@
 
 - `-v var` assign the output to shell variable `VAR` rather than display it on the standard output 
 
+The `printf` command in the shell is used for formatted printing. 
+It allows you to display text and variables with specific formatting options. 
 
+```bash
+printf FORMAT [ARGUMENT]...
+```
+- `FORMAT` specifies the format string.
+- `ARGUMENT` (optional) represents the values or variables to be displayed.
 
-# 环境变量
+The `FORMAT` string can contain plain text and format specifiers, which start with a percent symbol `%`. Here are some commonly used format specifiers:
 
-## CDPATH
-> [What is CDPATH](https://www.theunixschool.com/2012/04/what-is-cdpath.html)
-> [Hack 1. Use CDPATH to define the base directory for cd command](https://linux.101hacks.com/cd-command/cdpath/)
+- `%s`: Prints a string.
+- `%d` or `%i`: Prints a signed decimal integer.
+- `%f`: Prints a floating-point number.
+- `%c`: Prints a single character.
+- `%%`: Prints a literal percent symbol (%).
 
+Now, let's see some examples to understand how `printf` works:
 
-## PWD
+1. Printing a simple string:
+```bash
+printf "Hello, world!\n"
+```
+Output:
+```
+Hello, world!
+```
 
-## OLDPWD
+2. Printing a variable:
+```bash
+name="John"
+printf "My name is %s\n" "$name"
+```
+Output:
+```
+My name is John
+```
 
+3. Formatting numbers:
+```bash
+number=42
+printf "Decimal: %d, Hexadecimal: %x, Octal: %o\n" "$number" "$number" "$number"
+```
+Output:
+```
+Decimal: 42, Hexadecimal: 2a, Octal: 52
+```
+
+4. Controlling width and precision:
+```bash
+float_value=3.14159
+printf "Float: %.2f\n" "$float_value"
+```
+Output:
+```
+Float: 3.14
+```
+
+5. Printing multiple values:
+```bash
+age=25
+gender="Male"
+printf "Name: %s, Age: %d, Gender: %s\n" "$name" "$age" "$gender"
+```
+Output:
+```
+Name: John, Age: 25, Gender: Male
+```
 
 
 # Shell Functions
