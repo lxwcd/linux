@@ -5115,18 +5115,18 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 
 ![](img/2023-03-14-20-04-06.png)
 
-# grep 中正则表达式应用
-## <font color=red>grep 取出首尾单词相同的行</font>
+## grep 中正则表达式应用
+### <font color=red>grep 取出首尾单词相同的行</font>
 
 ![](img/2023-03-14-20-36-34.png)
 
 
-## grep "[0-Z]" 匹配
+### grep "[0-Z]" 匹配
 
 ![](img/2023-03-15-09-13-39.png)
 
 
-## [:digit:] 和 [[:digit:]]
+### [:digit:] 和 [[:digit:]]
 
 ![](img/2023-03-15-09-22-08.png)
 ![](img/2023-03-17-10-18-30.png)
@@ -5286,7 +5286,7 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 > [5.8 Escape Sequences - specifying special characters](https://www.gnu.org/software/sed/manual/sed.html#Escapes)
 
 
-## 命令格式
+## sed 命令格式
 - `sed [OPTION]... {script-only-if-no-other-script} [input-file]...`
 
 
@@ -5395,9 +5395,8 @@ Windows 格式的文件显示最后的 `^M` 标记，linux 格式文件不显示
 ![](img/2023-04-01-11-19-37.png)
 
 
-#### 命令
+#### sed 命令
 > [sed commands summary](https://www.gnu.org/software/sed/manual/sed.html#sed-scripts)
-
 
 ##### p 打印模式空间的内容
 - 默认区分大小写
@@ -5490,13 +5489,13 @@ hello
 ![](img/2023-03-16-20-37-53.png)
 ![](img/2023-03-16-21-13-27.png)
 
-## 处理一行中其中一个匹配内容
+## sed 处理一行中其中一个匹配内容
 ![](img/2023-03-16-20-45-45.png)
 
-## 处理多个命令
+## sed 处理多个命令
 > [Multiple commands syntax](https://www.gnu.org/software/sed/manual/sed.html#Multiple-commands-syntax)
 
-### `sed` 命令用 newlines 分隔
+### 命令用 newlines 分隔
 ![](img/2023-03-31-20-47-55.png)
 
 ### 用 `;` 分隔一些命令
@@ -5506,8 +5505,8 @@ hello
 ### 用 `-e` 选项
 
 
-## 例子
-1. 将一个文件中的一行如 `port 6379` 改为 `port num`，num 为变量，该行的开头为 `port`
+## sed 使用变量
+例如将一个文件中的一行如 `port 6379` 改为 `port num`，num 为变量，该行的开头为 `port`
 
 ```bash
 [root@docker init_data]$ num=6371
@@ -5515,6 +5514,71 @@ hello
 ```
 
 注意在 `sed` 中使用变量，用双引号而非单引号包围，单引号会无法识别变量 
+
+# awk
+> 跟着这个教程学习基本用法：[Awk Tutorial](https://www.tutorialspoint.com/awk/index.htm)
+> 要详细了解某个具体知识点查询 gnu 官网：[gnu gawk](https://www.gnu.org/software/gawk/manual/gawk.html)
+
+- AWK is an interpreted programming language. 
+- It is very powerful and specially designed for text processing. 
+
+```bash
+[root@ubuntu22-c0 ~]$ ll $(which awk)
+lrwxrwxrwx 1 root root 21 Aug  9  2022 /usr/bin/awk -> /etc/alternatives/awk*
+```
+
+## awk workflow
+> [AWK - Workflow](https://www.tutorialspoint.com/awk/awk_workflow.htm)
+
+- read a line from the input stream (file, pipe or stdin)
+- execute AWK command on a line
+- repeat it until the input stream reaches the its end
+
+## awk command format
+> gnu: [1.1 How to Run awk Programs](https://www.gnu.org/software/gawk/manual/gawk.html#Running-gawk)
+
+
+```bash
+awk 'program' input-file1 input-file2 …
+```
+
+```bash
+awk -f program-file input-file1 input-file2 …
+```
+
+也可以不指定文件，从标准输入读取，`Ctrl-d` 终止输入
+```bash
+awk 'program'
+```
+
+### awk program structure
+> [AWK - Workflow](https://www.tutorialspoint.com/awk/awk_workflow.htm)
+
+#### BEGIN block
+```bash
+BEGIN {awk-commands}
+```
+- The BEGIN block gets executed at program start-up. 
+- It executes only once. This is good place to initialize variables. 
+- BEGIN is an AWK keyword and hence it must be in upper-case. 
+- This block is optional.
+
+
+#### Body block
+```bash
+/pattern/ {awk-commands}
+```
+- The body block applies AWK commands on every input line. 
+- pattern 可以对行进行筛选只处理特定的行
+
+
+#### END Block
+```bash
+END {awk-commands}
+```
+- The END block executes at the end of the program. 
+- END is an AWK keyword and hence it must be in upper-case. 
+- This block is optional.
 
 
 # UID, EUID, RUID 
