@@ -5580,7 +5580,6 @@ END {awk-commands}
 - END is an AWK keyword and hence it must be in upper-case. 
 - This block is optional.
 
-
 # UID, EUID, RUID 
 > [euid,ruid,suid](https://book.hacktricks.xyz/linux-hardening/privilege-escalation/euid-ruid-suid)
 
