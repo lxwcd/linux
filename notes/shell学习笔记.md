@@ -3177,5 +3177,30 @@ d c b a
 1
 ```
 
+# 创建 shell 脚本时自动添加注释
+在 vim 配置文件添加下面自动命令
+```
+" 自动命令组 为 shell 脚本创建时自动添加说明信息
+augroup shellScriptAutoCmds
+autocmd!
+autocmd BufNewFile *.sh exec ":call AddShellScriptHeader()"
+function! AddShellScriptHeader()
+        call setline(1,"#!/bin/bash")
+        call setline(2,"#")
+        call setline(3,"#********************************************************************")
+        call setline(4,"#Author:            my name")
+        call setline(5,"#Date:              ".strftime("%Y-%m-%d"))
+        call setline(6,"#FileName:          ".expand("%"))
+        call setline(7,"#URL:               http://github.com")
+        call setline(8,"#Description:       shell script")
+        call setline(9,"#Copyright (C):     ".strftime("%Y")." All rights reserved")
+        call setline(10,"#********************************************************************")
+        call setline(11,"")
+        call setline(12,"")
+        call setline(13,"")
+endfunction
+autocmd BufNewFile * :normal G
+augroup END
+```
 
 # 信号捕捉工具 trap
