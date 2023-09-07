@@ -1853,7 +1853,7 @@ $
 
 #### PATH
 
-#### 下划线 
+#### 下划线 前一个命令的最后一个参数
 下划线表示前一个命令的最后一个参数 
 ```bash
 [root@ubuntu22-c0 ~]$ whatis printenv
@@ -1862,6 +1862,7 @@ printenv (1)         - print all or part of environment
 printenv
 ```
 
+也可以用 `!$`
 #### LANG 
 ```bash
 [root@ubuntu22-c0 ~]$ echo $LANG

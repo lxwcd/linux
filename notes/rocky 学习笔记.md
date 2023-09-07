@@ -535,7 +535,7 @@ ifcfg-ens160
 - `DEVICE` 的名字必须和网卡配置文件名字的后缀相同
 ```bash
 name
-               if specified, the connection will use the name (else NM creates a name itself).
+        if specified, the connection will use the name (else NM creates a name itself).
 ```
 ```bash
 lx@rocky86 firmware $ nmcli connection 
@@ -696,7 +696,6 @@ PING 10.0.0.111 (10.0.0.111) 56(84) bytes of data.
 
 ### 查看默认网络参数
 - `ip a` 查看 IP 地址，子网掩码，广播地址等
-
 ```bash
 [root@rocky8-1 network-scripts]$ ip addr show eth0
 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
@@ -708,12 +707,10 @@ PING 10.0.0.111 (10.0.0.111) 56(84) bytes of data.
     inet6 fe80::20c:29ff:fe54:b61a/64 scope link noprefixroute 
        valid_lft forever preferred_lft forever
 ```
-
-1. 上面 IPv4 地址为 `10.0.0.162`
-2. PREFIX 为 24，即子网掩码为 `255.255.255.0`
+上面 IPv4 地址为 `10.0.0.162`
+PREFIX 为 24，即子网掩码为 `255.255.255.0`
 
 - `route -n` 查看默认路由
-
 ```bash
 [root@rocky8-1 network-scripts]$ route -n
 Kernel IP routing table
@@ -722,8 +719,7 @@ Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
 10.0.0.0        0.0.0.0         255.255.255.0   U     100    0        0 eth0
 192.168.122.0   0.0.0.0         255.255.255.0   U     0      0        0 virbr0
 ```
-
-1. 上面可看到默认路由为 `10.0.0.2`
+上面可看到默认路由为 `10.0.0.2`
 
 - 从虚拟机中查看（这里使用的是 NAT 网络）
 编辑 ---> 虚拟网络编辑器 ---> NAT 设置
