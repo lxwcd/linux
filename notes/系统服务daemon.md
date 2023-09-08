@@ -791,3 +791,6 @@ Additional units to install or uninstall when this service is installed or unins
 别名
 > A space-separated list of additional names this service shall be installed under. 
 > The names listed here must have the same suffix (i.e. type) as the service filename.
+
+## 重要的系统服务
+> [7.3.3 埠口与服务的启动/关闭及开机时状态设定](http://cn.linux.vbird.org/linux_server/0210network-secure_3.php#portlimit_start)
