@@ -78,7 +78,6 @@ tmpfs                                198820       0    198820   0% /run/user/0
 ```
 
 # 查看内核中是否有某个模块
-
 ```bash
 [root@zabbix boot]$ uname -r
 5.15.0-73-generic
@@ -94,21 +93,3 @@ initrd.img                lost+found                    vmlinuz-5.15.0-72-generi
 ```bash
 [root@zabbix boot]$ grep -i "kvm" /boot/config-5.15.0-73-generic
 ```
-
-
-logger
-
-fuser -k 8888/tcp 杀掉使用某个目录的进程
-
-readlink
-
-ldd
-
-watch
-
-lsof
-
-iptables REJECT 不拒绝已经建立的连接？
-
-lx_00_cd@163.com
-JOHWJMGHTOTBETRB
