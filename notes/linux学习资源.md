@@ -20,6 +20,9 @@
 # 博客
 > [The Linux kernel](https://www.win.tue.nl/~aeb/linux/lk/lk.html#toc10)
 
+# 视频
+> [Linux 从入门到精通](https://www.bilibili.com/video/BV1cT411P7sC/?spm_id_from=333.999.0.0)
+> [PowerCert Animated Videos](https://www.youtube.com/@PowerCertAnimatedVideos)
 
 # 提问网站
 > [stackoverflow](https://stackoverflow.com/)
