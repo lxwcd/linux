@@ -5648,8 +5648,6 @@ wget (1)             - The non-interactive network downloader.
 
 
 
-# 必须存在的系统服务
-> [7.3.3 埠口与服务的启动/关闭及开机时状态设定](http://cn.linux.vbird.org/linux_server/0210network-secure_3.php#portlimit_start)
 
 
 //LABEL: 域名

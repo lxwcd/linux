@@ -2274,6 +2274,12 @@ visudo 的其他用法见 [第十四章、Linux 账号管理与 ACL 权限配置
 
 ![1](https://img-blog.csdnimg.cn/b88b35c015ef44c1bf64c091e93d6913.png)
 
+### chown --reference= 参考其他文件修改所有者
+```bash
+--reference=RFILE
+    use RFILE's owner and group rather than specifying OWNER:GROUP values
+```
+
 ### 修改文件所有者
 ![1](https://img-blog.csdnimg.cn/53ae2c3c525d47fd800f489e7e58168a.png)
 
