@@ -5696,6 +5696,19 @@ mktemp: too few X's in template ‘aXX’
 /tmp/tmp.y6wgdnTZsM
 ```
 
+# sleep
+
+```bash
+[root@ubuntu2204 ~]$ for i in {1..10..2}; do
+> echo $i
+> sleep 0.5
+> done
+1
+3
+5
+7
+```
+
 # install 复制文件设置属性
 ```bash
 [root@ubuntu22-c0 ~]$ whatis install
@@ -5703,3 +5716,29 @@ install (1)          - copy files and set attributes
 ```
 
 # 信号捕捉工具 trap
+
+
+# 文字接口网页浏览
+## 文字浏览器 links
+- 需要手动安装
+- 可以用来看 html 的文档，如/usr/share/doc 中的帮助文档
+- 用方向键不太方便
+
+### -dump 将网页内容输出到标准输出
+- 可以重定向到文件中
+
+## 文字接口下载器 wget
+
+```bash
+[root@ubunut22:~]$ whatis wget
+wget (1)             - The non-interactive network downloader.
+```
+
+```bash
+wget https://www.example.com/example.txt
+```
+
+## curl
+```bash
+curl -o filename.txt https://www.example.com/example.txt
+```
