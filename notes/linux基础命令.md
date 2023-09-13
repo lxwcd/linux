@@ -62,7 +62,7 @@
 
 ### 安装 
 - ubuntu 默认安装 openssh-client
-- ubuntu 安装 openssh-server：`sudo apt-get install openssh-server` 
+- ubuntu 安装 openssh-server：`sudo apt install openssh-server` 
 
 ### root 不能通过 xshell 远程
 - 修改服务端配置文件 /etc/ssh/sshd_config
