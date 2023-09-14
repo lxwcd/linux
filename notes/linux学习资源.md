@@ -15,7 +15,7 @@
 > [Linux 常用命令全拼](https://www.runoob.com/w3cnote/linux-command-full-fight.html)
 > [howtogeek](https://www.howtogeek.com/category/linux/)
 > [Linux Tutorial](https://rc.byu.edu/documentation/unix-tutorial/)
-
+> linux 工作的文章：[tldp](https://tldp.org/LDP/tlk/tlk-toc.html)
 
 # 博客
 > [The Linux kernel](https://www.win.tue.nl/~aeb/linux/lk/lk.html#toc10)

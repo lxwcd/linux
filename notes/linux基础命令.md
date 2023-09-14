@@ -2386,7 +2386,6 @@ It indicates that the file is using extents, which are contiguous blocks of disk
 - 如果文件原来的 owner 位有 `x` 权限，则原来的 `x` 变为 `s`
 - 如果文件原来的 owner 位没有 `x` 权限，则原来的 `x` 变为 `S`
 
-
 ![](img/2023-03-29-11-50-52.png)
 ![](img/2023-03-29-11-59-29.png)
 
