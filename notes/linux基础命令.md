@@ -2386,6 +2386,7 @@ It indicates that the file is using extents, which are contiguous blocks of disk
 - 如果文件原来的 owner 位有 `x` 权限，则原来的 `x` 变为 `s`
 - 如果文件原来的 owner 位没有 `x` 权限，则原来的 `x` 变为 `S`
 
+
 ![](img/2023-03-29-11-50-52.png)
 ![](img/2023-03-29-11-59-29.png)
 
@@ -4598,6 +4599,7 @@ Ubuntu 20.04.5 LTS \n \l
 
 ### -C 解打包时将里面的文件提取到其他目录
 - Change directory 
+
 ![1](https://img-blog.csdnimg.cn/a72a77f083d246d3a93c8a9b44f7b929.png)
 
 ### -p 保留权限
