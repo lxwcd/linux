@@ -3843,6 +3843,12 @@ By updating the directory entry instead of performing a data block copy, the `mv
 
 ![1](https://img-blog.csdnimg.cn/4122847d4bad48f59679af0ed9e0500b.png)
 
+```bash
+[root@ubuntu22-c0 ~]$ cat -n 1 12/12.txt
+     1  1
+     2  12
+```
+
 #### cat -b 标注行号不包括空白行
 ![1](https://img-blog.csdnimg.cn/977fba59db4748e195507a9304d2dcae.png)
 

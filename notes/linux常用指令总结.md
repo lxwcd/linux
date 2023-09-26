@@ -237,3 +237,6 @@ root     pts/4    10.0.0.1         20:00    0.00s  0.18s  0.00s w
 ```bash
 [root@es ~]$ top -d 1 -p 991
 ```
+
+# 文件排序并去重
+- sort demo.txt | uniq
