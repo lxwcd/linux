@@ -1304,7 +1304,7 @@ drwxr-xr-x 12 nginx nginx 4.0K May 18 15:57 ../
 > [RAID](https://www.prepressure.com/library/technology/raid)
 
 - RAID 5
-有一个磁盘损坏时，能利用校验位恢复算坏的数据，只能容忍一个磁盘损坏
+有一个磁盘损坏时，能利用校验位恢复损坏的数据，只能容忍一个磁盘损坏
  
 
 ## 硬件 RAID 和软件 RAID
