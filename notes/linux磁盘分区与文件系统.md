@@ -271,7 +271,7 @@ Device       Start       End   Sectors  Size Type
 ```
 
 - 有主分区和扩展分区组成，最多 4 个
-- 扩展分区只能 1 个，或者没有，即 4 个主分区
+- 扩展分区只能 1 个，或者没有
 - 扩展分区不能直接使用，必须在扩展分区中划分逻辑分区来使用
 
 #### 主分区
@@ -285,7 +285,6 @@ Device       Start       End   Sectors  Size Type
 - 扩展分区仍然不能超过 2T
 - 扩展分区最多只能有 1 个
 - 扩展分区无法格式化，需要划分逻辑分区来存储数据
-
 
 #### 逻辑分区
 - 在扩展分区中划分
@@ -303,8 +302,6 @@ Device       Start       End   Sectors  Size Type
 - GPT 用 64 位表示分区大小，因此单个分区的容量为 8 ZB
 - 和 MBR 仅有第一个扇区的 512 字节来记录不同，GPT分区在磁盘的最后会备份分区信息
 - GPT 分区默认可以提供多达 128 组记录每组记录都能独立存在，都可视为主分区，用来格式化
-
-
 
 ## 新增磁盘
 > [ Virtual Hard Disk is added, but not showing using lsblk -d command](https://www.linuxquestions.org/questions/linux-newbie-8/virtual-hard-disk-is-added-but-not-showing-using-lsblk-d-command-4175645367/)
