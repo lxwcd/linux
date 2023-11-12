@@ -200,7 +200,8 @@ message-digest algorithm，很常用，很多软件用 MD5 算法来得到一个
 指纹函数也是可以将数据运算后得到唯一的指纹，该指纹字符串很短，特点和摘要很像  
 可以用于跟踪一个文件是否被修改过等，指纹字符很短，很多场景使用比哈希运算更适合  
   
-上述说法是否准确不确定，有些地方将指纹和哈希看作相同的，[Hash function](https://en.wikipedia.org/wiki/Hash_function) 中指明两者有区别，但未说明具体区别  
+上述说法是否准确不确定，有些地方将指纹和哈希看作相同的，  
+[Hash function](https://en.wikipedia.org/wiki/Hash_function) 中指明两者有区别，但未说明具体区别  
   
   
 # 数字签名  
@@ -328,8 +329,10 @@ X9.62 ECDSA Signature with SHA-384
   
 3. Certificate Signature Value  
 证书数字签名的结果，该部分不是证书 body 的部分，证书的 body 部分未加密，公开的  
-用户根据证书的内容知道证书数字签名的算法，利用相同算法和 CA 的公钥对数字签名的值解密得到摘要信息，再根据证书的内容，用相同的哈希算法对证书内容进行哈希运算  
+用户根据证书的内容知道证书数字签名的算法，利用相同算法和 CA 的公钥对数字签名的值解密  
+得到摘要信息，再根据证书的内容，用相同的哈希算法对证书内容进行哈希运算  
 最后比对哈希运算的结果和数字签名解密后的结果（哈希运算不可逆）  
+  
   
 ## 浏览器中查看网站的证书  
 用 google chrome 进入如维基百科网页时，点击网页 url 左侧的小锁，查看证书时发现最后有个指纹信息，  
@@ -384,7 +387,8 @@ Base64编码则是一种用64个字符来表示二进制数据的编码方式，
 ### .crt 和 .pem 文件的区别  
 `.pem` 和 `.crt` 文件都是存储加密信息的文件格式，它们之间的区别如下：  
   
-1. `.pem` 文件是 OpenSSL 中的一种通用格式，可以存储多种加密信息，包括证书、公钥、私钥等，其文件内容是经过 BASE64 编码的 ASCII 文本。  
+1. `.pem` 文件是 OpenSSL 中的一种通用格式，可以存储多种加密信息，包括证书、公钥、私钥等，  
+其文件内容是经过 BASE64 编码的 ASCII 文本。  
 由于其灵活性，.pem 文件常用于在不同的系统之间共享证书和密钥等信息。  
   
   
@@ -1435,7 +1439,9 @@ string   Q_C, client's ephemeral public key octet string
   
   
 ### 服务端回应客户端 SSH_MSG_KEX_ECDH_REPLY 消息  
-- 服务端监听 `SSH_MSG_KEX_ECDH_INIT` message，一旦接受到该消息，发送 `SSH_MSG_KEX_ECDH_REPLY` 响应客户端，内容由三部分组成：  
+  
+- 服务端监听 `SSH_MSG_KEX_ECDH_INIT` message，一旦接受到该消息，  
+  发送 `SSH_MSG_KEX_ECDH_REPLY` 响应客户端，内容由三部分组成：  
 ```bash  
 byte     SSH_MSG_KEX_ECDH_REPLY  
 string   K_S, server's public host key  
@@ -1443,8 +1449,10 @@ string   Q_S, server's ephemeral public key octet string
 string   Sig_S, the signature on the exchange hash  
 ```  
   
-1) `K_S` 为服务端的 host key，非临时的，服务端有针对不同的算法生成的多个公私钥对，根据前面协商的算法，发送给客户端其公钥文件  
-如服务端为 ubuntu20.04，其 `/etc/ssh` 目录中有几种不同算法的公钥，其中 `.pub` 为公钥文件，文件名可以看出所用的算法  
+1) `K_S` 为服务端的 host key，非临时的，服务端有针对不同的算法生成的多个公私钥对，  
+根据前面协商的算法，发送给客户端其公钥文件  
+如服务端为 ubuntu20.04，其 `/etc/ssh` 目录中有几种不同算法的公钥，  
+其中 `.pub` 为公钥文件，文件名可以看出所用的算法  
 ```bash  
 [18:59:15 root@ubuntu2004 /etc/ssh]#ls  
 moduli        sshd_config         ssh_host_ecdsa_key.pub    ssh_host_rsa_key  
