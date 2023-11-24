@@ -1,6 +1,6 @@
 # 学习资源  
 > [学习 Shell 脚本编程的免费资源 | Linux 中国](https://zhuanlan.zhihu.com/p/155613380)  
-  
+> [电子书和shell脚本示例](https://pan.baidu.com/s/1g006A023DukmKht1k1ZrMg?pwd=jvlj)  
   
 ## 官方文档  
 > man 手册官方文档：[bash(1) — Linux manual page](https://man7.org/linux/man-pages/man1/bash.1.html#OPTIONS)  
@@ -3207,7 +3207,8 @@ augroup END
 # 信号捕捉工具 trap  
   
 # shell 脚本  
-  
+> [电子书和shell脚本示例](https://pan.baidu.com/s/1g006A023DukmKht1k1ZrMg?pwd=jvlj)  
+
 ## 注意事项  
 1. 幂等性  
 执行多次结果相同，做一些条件判断，如以操作过则不重复执行等  
