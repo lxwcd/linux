@@ -69,9 +69,23 @@
 ![](img/2023-04-07-15-39-19.png)  
   
 #### -c  
-- 不是太明白用处  
-  
-  
+bash -c 是一个用于在命令行中执行指定命令的选项。它允许你在命令行中直接执行包含多个命令或复杂命令的字符串。这个选项在编写脚本或需要在命令行中执行复杂命令时非常有用。  
+
+```bash
+[root@docker dockerfile]$ bash 'echo "hello world"'
+bash: echo "hello world": No such file or directory
+[root@docker dockerfile]$ bash -c 'echo "hello world"'
+hello world
+```
+
+```bash
+[root@docker dockerfile]$ bash -c 'echo "Starting the process"; pwd; echo "Finished the process"'
+Starting the process
+/docker-02/dockerfile
+Finished the process
+``` 
+In this example, the Bash shell code passed as an argument to `bash -c` runs three commands (`echo`, `pwd`, and `echo`) and prints out status messages before and after the command execution.
+
 #### -i interactive shell  
 - 如果设置，则 shell is `interactive`  
 - `echo $-` 可查看该选项是否设置  
@@ -1548,6 +1562,12 @@ Bye!
 Bye!  
 Bye!  
 ```  
+
+```bash
+root@ubuntu2204c12:/home/lx/shell_scripts# num=$((RANDOM % 7 + 31))
+root@ubuntu2204c12:/home/lx/shell_scripts# echo $num
+33
+```
   
 ## <(list) 或 >(list) Process Substitution  
 > [3.5.6 Process Substitution](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Process-Substitution)  
@@ -1878,6 +1898,14 @@ en_US.UTF-8
 [root@ubuntu22-c0 ~]$ echo $OLDPWD  
 /etc  
 ```  
+
+或者用 `~-`
+```bash
+[root@docker dockerfile]$ echo ~-
+/root
+[root@docker dockerfile]$ echo $OLDPWD
+/root
+```
   
 ### USER  
   
@@ -2944,6 +2972,7 @@ Output:
 Name: John, Age: 25, Gender: Male  
 ```  
   
+LABEL: 函数
 # Shell Functions  
 > [Shell Functions](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Shell-Functions)  
   
@@ -3022,6 +3051,15 @@ __get_cword_at_cursor_by_ref ()
 - exit 也可以结束函数执行并自定义返回值，但 exit 会中断整个脚本的执行，return 只会中断函数执行  
 如果在当前 shell 执行一个脚本用 exit 退出，如用 source 命令执行脚本，则当前终端也会退出  
   
+## 内置函数
+
+### getopts
+> [getopts](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#index-getopts)
+> [Small getopts tutorial](https://web.archive.org/web/20200507131743/https:/wiki.bash-hackers.org/howto/getopts_tutorial)
+> [Shell脚本中的while getopts用法小结](https://www.cnblogs.com/kevingrace/p/11753294.html)
+
+
+
   
 # 数组 array  
 - 数值索引编号从 0 开始，可支持自定义索引，及关联索引  
@@ -3090,6 +3128,34 @@ a
   
 ${arr_1[*]} treats the array as a single string  
 ${arr_1[@]} treats each element of the array as a separate word  
+
+
+将脚本的参数保存到数组中
+```bash
+# 将命令行参数保存到数组中 不包括脚本名称
+# 使用括号将 $@ 包裹起来，以确保每个参数作为数组中的一个元素。
+# 同时，使用引号将其括起来，可以保留参数中的空格和特殊字符
+# 如 ./test.sh -a about -b "buy now" -c "hello world" foo bar baz
+# 需要将 buy now 作为数组的一个元素，则用引号括起来
+all_args=("$@")  
+```    
+
+将脚本名称和全部参数保存到数组中
+```bash
+# 将脚本名称添加到数组中
+args=("$0")  
+
+# 将命令行参数添加到数组中
+for arg in "$@"; do
+  args+=("$arg")
+done
+
+# 显示参数的位置和值
+for ((i=0; i<${#args[@]}; i++)); do
+  echo "第 $i 个参数：${args[$i]}"
+done
+```
+
   
 ## 显示所有数组下标  
 ```bash  

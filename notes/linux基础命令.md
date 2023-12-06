@@ -4210,6 +4210,7 @@ reverse lines charaterwise
 &nbsp;  
   
 # Here 文档 输入多行字符串  
+> [Here-Document](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_07_04)
 > [How to Use “Here Documents” in Bash on Linux](https://www.howtogeek.com/719058/how-to-use-here-documents-in-bash-on-linux/)  
 > [Here 文档 ](https://wangdoc.com/bash/quotation#here-%E6%96%87%E6%A1%A3)  
   
@@ -5675,8 +5676,15 @@ Consider a program named "example" that performs sensitive operations and is own
 > [chroot](https://wiki.archlinux.org/title/chroot)  
 > [How to Use the chroot Command on Linux](https://www.howtogeek.com/441534/how-to-use-the-chroot-command-on-linux/)  
 > [chroot command in Linux with examples](https://www.geeksforgeeks.org/chroot-command-in-linux-with-examples/)  
+> [chroot](https://github.com/saschagrunert/demystifying-containers/blob/master/part1-kernel-space/post.md#chroot)  
   
-  
+
+# lsns 查看名称空间
+```bash
+[root@docker ~]$ whatis lsns
+lsns (8)             - list namespaces
+```
+
 # wall   
 > [Wall Command in Linux with Examples](https://linuxhint.com/wall-command-in-linux-with-examples/)  
   
@@ -5913,3 +5921,6 @@ initrd.img                lost+found                    vmlinuz-5.15.0-72-generi
 ```bash  
 [root@zabbix boot]$ grep -i "kvm" /boot/config-5.15.0-73-generic  
 ```  
+
+# iotop 监视磁盘 I/O 工具
+需要额外安装
