@@ -1510,6 +1510,20 @@ test.txt
 [root@docker nginx]$ echo $str1  
 test  
 ```  
+
+### ${parameter,,pattern} 字符串转换为小写
+```bash
+root@ubuntu2204c12:/home/lx/shell_scripts# b="CAT"
+root@ubuntu2204c12:/home/lx/shell_scripts# echo ${b,,}
+cat
+```
+
+### ${parameter^^pattern} 字符串转换为大写
+```bash
+root@ubuntu2204c12:/home/lx/shell_scripts# echo ${a^^}
+HELLO
+```
+
   
 ## $(command) 子命令扩展  
 > [Difference between $() and () in Bash](https://stackoverflow.com/questions/39110485/difference-between-and-in-bash)  
@@ -2489,6 +2503,9 @@ Overall, `(( ))` is mainly used for arithmetic comparisons, while `[ ]` or `test
   
 ![](img/2023-03-29-17-52-44.png)  
 ![](img/2023-03-29-18-00-37.png)  
+
+- 可以添加标识  
+
   
 ## , comma operator  
 - 逗号连接多个算术操作，返回最后一个的值  

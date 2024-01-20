@@ -10,8 +10,8 @@
 #Copyright (C):     2023 All rights reserved
 #********************************************************************
 
-set -e
-set -u
+#set -e
+#set -u
 #set -x
 
 ### **************** 获取选项和参数 字体颜色 字体属性 背景颜色 ******************* ###
@@ -189,3 +189,5 @@ fi
 
 
 echo -e "${attribute_code}${background_code}${color_code}${text}${reset_code}"
+
+unset text color attributes background *_code
