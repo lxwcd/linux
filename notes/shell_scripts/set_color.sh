@@ -32,13 +32,14 @@ function showHelp() {
     echo "black, red, green, yellow, blue, magenta, cyan, white, random"
     echo ""
     echo "Example usage:"
-    echo "./set_color.sh -c red -b green -a bold,underline "Hello, world!""
+    echo "./set_color.sh -c red -b green -a bold,underline \"Hello, world!\""
 }
 
 text=""
 color=""
 attributes=""
 background=""
+reset_code="\e[0m"
 
 while getopts ":c:a:b:h" opt; do
     case $opt in
@@ -66,17 +67,18 @@ done
 ### ********* 获取需要设置颜色的文本内容 默认放在最后，无则终端的全部颜色 ********** ###
 # get text content
 shift $((OPTIND - 1))
-text="$1"
 
 # If no text is specified, set it to receive all subsequent input text.
-if [ -z "$text" ]; then
+if [ "$#" -eq 0 ]; then
+    text=""
     reset_code=""
+else
+    text="$1"
 fi
 
 
 ### ***************** 设置字体属性 可以多个 逗号分割 ************************ ###
 attribute_code=""
-reset_code="\e[0m"
 
 if [ -n "$attributes" ]; then
     IFS=',' read -ra attr_list <<< "$attributes"
@@ -107,7 +109,6 @@ fi
 
 ### ************************** 设置字体颜色 **************************** ###
 color_code=""
-background_code=""
 
 if [ -n "$color" ]; then
     case $color in
@@ -147,6 +148,8 @@ if [ -n "$color" ]; then
 fi
 
 ### ************************* 设置背景颜色 **************************** ###
+background_code=""
+
 if [ -n "$background" ]; then
     case $background in
         black)
