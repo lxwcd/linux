@@ -10,8 +10,6 @@
 #********************************************************************
 
 
-#!/bin/bash
-
 # 设置发送邮件的参数
 sender_email="your_email@example.com"
 smtp_server="smtp.example.com"
