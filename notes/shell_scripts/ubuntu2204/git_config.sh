@@ -31,11 +31,11 @@ git config --global https.proxy https://${HOST_IP}:${PROXY_PORT}
 # add ssh key https://www.liaoxuefeng.com/wiki/896043488029600/896954117292416
 # ssh-keygen -t rsa -b 4096 -C "your_email@example.com" -f ~/.ssh/id_rsa_custom
 # 设置 SSH 密钥文件名
-key_filename="~/.ssh/id_rsa"
+key_filename="${HOME}/.ssh/id_rsa"
 
 # 检查是否存在 SSH 密钥文件
-if [ -f "$key_filename" ]; then
-    echo "SSH key already exists: $key_filename"
+if [ -f "${key_filename}" ]; then
+    echo "SSH key already exists: ${key_filename}"
 else
     # 生成 SSH 密钥
     read -p "Do you want to generate a new pair of ssh key? (y/n): " answer
