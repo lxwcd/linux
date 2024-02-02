@@ -54,7 +54,7 @@ EOF
 
     echo "Proxy configuration saved to ${proxy_file}"
     return 0
-elif [ ${has_proxy} == "ture" ]; then
+elif [ ${has_proxy} == "true" ]; then
     return 0
 else
     return 1
