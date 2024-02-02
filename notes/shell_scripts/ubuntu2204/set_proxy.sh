@@ -13,10 +13,12 @@
 proxy_file="/etc/profile.d/bash_proxy.sh"
 
 answer=""
+has_proxy="false"
 
 # 主机 ip 变化后更新
 if [ -f "${proxy_file}" ]; then
     read -p "Do you want to update proxy? (y/n): " answer
+    has_proxy="true"
 else
     read -p "Do you want to configure a proxy? (y/n): " answer
 fi
@@ -28,14 +30,14 @@ if [ "${answer_lower}" == "y" ]; then
     read -p "Enter the host IP: " host_ip
     if ! [[ "$host_ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]]; then
         echo "Invalid IP address."
-        return
+        return 1
     fi
 
     # 用户输入proxy port
     read -p "Enter the proxy port: " proxy_port
     if ! [[ "$proxy_port" =~ ^[0-9]+$ ]]; then
         echo "Invalid port number."
-        return
+        return 1
     fi
 
     # 将变量保存到文件中
@@ -51,4 +53,9 @@ EOF
     . ${proxy_file}
 
     echo "Proxy configuration saved to ${proxy_file}"
+    return 0
+elif [ ${has_proxy} == "ture" ]; then
+    return 0
+else
+    return 1
 fi

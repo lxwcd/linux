@@ -23,10 +23,12 @@ git config --global user.email "${email}"
 
 # config proxy
 . set_proxy.sh
-. /etc/profile.d/bash_proxy.sh
 
-git config --global http.proxy http://${HOST_IP}:${PROXY_PORT}
-git config --global https.proxy https://${HOST_IP}:${PROXY_PORT}
+if [ $? -eq 0 ]; then
+    . /etc/profile.d/bash_proxy.sh
+    git config --global http.proxy http://${HOST_IP}:${PROXY_PORT}
+    git config --global https.proxy https://${HOST_IP}:${PROXY_PORT}
+fi
 
 # add ssh key https://www.liaoxuefeng.com/wiki/896043488029600/896954117292416
 # ssh-keygen -t rsa -b 4096 -C "your_email@example.com" -f ~/.ssh/id_rsa_custom
