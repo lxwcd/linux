@@ -8,7 +8,6 @@
 - 保证对计算机资源的公平竞争和使用  
 - 防止对计算机资源的非法侵占和使用  
     
-    
 # Linux 介绍  
 > [Operating System - Linux](https://www.tutorialspoint.com/operating_system/os_linux.htm)  
 > [What is Linux](https://www.redhat.com/en/topics/linux/what-is-linux)  
@@ -18,7 +17,6 @@
 - 管理系统的硬件和资源  
 - 介于硬件和应用程序之间  
 - 提供一个平台能让用户方便的运行应用程序  
-    
     
 ## 特点  
 - Portable  
@@ -33,10 +31,8 @@
 > [Operating System - Linux](https://www.tutorialspoint.com/operating_system/os_linux.htm)  
 > [Introduction: The Linux Operating System](https://rc.byu.edu/documentation/unix-tutorial/unix1.php)  
     
-    
 ## Linux 分支介绍  
 > [Linux的分支及使用选择](https://zhuanlan.zhihu.com/p/381753464)  
-    
     
 # 远程连接  
 ## SSH  
@@ -55,11 +51,9 @@
 - openssh 对**服务器**的实现为 sshd  
 - 用小写 ssh 表示客户端程序  
   
-![1](https://img-blog.csdnimg.cn/dd5063d8abd74f1d93f4cb361907bd73.png)  
-![2](https://img-blog.csdnimg.cn/7cccddb0b78b475d8113b35f0e956129.png)  
-![1](https://img-blog.csdnimg.cn/5eb10cfa4dfd41888262a129561743e6.png)  
-    
-    
+![](img/2025-02-04-18-40-31.png)
+![](img/2025-02-04-18-41-34.png)
+![](img/2025-02-04-18-42-04.png)
     
 ### 安装  
 - ubuntu 默认安装 openssh-client  
@@ -102,14 +96,11 @@ PermitEmptyPasswords yes
 ```  
     
 - 换其他方式连接，如密钥或其他方式，还未试过  
-![2](https://img-blog.csdnimg.cn/cd84de7e58804de98bc460f55723afbe.png)  
-    
+![](img/2025-02-04-18-45-28.png)
     
 ### ssh 通过公钥远程登录  
 > [设置 SSH 通过密钥登录](https://www.runoob.com/w3cnote/set-ssh-login-key.html)  
 > [linux下ssh公钥验证的设置和远程登录](https://donaldhan.github.io/linux/2020/04/29/linux下ssh公钥验证的设置和远程登录.html)  
-    
-    
     
 # linux 终端  
 > [Difference between pts and tty](https://unix.stackexchange.com/questions/21280/difference-between-pts-and-tty)  
@@ -117,11 +108,57 @@ PermitEmptyPasswords yes
 > [Difference between /dev/tty and /dev/pts (tty vs pts) in Linux](https://www.golinuxcloud.com/difference-between-pty-vs-tty-vs-pts-linux/)  
 > [Linux的各种终端类型及概念](https://blog.csdn.net/xyz/article/details/118066465)  
     
-    
-    
 ## console  
-    
-    
+Console（控制台）是 Linux 系统中用于与用户交互的设备。它通常是一个物理终端（如键盘和显示器）或一个虚拟终端，用于显示系统消息、登录提示、用户输入和输出等。
+
+### Console 的类型
+（1）物理控制台（Physical Console）
+物理控制台是指直接连接到计算机硬件的终端设备，例如通过键盘和显示器直接与系统交互。在 Linux 系统启动时，物理控制台通常用于显示启动信息、登录提示等。物理控制台通常通过 /dev/console 设备文件进行访问。
+
+（2）虚拟控制台（Virtual Console）
+虚拟控制台是 Linux 提供的一种多用户、多任务的终端模拟环境。用户可以通过组合键（如 Ctrl + Alt + F1 到 Ctrl + Alt + F6）在不同的虚拟控制台之间切换。每个虚拟控制台都模拟了一个独立的终端，用户可以在不同的虚拟控制台中运行不同的程序。
+虚拟控制台的设备文件：虚拟控制台通过 /dev/tty1、/dev/tty2 等设备文件进行访问。例如，/dev/tty1 对应第一个虚拟控制台。
+多用户支持：虚拟控制台允许多个用户同时登录系统，每个用户可以在自己的虚拟控制台中独立操作，互不干扰。
+
+（3）串行控制台（Serial Console）
+串行控制台是通过串行端口（如 COM 端口）连接的终端设备。它通常用于远程管理服务器或嵌入式设备。串行控制台通过 /dev/ttyS0、/dev/ttyS1 等设备文件进行访问。
+应用场景：在服务器机房中，管理员可以通过串行控制台远程连接服务器进行维护，即使服务器没有键盘和显示器。
+配置：需要在 BIOS 和操作系统中配置串行端口参数（如波特率、数据位、停止位等）。
+
+### Console 的功能
+（1）系统启动信息显示
+在系统启动过程中，console 用于显示内核初始化信息、硬件检测信息、服务启动信息等。这些信息对于系统管理员排查启动问题非常重要。
+（2）用户登录与交互
+用户可以通过 console 登录系统，输入用户名和密码进行身份验证。登录后，用户可以在控制台中运行命令、管理文件、配置系统等。
+（3）系统消息输出
+系统会将重要的消息（如错误信息、警告信息、日志信息等）输出到 console。这些消息通常会记录到日志文件中（如 /var/log/messages），同时也会显示在控制台上。
+
+### Console 的配置
+（1）内核启动参数
+在 Linux 系统启动时，可以通过内核启动参数指定 console 的类型和设备。例如：
+console=tty0：表示使用默认的物理控制台。
+console=ttyS0,9600：表示使用串行端口 /dev/ttyS0，波特率为 9600。
+这些参数通常在启动加载器（如 GRUB）的配置文件中设置。
+（2）虚拟控制台的配置
+虚拟控制台的行为可以通过 /etc/inittab 文件（在 System V init 系统中）或 systemd 的服务单元文件（在 systemd 系统中）进行配置。例如，可以指定虚拟控制台的数量、默认运行级别等。
+
+### Console 的使用场景
+（1）系统维护
+在系统出现故障时，管理员可以通过 console 登录系统进行故障排查和修复。例如，当网络服务不可用时，管理员可以通过物理控制台或串行控制台直接访问系统。
+（2）多用户环境
+在多用户环境中，虚拟控制台允许多个用户同时登录系统，每个用户可以在自己的虚拟控制台中独立工作，互不干扰。
+（3）嵌入式设备
+在嵌入式设备中，串行控制台是常用的调试和管理工具。由于嵌入式设备通常没有物理键盘和显示器，串行控制台可以通过串行端口与外部设备（如调试器）连接，方便开发和维护。
+
+### Console 与其他终端的区别
+（1）与图形终端（X Terminal）的区别
+功能：console 是基于字符的终端，主要用于系统管理和命令行操作；而图形终端（如 X Terminal）支持图形界面，可以运行图形应用程序。
+启动顺序：console 在系统启动时首先加载，而图形终端通常在用户登录后启动。
+资源占用：console 资源占用较少，适合在资源受限的环境中使用；图形终端需要更多的硬件资源。
+（2）与远程终端（如 SSH）的区别
+连接方式：console 是本地终端，直接连接到系统的硬件设备；远程终端（如 SSH）通过网络连接到系统。
+安全性：远程终端需要网络连接，可能存在网络攻击的风险；console 是本地设备，相对更安全。
+
 ## tty  
 > [Difference between /dev/tty and /dev/pts (tty vs pts) in Linux](https://www.golinuxcloud.com/difference-between-pty-vs-tty-vs-pts-linux/)  
 > [The TTY demystified](http://www.linusakesson.net/programming/tty/)  
@@ -141,8 +178,12 @@ PermitEmptyPasswords yes
     
 - 在图形界面可通过 `init 5` 再回到图形界面，查看其他终端还保持原来的界面不变  
     
-    
 ## pty  
+PTY 是伪 TTY 的主设备（Master），它用于控制从设备（pts）。PTY 设备通常由应用程序（如终端模拟器或 SSH 客户端）创建和管理。
+
+**设备文件**：PTY 设备文件通常位于 /dev/ptmx（Pseudo-TTY Multiplexor），它是一个特殊的设备文件，用于分配伪 TTY 对。
+
+**作用**：PTY 设备用于管理伪 TTY 对，它将用户的输入传递给从设备（pts），并将从设备的输出传递给用户。
     
 ## pts  
 - 图形界面和远程登录时终端显示的设备为 `pts` 而非 `tty`  
@@ -153,24 +194,20 @@ PermitEmptyPasswords yes
 > [startx Command](https://www.ibm.com/docs/en/aix/7.2?topic=s-startx-command)  
     
     
-    
 # session 会话管理  
 > [Linux session(会话)](https://www.cnblogs.com/sparkdev/p/12146305.html)  
 > [10. Processes](https://www.win.tue.nl/~aeb/linux/lk/lk-10.html)  
-    
     
     
 # Tmux 终端复用  
 > [Tmux使用手册](http://louiszhai.github.io/2017/09/30/tmux/)  
 > [Tmux 使用教程](https://www.ruanyifeng.com/blog/2019/10/tmux.html)  
     
-    
 # linux 基本规则  
 - 区分大小写  
     
 # linux 命令格式  
 > [What's the difference between a flag, an option, and an argument? [closed]](https://unix.stackexchange.com/questions/285575/whats-the-difference-between-a-flag-an-option-and-an-argument)  
-    
     
 # Tab 补全命令  
     
@@ -179,8 +216,6 @@ PermitEmptyPasswords yes
     
 ## 列出全部用户  
 - 输入 `~` 后按两次 `Tab` 键  
-    
-    
     
 # linux 常用热键查看  
 - `stty -a` 查看热键，`man stty` 查看帮助说明  
@@ -191,13 +226,12 @@ PermitEmptyPasswords yes
 ## 热键来源  
 - `man bash` 查看帮助文档介绍，bash 会用到 [readline 库](https://en.wikipedia.org/wiki/GNU_Readline)  
 - readline 库中热键如 ctrl z 等用 [emacs](https://en.wikipedia.org/wiki/Emacs)  快捷键  
-![1](https://img-blog.csdnimg.cn/bc93f100bd7a48b4b3bc4d5b73357c27.png)  
-![2](https://img-blog.csdnimg.cn/72111b4c14e84a9baa76b26686224aed.png)  
-![3](https://img-blog.csdnimg.cn/ae412ba4373e4542bb123ad50f81bbec.png)  
+![](img/2025-02-04-18-58-51.png)
+![](img/2025-02-04-18-59-50.png)
+![](img/2025-02-04-19-00-13.png)
 - readline 库初始化文件在 `/etc/inputrc` 中，可以看到默认是 emacs 快捷键  
-![4](https://img-blog.csdnimg.cn/32ae80777eb842a7a29b76acee1e1f4d.png)  
-![5](https://img-blog.csdnimg.cn/64cd1010d39543aebc3f300cceb0a749.png)  
-    
+![](img/2025-02-04-19-00-47.png)
+![](img/2025-02-04-19-01-17.png)
     
 ## 中断执行  
 > [ctrl+c 和 ctrl+z 的区别](https://blog.csdn.net/qq_54947566/article/details/124345900?spm=1001.2014.3001.5502)  
@@ -205,27 +239,20 @@ PermitEmptyPasswords yes
 > [Linux后台进程管理以及ctrl+z（挂起）、ctrl+c（中断）、ctrl+\（退出）和ctrl+d（EOF）的区别](https://blog.csdn.net/qq_36838191/article/details/82710101)  
 > [What is the difference in using Ctrl+D and Ctrl+C to terminate cat command?](https://unix.stackexchange.com/questions/379347/what-is-the-difference-in-using-ctrld-and-ctrlc-to-terminate-cat-command)  
     
-    
 ### Ctrl + z 进程放到后台挂起  
-![1](https://img-blog.csdnimg.cn/b92877d442d0478ca70bdddc6aaa33ff.png)  
-    
-    
+![](img/2025-02-04-19-02-05.png) 
+
 ### Ctrl + c 发送 SIGINT 信号  
 > [POSIX signals](https://dsa.cs.tsinghua.edu.cn/oj/static/unix_signal.html)  
 > [How to Use SIGINT and Other Termination Signals in Linux](https://linuxhandbook.com/termination-signals/)  
     
-    
 - 终端输入命令时，如果不想输入了可以按这两个键，该输入不会执行，不会记录到历史记录  
 - 如果输入 `sleep 100`，可以用该快捷键终止  
-    
     
 ### Ctrl + d 发送 EOF  
 > [Why does Ctrl-D (EOF) exit the shell?](https://unix.stackexchange.com/questions/110240/why-does-ctrl-d-eof-exit-the-shell)  
     
-    
 - 终端直接按该快捷键则退出终端  
-    
-    
     
 ## Ctrl + s 屏幕不显示和执行输入命令  
 - 按 `Ctrl + s` 后，输入的命令不显示在屏幕上，按 `Enter` 也不执行命令  
@@ -233,19 +260,126 @@ PermitEmptyPasswords yes
     
 ## Ctrl + q 解锁 Ctrl + s  
     
-    
 # 命令放后台执行  
 ## &  
 > [Linux 命令中的 & 符号](https://blog.csdn.net/weixin_45505313/article/details/103749523)  
-    
-    
-    
-    
+
+在 Linux 系统中，使用 & 符号可以将命令放到后台执行。这是一个非常实用的功能，尤其是在需要同时运行多个任务或避免阻塞当前终端时。
+
+在 Linux 中，任务（或进程）可以在前台或后台运行：
+**前台任务**：直接在终端中运行的任务，会阻塞终端，直到任务完成。
+**后台任务**：在终端的后台运行的任务，不会阻塞终端，用户可以在后台任务运行的同时继续使用终端。
+
+在命令后面加上 & 符号，可以让该命令在后台运行。例如：
+假设想运行一个长时间的任务，比如下载一个大文件，可以使用以下命令：
+bash复制
+```bash
+wget http://example.com/largefile.zip &
+```
+这条命令会立即返回，终端不会被阻塞，可以继续在终端中输入其他命令。
+
+### 查看后台任务
+在 Linux 中，可以使用 jobs 命令查看当前终端会话中的后台任务：
+```bash
+[root@lx-virtual-machine ~]$ jobs
+[1]-  Running                 sleep 100 &
+[2]+  Running                 sleep 200 &
+```
+
+### 将前台任务放到后台
+如果已经开始运行了一个命令，但希望将其放到后台，可以使用以下步骤：
+**暂停当前任务**：按下 Ctrl + Z，这会将当前任务暂停。
+**将任务放到后台**：使用 bg 命令将任务放到后台继续运行。
+
+### 将后台任务放到前台
+如果需要将后台任务重新放到前台运行，可以使用 fg 命令：
+```bash
+[root@lx-virtual-machine ~]$ jobs
+[1]   Done                    sleep 100
+[2]-  Running                 sleep 200 &
+[3]+  Running                 sleep 500 &
+[root@lx-virtual-machine ~]$ fg %3
+sleep 500
+```
+
+### 任务结束通知
+当后台任务完成时，终端会通知。如果不想接收通知，可以在命令中加上 `>/dev/null 2>&1`，将标准输出和标准错误重定向到 /dev/null：
+
+```bash
+command > /dev/null 2>&1 &
+```
+
+### 任务与终端的关系
+**会话控制**：默认情况下，后台任务仍然属于当前终端会话。如果关闭终端，后台任务可能会被终止。
+
+### 任务状态
+可以使用 ps 或 top 命令查看所有后台任务的状态：
+```bash
+[root@lx-virtual-machine ~]$ ps
+    PID TTY          TIME CMD
+   3346 pts/1    00:00:00 bash
+  32470 pts/1    00:00:00 sleep
+  32474 pts/1    00:00:00 ps
+```
+
+## nohup
+nohup 是一个常用的 Linux 命令，全称为 no hang up（不挂起）。它的主要功能是让指定的命令或程序在用户退出终端或注销后仍然继续运行。
+
+### nohup 与 & 的区别
+**&**：
+**功能**：将命令放到后台执行，但不会改变命令对终端挂起信号（SIGHUP）的响应。如果终端关闭，后台任务可能会被终止。
+**输出**：默认情况下，命令的标准输出和错误输出仍然会发送到终端。
+
+**nohup**：
+**功能**：让命令忽略挂起信号（SIGHUP），即使终端关闭或用户注销，命令仍会继续运行。
+**输出**：默认情况下，标准输出和错误输出会被重定向到当前目录下的 nohup.out 文件。可以通过重定向操作符（如 > 和 2>&1）指定输出文件。
+
+### 是否绑定窗口或终端
+**&**：后台任务与终端绑定，终端关闭时任务可能会被终止。
+**nohup**：后台任务与终端解绑，终端关闭或用户注销后任务仍会继续运行。用 jobs 看不到进程，用 ps 可以在另一个窗口查看进程。
+
+### 使用场景
+**长时间运行的任务**：例如数据处理、备份脚本等，需要在后台运行且不受终端关闭影响。
+**远程会话**：通过 SSH 连接到服务器时，使用 nohup 可以确保任务不会因网络断开而终止。
+**日志记录**：将任务的输出重定向到日志文件，便于后续分析。
+
+5. 常见用法
+
+```bash
+nohup command &
+```
+command 是要执行的命令。
+& 表示将命令放到后台运行。
+
+重定向输出：
+```bash
+nohup command > output.log 2>&1 &
+```
+> 将标准输出重定向到 output.log 文件。
+2>&1 将标准错误重定向到标准输出，所有输出都会记录到 output.log。
+
+指定不同的输出文件：
+```bash
+nohup command > output.log 2> error.log &
+```
+标准输出写入 output.log，错误输出写入 error.log。
+
+### 查看进程
+```bash
+ps aux | grep command
+```
+使用 ps 命令结合 grep 查找相关进程。
+
+### 终止进程
+```bash
+kill <PID>
+```
+找到进程 ID 后，使用 kill 命令终止任务。
+
 # shell 设置文本输出颜色  
 > [shell中设置文字输出的颜色及字体格式](https://blog.csdn.net/yetugeng/article/details/89978787)  
 > [Bash tips: Colors and formatting (ANSI/VT100 Control sequences)](https://misc.flogisoft.com/bash/tip_colors_and_formatting)  
 > [How to change the output color of echo in Linux](https://stackoverflow.com/questions/5947742/how-to-change-the-output-color-of-echo-in-linux)  
-    
     
 ```bash  
 [root@ubuntu22-c0 ~]$ echo $PS1  
@@ -257,7 +391,6 @@ PermitEmptyPasswords yes
 ## 安装输入法  
 > [在 Ubuntu Linux 上安装 Fcitx5 中文输入法](https://zhuanlan.zhihu.com/p/415648411)  
     
-    
 ## 服务器修改控制台字体  
 > [在Ubuntu服务器中更改控制台字体](https://lzyws739307453.blog.csdn.net/article/details/103101188?spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-1-103101188-blog-89723707.pc_relevant_3mothn_strategy_recovery&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-1-103101188-blog-89723707.pc_relevant_3mothn_strategy_recovery&utm_relevant_index=2)  
     
@@ -267,6 +400,7 @@ PermitEmptyPasswords yes
 可以不改字体，用 MobaXterm 远程登录，修改和操作更方便  
     
 ## localectl 设置语言环境  
+
 - 查看当前的语言环境  
 ```bash  
 [root@ubuntu22-c0 ~]$ localectl  
@@ -279,6 +413,7 @@ PermitEmptyPasswords yes
 [root@ubuntu2204 ~]#echo $LANG  
 en_US.UTF-8  
 ```  
+
 - 查看当前支持语言列表  
 ```bash  
 [root@ubunut22:~]$ localectl list-locales  
@@ -325,6 +460,7 @@ sudo timedatectl set-timezone 'Asia/Shanghai'
 ```bash  
 echo -e "6\n70" | sudo apt install -y tzdata  
 ```  
+
 ## 修改提示符 PS1  
 > [Controlling-the-Prompt](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Controlling-the-Prompt)  
 > [环境变量PS1介绍](https://hongjh.blog.csdn.net/article/details/121312038)  
@@ -332,14 +468,14 @@ echo -e "6\n70" | sudo apt install -y tzdata
 > [6.9 Controlling the Prompt](https://www.gnu.org/software/bash/manual/html_node/Controlling-the-Prompt.html)  
     
 - `man bash` 帮助文档查看环境变量 `$PS1` 的介绍  
-![1](https://img-blog.csdnimg.cn/73a3f9095dc1413e8de842dc0318a530.png)  
+![](img/2025-02-04-19-38-17.png)
     
 - 提示符说明：`man bash` 搜索 `PROMPTING`  
-![2](https://img-blog.csdnimg.cn/16d7d4f2437049f485ab801d1a428124.png)  
+![](img/2025-02-04-19-38-45.png)
     
 - 注意 `\h` 显示主机名只到第一个 `.`前，之后的不显示，`\H` 显示完整主机名  
-![3](https://img-blog.csdnimg.cn/5fb00cec78d54535ba7f7a31f42ce3ee.png)  
-    
+![](img/2025-02-04-19-39-07.png)
+
 - 示例  
 ```bash  
 [root@ubuntu22-c0 ~]$ echo $PS1  
@@ -350,12 +486,10 @@ echo -e "6\n70" | sudo apt install -y tzdata
 Ubuntu22.04 中 `~/.bashrc` 中会设置 `PS1`，因此覆盖之前的设置  
 不同 bash 版本可能有差异，注意脚本调用顺序和规则  
     
-    
 # 主机名  
 > [Linux 配置（一）：临时修改主机名 | 永久修改主机名 | 详解](https://blog.csdn.net/succing/article/details/120638064)  
 > [LINUX 主机名字规范](https://blog.51cto.com/linuxguest/109487)  
 > [Linux修改主机名(静态主机名、临时主机名)](https://blog.csdn.net/zhaogang1993/article/details/82769439)  
-    
     
 - 注意主机名不规范可能出现错误  
     
@@ -394,28 +528,53 @@ ubuntu22-c0
     
 ## 临时修改主机名  
 - `hostname` 加新主机名，需要 root 权限，临时生效，不修改配置文件  
-![1](https://img-blog.csdnimg.cn/fd8cbfa46742403fa005d1ffc6d2bef9.png)  
+```bash
+
+[root@lx-virtual-machine ~]$ hostname "ubuntu2204"
+[root@lx-virtual-machine ~]$ cat /etc/hostname
+lx-virtual-machine
+[root@lx-virtual-machine ~]$ cat /etc/hosts
+127.0.0.1       localhost
+127.0.1.1       lx-virtual-machine
+
+# The following lines are desirable for IPv6 capable hosts
+::1     ip6-localhost ip6-loopback
+fe00::0 ip6-localnet
+ff00::0 ip6-mcastprefix
+ff02::1 ip6-allnodes
+ff02::2 ip6-allrouters
+[root@lx-virtual-machine ~]$ bash
+[root@ubuntu2204 ~]$
+```
     
 ## hostnamectl 永久修改主机名  
 - `man hostnamectl` 查看帮助文档  
-![1](https://img-blog.csdnimg.cn/374965746b094d72bd6c24d49a88210f.png)  
+![](img/2025-02-04-19-42-39.png)
+
 - `hostname` 查看当前系统主机名  
-	- 前面修改主机名时用的 `hostnamectl --static`，因此只修改 `static` 和 `transient` 两个参数  
-![2](https://img-blog.csdnimg.cn/0f220302a5334e428c11d11b3724a562.png)  
+前面修改主机名时用的 `hostnamectl --static`，因此只修改 `static` 和 `transient` 两个参数  
+
 - `hostnamectl set-hostname` 永久修改主机名  
-![1](https://img-blog.csdnimg.cn/17c3cc520e6e42c09b45f20c5b2514e8.png)  
-    
+```bash
+[root@ubuntu2204 ~]$ hostnamectl --static set-hostname "Ubuntu2204"
+[root@ubuntu2204 ~]$ cat /etc/host
+host.conf    hostid       hostname     hosts        hosts.allow  hosts.deny
+[root@ubuntu2204 ~]$ cat /etc/hostname
+Ubuntu2204
+[root@ubuntu2204 ~]$ cat /etc/hosts
+127.0.0.1       localhost
+127.0.1.1       lx-virtual-machine
+```    
     
 ## /etc/hostname 主机名所在配置文件  
-- `hostnamectl` 修改主机名后，可以看到 `/etc/hostname` 配置文件的内容改变，变为新的主机名  
+`hostnamectl` 修改主机名后，可以看到 `/etc/hostname` 配置文件的内容改变，变为新的主机名  
     
 ## 修改主机名后刷新显示  
 - 如果输入 `bash` 重新打开一个 shell，可以看到主机名更新了  
 - 如果要当前的 shell 的主机名更新，需要退出后重新进入终端  
     
-    
 # 查看 Linux 操作系统版本  
-- cat /etc/os-release  
+## cat /etc/os-release  
 ```bash  
 [root@ubuntu22-c0 ~]$ cat /etc/os-release  
 PRETTY_NAME="Ubuntu 22.04.1 LTS"  
@@ -433,7 +592,7 @@ UBUNTU_CODENAME=jammy
 [root@ubuntu22-c0 ~]$  
 ```  
     
-- cat /etc/issue  
+## cat /etc/issue  
 ubuntu22.04 默认会显示，可以修改其内容  
     
 ```bash  
@@ -442,7 +601,7 @@ Ubuntu 22.04.1 LTS \n \l
 ```  
     
 # 查看 linux 内核版本  
-- uname -r  
+## uname -r  
 ```bash  
 [root@ubuntu22-c0 ~]$ uname -r  
 5.15.0-73-generic  
@@ -451,7 +610,7 @@ Linux ubuntu22-c0 5.15.0-73-generic #80-Ubuntu SMP Mon May 15 15:18:26 UTC 2023 
 [root@ubuntu22-c0 ~]$  
 ```  
     
-- cat /proc/version  
+## cat /proc/version  
 ```bash  
 [root@ubuntu22-c0 ~]$ cat /proc/version  
 Linux version 5.15.0-73-generic (buildd@bos03-amd64-060) (gcc (Ubuntu 11.3.0-1ubuntu1~22.04.1) 11.3.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #80-Ubuntu SMP Mon May 15 15:18:26 UTC 2023  
@@ -459,15 +618,21 @@ Linux version 5.15.0-73-generic (buildd@bos03-amd64-060) (gcc (Ubuntu 11.3.0-1ub
     
     
 # 查看 IP 地址  
-    
 - ip a  
 - hostname -I  
     
 # 查看登录用户  
 ## logname  
-![1](https://img-blog.csdnimg.cn/a870ec486e964186b0ab3d4caa1b6ba6.png)  
+```bash
+[root@ubuntu2204 ~]$ logname
+root
+[root@ubuntu2204 ~]$ who
+lx       tty2         2025-02-04 17:30 (tty2)
+root     pts/2        2025-02-04 19:31 (10.0.0.1)
+root     pts/3        2025-02-04 19:30 (10.0.0.1)
+```
     
-- 登录系统的用户和当前终端用户有区别，不管当前用 su 切换到哪个用户，登录用户都不变  
+登录系统的用户和当前终端用户有区别，不管当前用 su 切换到哪个用户，登录用户都不变  
     
 ## last  
 - 查看最近登陆的用户  
@@ -489,16 +654,34 @@ wtmp begins Tue Feb 21 08:28:33 2023
 > [who命令、whoami命令和who am i命令的区别](https://blog.csdn.net/u014270566/article/details/124177994)  
 > [w who whoami](http://pygo2.top/articles/52265/)  
     
-    
 用 `su` 切换不同用户，`whoami` 显示切换后用户名，但 `who` 显示始终是当前登录系统的用户。  
-![1](https://img-blog.csdnimg.cn/52e6a08cba874f7bb933c33f74055c53.png)  
-    
     
 ```bash  
+[root@lx-virtual-machine ~]$ id
+uid=0(root) gid=0(root) groups=0(root)
+[root@lx-virtual-machine ~]$ who
+lx       tty2         2025-02-04 17:30 (tty2)
+root     pts/2        2025-02-04 19:31 (10.0.0.1)
+root     pts/3        2025-02-04 19:30 (10.0.0.1)
+[root@lx-virtual-machine ~]$ logname
+root
+[root@lx-virtual-machine ~]$ su lx
+[lx@Ubuntu2204 root]$ id
+uid=1000(lx) gid=1000(lx) groups=1000(lx),4(adm),24(cdrom),27(sudo),30(dip),46(plugdev),122(lpadmin),134(lxd),135(sambashare)
+[lx@Ubuntu2204 root]$ who
+lx       tty2         2025-02-04 17:30 (tty2)
+root     pts/2        2025-02-04 19:31 (10.0.0.1)
+root     pts/3        2025-02-04 19:30 (10.0.0.1)
+[lx@Ubuntu2204 root]$ logname
+root
+[lx@Ubuntu2204 root]$ whoami
+lx
+```
+
+```bash
 [lx@ubuntu22-c0 ~]$ whatis who  
 who (1)              - show who is logged on  
 ```  
-    
     
 ## w  
 - `w` 显示当前全部登录用户以及做的操作  
@@ -525,7 +708,6 @@ root     pts/1    10.0.0.1         16:37    3.00s  0.03s  0.00s w
 - 按照提示输入当前登录用户的密码，即安装时设置的账户和密码  
 - 按照提示输入 `root` 的密码，输入完回车还要再输入一次确认  
     
-    
 # 内部命令和外部命令  
 > [Linux的内部命令和外部命令](https://blog.csdn.net/tqptr_opqww/article/details/123879877)  
 > [Linux 中的内部命令和外部命令 ](https://www.cnblogs.com/greyzeng/p/16912218.html)  
@@ -533,19 +715,21 @@ root     pts/1    10.0.0.1         16:37    3.00s  0.03s  0.00s w
 > [hash](https://ipcmen.com/hash)  
 > [关於运行档路径的变量： $PATH](http://cn.linux.vbird.org/linux_basic/0220filemanager_1.php#dir_path)  
     
+![](img/2025-02-04-19-55-49.png)
+![](img/2025-02-04-19-58-25.png)
     
 - 内部命令集成在 shell 中，shell 被执行时这些内部命令被加载到内存中，访问速度快  
-![1](https://img-blog.csdnimg.cn/a1075156c3074f96a1168a401f23ead6.png)  
-![2](https://img-blog.csdnimg.cn/92f97c9b9d9548cd96178ccb1b746760.png)  
+
+```bash
+[root@ubuntu2204 ~]$ type cd
+cd is a shell builtin
+```
     
 - 外部命令不在 shell 中，需要时才加载，一个外部命令对应一个二进制文件  
+
 - 外部变量的路径要在 `PATH` 环境变量中，才能找到该命令执行  
+
 - 外部命令由 shell 控制，shell 中第一次使用一个外部命令时，从 `PATH` 路径中查找，找到后放到 hash 表中缓存到，之后再次调用该命令时直接从 hash 缓存表中查找  
-    
-    
-****************  
-![2](https://img-blog.csdnimg.cn/0c7622fe76024419ad9e94e3f75b7f51.png)  
-    
     
 ## type 查看命令是内部命令还是外部命令  
 - `type` 查看是内部命令还是外部命令  
@@ -581,12 +765,21 @@ type: type [-afptP] name [name ...]
     Exit Status:  
     Returns success if all of the NAMEs are found; fails if any are not found.  
 ```  
-    
-![1](https://img-blog.csdnimg.cn/afe54a6eea654b37aa85cc5612d9e29f.png)  
+```bash
+[root@ubuntu2204 ~]$ type which
+which is hashed (/usr/bin/which)
+[root@ubuntu2204 ~]$ type cd
+cd is a shell builtin
+```
     
 ### type -a 列出命令的全部位置  
 - 有些命令可能既是内部命令，又是外部命令，如 `echo` 这种常见命令，因为 shell 种类很多，防止内部命令不能用，则使用外部命令  
-![1](https://img-blog.csdnimg.cn/97a0466bf2e14dc6a4f59ce77352963c.png)  
+```bash
+[root@ubuntu2204 ~]$ type -a echo
+echo is a shell builtin
+echo is /usr/bin/echo
+echo is /bin/echo
+```
     
 ## enable 管理内部命令  
 ```bash  
@@ -620,45 +813,34 @@ enable: enable [-a] [-dnps] [-f filename] [name ...]
 ```  
     
 ### enable 查看能使用的内部命令  
-![1](https://img-blog.csdnimg.cn/7bb50424a0754ab09460a266204aee4a.png)  
+![](img/2025-02-04-20-01-34.png)
     
 ### enable -a 查看全部内部命令以及状态  
-![1](https://img-blog.csdnimg.cn/461c088217834b7b8a1ea832702e905b.png)  
     
 ### enable -n 禁用内部命令  
 - 禁用后用 `enable` 查看不到  
 - 禁用后仍可以用 `enable -a` 查看  
 - 重新用 `enable` 加命令可以解除禁用  
     
-![1](https://img-blog.csdnimg.cn/edd4339fa63b4f2aa50e296c3d967bde.png)  
-    
 ## 外部命令  
-![1](https://img-blog.csdnimg.cn/59db47e14eef43bfa8c8413cf4d541d2.png)  
-![2](https://img-blog.csdnimg.cn/5bac4d6f11f646fa8aa5a4f6da3719d5.png)  
-![3](https://img-blog.csdnimg.cn/e2529c21609442df95255ea4e5d1c293.png)  
     
 # hash  
 > [linux的hash命令](https://blog.csdn.net/wei2314857815/article/details/104077515)  
-    
     
 - 已使用过的外部命令的路径会保存在 `hash` 表中，可用 `hash` 命令查看，初始为空  
 - hash 表的缓存只是临时存在，只对当前终端，当前用户有效  
 - 将 hash 中已缓存的命令路径修改到环境变量 PATH 中的其他位置，无法执行该命令，因为会从 hash 中查找命令  
     
 ![0](img/2023-03-06-14-53-37.png)  
-    
-![1](https://img-blog.csdnimg.cn/a6ece557fb734aebaf3b5f337f50441f.png)  
-![2](https://img-blog.csdnimg.cn/1143c8736d2b4127a7ba8d2c8ae2557a.png)  
+![](img/2025-02-04-20-04-56.png)
     
 ## hash -d 从 hash 表中删除缓存的命令  
-![1](https://img-blog.csdnimg.cn/46a6e5138aff4633be131e8572c07a65.png)  
+![](img/2025-02-04-20-06-03.png)
     
-## hash -r 情况 hash 表记录  
+## hash -r 清空 hash 表记录  
 forget all remembered locations  
-![1](https://img-blog.csdnimg.cn/264ca43ee74f4e67bd7a8895d93f3bfe.png)  
     
 ## hash -t 查看指定命令的路径  
-![1](https://img-blog.csdnimg.cn/6e4b5def196b4465a27ff3867bd71c68.png)  
     
 # 别名 alias  
 > [alias命令_Linux alias命令：给命令定义别名](http://c.biancheng.net/linux/alias.html)  
@@ -672,20 +854,25 @@ forget all remembered locations
 - 用**双引号**包围命令  
 - `command 命令`  
 - 直接写命令的完整路径  
-  
-![1](https://img-blog.csdnimg.cn/989095a3f6c94a5e8f4dda00600a052b.png)  
-![2](https://img-blog.csdnimg.cn/b66c930ce58f40fcb622f979552db10f.png)  
+
+![](img/2025-02-04-20-10-42.png) 
+![](img/2025-02-04-20-11-03.png)
     
 ## 自定义别名  
-![1](https://img-blog.csdnimg.cn/30a712a2171443a7acdb8da712322731.png)  
+```bash
+[root@ubuntu2204 ~]$ alias ls1='/bin/ls'
+[root@ubuntu2204 ~]$ ls1
+bash_custom.sh  nohup.out  shell_scripts  snap
+```
     
 ## 删除别名 unalias  
+```bash
+[root@ubuntu2204 ~]$ unalias ls1
+```
     
 ### unalias 删除一个或多个别名  
-![1](https://img-blog.csdnimg.cn/7d7a89cd18aa4ba4a239d05a9d5fe9f1.png)  
     
 ### unalias -a 删除全部别名  
-![1](https://img-blog.csdnimg.cn/be270b3652ce4813b66d45748a555688.png)  
     
 ## 设置别名永久生效  
 - 将别名定义写道配置文件中，根据当前系统 shell 调用配置文件的顺序将别名写到合适的位置  
@@ -693,7 +880,6 @@ forget all remembered locations
 配置文件中写入位置等见 shell 笔记中讲解  
     
 - 修改文件后立即生效：`source` 命令。（[Linux下source命令详解 ](https://www.cnblogs.com/shuiche/p/9436126.html)）  
-    
     
 # 获取帮助  
 ## whatis 简要查看命令说明  
@@ -709,9 +895,8 @@ forget all remembered locations
 [root@ubuntu22-c0 ~]$ whatis whatis  
 whatis (1)           - display one-line manual page descriptions  
 ```  
+
 ## help 查看内部命令  
-    
-![1](https://img-blog.csdnimg.cn/a6e3fe3b565b48198ce72a3fdce270e5.png)  
     
 ## COMMAND --help 或 COMMAND -h  
 有些命令两种格式都支持，有些只支持一种  
@@ -720,16 +905,18 @@ whatis (1)           - display one-line manual page descriptions
 - 一般查看外部命令，比 --help 和 -h 的帮助内容更详细。  
     
 - man 手册进行分区段处理，分为 9 个区，可以用 `man man` 查看：  
-![1](https://img-blog.csdnimg.cn/68a0626d424a4d6b9e2c4bdea281a856.png)  
-    
+![](img/2025-02-04-20-15-53.png)    
+
 - 一般文件说明在第 5 区段，用 `man 5 COMMAND`  
     
 - 有些命令可能在不同区段都有说明，可以用 `whatis` 来查看，然后用 `man section CMD` 查看对应区段说明。  
 如 `passwd` 在第 1 区段为命令的解释，第 5 区段为 `passwd` 文件的说明。  
-![1](https://img-blog.csdnimg.cn/863fb534a10143b4b42ce22215ea38de.png)  
-![2](https://img-blog.csdnimg.cn/70f661dbb19f44f3b94998b777f2555b.png)  
-![3](https://img-blog.csdnimg.cn/f9d036cbad83414e9b9e02dc89b05d6c.png)  
-![4](https://img-blog.csdnimg.cn/0e972779b5b64649ba4d1eb9ee8557e2.png)  
+```bash
+[root@ubuntu2204 ~]$ whatis passwd
+passwd (5)           - the password file
+passwd (1)           - change user password
+passwd (1ssl)        - OpenSSL application commands
+```
     
 ### man -f  
 - 相当于 `whatis`  
@@ -781,7 +968,7 @@ manpath (5)          - format of the /etc/manpath.config file
 在 windows 中安装 linux 子系统，如 ubuntu 20.04，进入该子系统的 `/mnt` 目录即可以操作windows 中的文件，再用 scp 等命令可以在 linux 虚拟机和 windows 中传文件  
     
 # 一行执行多个命令  
-1. 每个命令用分号（`;`）隔开  
+## 每个命令用分号（`;`）隔开  
 ```bash  
 [root@ubuntu22-c0 ~]$ ls 1.txt; echo $?; ls snap/ -d; echo $?  
 ls: cannot access '1.txt': No such file or directory  
@@ -806,8 +993,7 @@ ubuntu22-c0
 > [Linux bc 命令](https://www.runoob.com/linux/linux-comm-bc.html)  
 > [bc command in Linux with examples](https://www.geeksforgeeks.org/bc-command-linux-examples/)  
     
-    
-1. scale  
+## scale  
 - 设置小数点后位数  
 - 默认值为 0，即无小数  
     
@@ -831,7 +1017,7 @@ scale=2
 1.50  
 ```  
     
-2. ibase  
+## ibase  
 输入数字的进制（2~36），如果输入包含字母，必须大写。  
 ```bash  
 ibase=10  
@@ -842,18 +1028,18 @@ obase=2
 11111111  
 ```  
     
-3. obase  
+## obase  
 输出数字的进制（2~36）  
     
-4. last  
+## last  
 上次打印的结果。  
     
-5. quit 结束  
+## quit 结束  
 输入 quit 会终止执行 `bc` 命令  
-    
     
 # 查看系统信息  
 > [Linux 常用命令集合](https://www.runoob.com/w3cnote/linux-common-command.html)  
+
 ## 查看系统是 32 位还是 64 位  
     
 ### getconf  
@@ -915,7 +1101,6 @@ The difference between "free" and "available" is that "free" refers specifically
 > [Linux 查看磁盘空间](https://www.runoob.com/w3cnote/linux-view-disk-space.html)  
 > [Linux命令 lsblk - 列出块设备信息](https://ipcmen.com/lsblk)  
     
-    
 ### df  
 > [Linux df 命令](https://www.runoob.com/linux/linux-comm-df.html)  
     
@@ -968,7 +1153,6 @@ sync (1)             - Synchronize cached writes to persistent storage
 > [Linux shutdown 命令](https://www.runoob.com/linux/linux-comm-shutdown.html)  
 > [Linux系统Shutdown命令定时关机详解](https://blog.csdn.net/q_l_s/article/details/44855817)  
     
-    
 ### shutdown -h now 立即关机  
     
 ### shutdown -h 时间 设定时间关机  
@@ -997,15 +1181,12 @@ Shutdown scheduled for Fri 2023-08-18 13:39:39 CST, use 'shutdown -c' to cancel.
     
 ![](img/2023-03-06-19-31-22.png)  
     
-    
 ### shutdown -k 广播关机消息，不真的关机  
 ![](img/2023-03-06-19-44-09.png)  
-    
     
 ### shutdown --no-wall 不发送 wall message  
 - `man wall` 查看 `wall` 介绍  
 ![](img/2023-03-06-19-51-47.png)  
-    
     
 ### shutdown -r 重启 reboot  
 - 和 `shutdown -h` 语法相同，可以设置时间，只是这个是重启  
@@ -1014,10 +1195,8 @@ Shutdown scheduled for Fri 2023-08-18 13:39:39 CST, use 'shutdown -c' to cancel.
 > [Linux halt命令](https://www.runoob.com/linux/linux-comm-halt.html)  
 > [Understanding Shutdown, Poweroff, Halt and Reboot Commands in Linux](https://www.tecmint.com/shutdown-poweroff-halt-and-reboot-commands-in-linux/)  
     
-    
 ## 关机指令 poweroff  
 > [Linux poweroff 命令](https://www.runoob.com/linux/linux-comm-poweroff.html)  
-    
     
 ## 重启指令 reboot  
 > [Linux reboot命令](https://www.runoob.com/linux/linux-comm-reboot.html)  
@@ -1025,7 +1204,6 @@ Shutdown scheduled for Fri 2023-08-18 13:39:39 CST, use 'shutdown -c' to cancel.
 ## 休眠指令suspend  
 > [Linux suspend命令](https://www.runoob.com/linux/linux-comm-suspend.html)  
 > [Linux下怎么让挂起的(suspend or stopped)进程恢复执行(resume)](https://blog.csdn.net/baiyan83/article/details/109759386)  
-    
     
 # init  
 > [init command in linux with examples](https://www.geeksforgeeks.org/init-command-in-linux-with-examples/)  
@@ -1049,7 +1227,6 @@ Shutdown scheduled for Fri 2023-08-18 13:39:39 CST, use 'shutdown -c' to cancel.
 ## init 6 reboot  
 - 重启  
     
-    
 # history 历史命令  
 > [原来 history 可以这么强大](https://zhuanlan.zhihu.com/p/371739269)  
     
@@ -1064,6 +1241,7 @@ Shutdown scheduled for Fri 2023-08-18 13:39:39 CST, use 'shutdown -c' to cancel.
     4  [2023-08-18 16:46:00 lx] history  
     5  [2023-08-18 16:51:57 lx] history 3  
 ```  
+
 ## history -w 将当前缓冲区的历史记录写入到历史记录文件中  
 - `history --help | less` 查看说明  
       
@@ -1106,7 +1284,6 @@ clear
     
 ## CTRL-r 搜索历史命令  
 - CTRL-g 取消搜索  
-    
     
 ## 执行最后一次的历史命令  
 - 按 `Esc` 后再按 `.`，会显示出最后一次的历史命令  
@@ -1151,7 +1328,6 @@ history | head -n5
 - `Ctrl`+`R` 可以输入关键字查找历史记录，找到后按 `Enter` 键执行该命令，如果未找到，可按 `Ctrl` + `C` 结束输入，或者按 `Ctrl` + `G` 结束查找  
 - 当前用户的历史记录默认保存在 `~/.bash_history` 文件中，可在该文件中搜索  
     
-    
 当想根据关键字搜索历史记录，只显示不执行时，用 `!string:p` 很有用，  
 如果搜索的词不在开头，需要加上通配符，否则搜索不到  
 ```bash  
@@ -1162,7 +1338,6 @@ cat /proc/version
 [root@ubuntu22-c0 ~]$ !whatis:p  
 whatis strftime  
 ```  
-    
     
 ## 指定历史记录的格式和保存数目  
 ### HISTTIMEFORMAT 指定历史记录的格式  
@@ -1219,7 +1394,6 @@ export HISTTIMEFORMAT="[%F %T $(whoami)] "
 	- ubuntu 22.04 为该选项  
 	- ubuntu 20.04 为 ignoredups:ignorespace  
     
-    
 # hwclock 硬件时间  
 > [hwclock](https://linux.die.net/man/8/hwclock)  
     
@@ -1237,44 +1411,43 @@ Sat Aug 19 03:22:45 PM CST 2023
 > [How To Format Date And Time In Linux, MacOS, And Bash?](https://www.shell-tips.com/linux/how-to-format-date-and-time-in-linux-macos-and-bash/)  
 > [How to Display the Date and Time in the Linux Terminal](https://www.howtogeek.com/410442/how-to-display-the-date-and-time-in-the-linux-terminal-and-use-it-in-bash-scripts/)  
     
-    
 - `date` 显示系统时间  
     
 ## 日期的格式  
     
 - `man date` 查看帮助文档，可看到 FORMAT 介绍  
-![0](https://img-blog.csdnimg.cn/d6fadabe5ed848b0b2544a07c7bd0b78.png)  
+![](img/2025-02-04-20-26-28.png)
     
 ## -d 指定具体日期  
-![1](https://img-blog.csdnimg.cn/80af8ce7463049628b28bd23bc6a2e25.png)  
-![1](https://img-blog.csdnimg.cn/1264f460f34247b2950d7840ee3c596a.png)  
-![2](https://img-blog.csdnimg.cn/b7b87a8f32534b1b9c544bab7d7b5a16.png)  
-![3](https://img-blog.csdnimg.cn/d59789f03b374d07a3f326220a2ee133.png)  
-![4](https://img-blog.csdnimg.cn/e445603ba8bd45f78997baa31a0cfc3c.png)  
+![](img/2025-02-04-20-27-09.png)
+![](img/2025-02-04-20-27-36.png)
+![](img/2025-02-04-20-27-51.png)
+![](img/2025-02-04-20-28-19.png)
+![](img/2025-02-04-20-28-32.png)
     
 ## + 指定具体格式  
-    
-![0](https://img-blog.csdnimg.cn/9c61e1dc47324ae38bd266657cd76ec2.png)  
-![0](https://img-blog.csdnimg.cn/7d2e0c9ce210482e9a0a44b0511b6d3a.png)  
-    
-    
-![1](https://img-blog.csdnimg.cn/90519073b41f4fce893106807153f03b.png)  
-![2](https://img-blog.csdnimg.cn/857587ea0fac48958acc21a8c3e1ec6b.png)  
-![3](https://img-blog.csdnimg.cn/f395c91b4e59481eaa3e07d897b5a0e8.png)  
-![4](https://img-blog.csdnimg.cn/7fafc7f00dd245e694139c31230c91e7.png)  
-![5](https://img-blog.csdnimg.cn/672a5ceed1654dcfbbad4bbba4bad6f2.png)  
-    
-![5](https://img-blog.csdnimg.cn/94e00276e5fc4bdd80dc14a6a5a0476b.png)  
-![6](https://img-blog.csdnimg.cn/ebfb1076989146de926101ab05954a97.png)  
-    
-![7](https://img-blog.csdnimg.cn/9a8120c12430400fb0f060b0f6ba2cc0.png)  
-    
-![8](https://img-blog.csdnimg.cn/f5c36acc51a24efc80b490e5005670f1.png)  
-    
+```bash
+[root@ubuntu2204 ~]$ date +"%F-%H:%M:%M"
+2025-02-04-20:30:30
+[root@ubuntu2204 ~]$ date "+%F-%H:%M:%S"
+2025-02-04-20:31:16
+[root@ubuntu2204 ~]$
+[root@ubuntu2204 ~]$ date; date +"%F"
+2025年 02月 04日 星期二 20:31:29 CST
+2025-02-04
+[root@ubuntu2204 ~]$
+[root@ubuntu2204 ~]$ date +"year: %Y, month: %m, day: %d"
+year: 2025, month: 02, day: 04
+[root@ubuntu2204 ~]$
+[root@ubuntu2204 ~]$ date +"%H"
+20
+[root@ubuntu2204 ~]$
+[root@ubuntu2204 ~]$ date +"%I"
+08
+```
     
 ## --set 设置时间 系统时间和硬件时间  
-    
-![1](https://img-blog.csdnimg.cn/fa41083e511c445d9ba80cf2cf6e68b2.png)  
+![](img/2025-02-04-20-33-59.png)
     
 ## -u 显示 UTC 时间  
 ```bash  
@@ -1290,8 +1463,8 @@ Sat Aug 19 07:34:25 AM CST 2023
 ## 应用  
     
 ### Use date with Other Commands  
-![1](https://img-blog.csdnimg.cn/15c1d1aaed4e4820abed78946b1cb403.png)  
-    
+![](img/2025-02-04-20-34-37.png)
+
 ### 显示过去某天的星期  
 ![](img/2023-03-15-14-12-20.png)  
     
@@ -1340,13 +1513,10 @@ echo "Time difference: $days days, $hours hours, $minutes minutes, $seconds seco
 # 修改 bash 快捷键为 Vi 快捷键  
 > [Bash 行操作](https://wangdoc.com/bash/readline)  
     
-    
 - 在 `~/.bashrc` 中加上 `set -o vi` 后，用 `source ~/.bashrc` 使配置生效  
-    
     
 # dos2unix windows格式文件转换为Linux 格式文件  
 > [Linux命令 dos2unix - 将DOS格式文本文件转换成Unix格式](https://www.w3cschool.cn/linuxc/linuxc-gvjq3lbf.html)  
-    
     
 # echo  
 > [echo command in Linux with Examples](https://www.geeksforgeeks.org/echo-command-in-linux-with-examples/)  
@@ -1359,9 +1529,8 @@ echo "Time difference: $days days, $hours hours, $minutes minutes, $seconds seco
 ## echo -e 允许转义  
 ![](img/2023-03-14-19-46-03.png)  
 ![](img/2023-03-14-19-46-54.png)  
-![](img/2023-03-14-19-48-11.png)  
     
-- \b 为退格符，删掉前面一个字符  
+## `\b` 退格符，删掉前面一个字符  
 ```bash  
 [root@ubuntu22-c0 ~]$ echo  "a\bbc"  
 a\bbc  
@@ -1369,7 +1538,7 @@ a\bbc
 bc  
 ```  
     
-- \n 换行符  
+## `\n` 换行符  
 ```bash  
 [root@ubuntu22-c0 ~]$ echo -e "a\nb\nc"  
 a  
@@ -1377,13 +1546,13 @@ b
 c  
 ```  
     
-- \t 水平制表符  
+## `\t` 水平制表符  
 ```bash  
 [root@ubuntu22-c0 ~]$ echo -e "a\tb\tc"  
 a       b       c  
 ```  
     
-- \v 垂直制表符  
+## `\v` 垂直制表符  
 ```bash  
 [root@ubuntu22-c0 ~]$ echo -e "a\vb\vc"  
 a  
@@ -1391,28 +1560,23 @@ a
   c  
 ```  
     
-- \r carriage return  
+## `\r` carriage return  
 ```bash  
 [root@ubuntu22-c0 ~]$ echo -e "a\rbc"  
 bc  
 ```  
     
-    
-- \c 去掉换行符  
+## `\c` 去掉换行符  
 ```bash  
 [root@ubuntu22-c0 ~]$ echo -e "abc\c"  
 abc[root@ubuntu22-c0 ~]$  
 ```  
     
-    
 ## echo $(ls) 和 ls  
 > [Difference between 'ls' and 'echo $(ls)'](https://unix.stackexchange.com/questions/283586/difference-between-ls-and-echo-ls)  
 > [Command Substitution](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html#Command-Substitution)  
     
-    
-    
 ![](img/2023-03-16-19-32-57.png)  
-    
     
 - 直接 `ls` 执行的是别名，输出的内容带颜色（ubuntu22.04）  
 ```bash  
@@ -1423,10 +1587,8 @@ alias ls='ls --color=auto'
     
 - 直接 `ls` 后将输出的内容保存到文件中，会将每项加一个换行符单独显示为一行；而 `echo $(ls)` 不会  
     
-    
 # 环境变量  
 > [Environment variable](https://en.wikipedia.org/wiki/Environment_variable)  
-    
     
 - 不区分大小写  
 - `env` 查看  
@@ -1436,23 +1598,29 @@ alias ls='ls --color=auto'
 > [环境变量](https://www.lanqiao.cn/courses/1/learning/?id=60)  
 > [How to Set Environment Variables in Linux](https://phoenixnap.com/kb/linux-set-environment-variable#ftoc-heading-1)  
     
-    
 ## 设置临时环境变量  
-![1](https://img-blog.csdnimg.cn/203283acce344b7499130fe99b14b442.png)  
-![2](https://img-blog.csdnimg.cn/5cd63e05c1454c27ba8e28527dca8324.png)  
+```bash
+[root@ubuntu2204 ~]$ var=a
+[root@ubuntu2204 ~]$ echo $var
+a
+[root@ubuntu2204 ~]$ bash
+[root@Ubuntu2204 ~]$ echo $var
+
+[root@Ubuntu2204 ~]$ exit
+exit
+[root@ubuntu2204 ~]$ echo $var
+a
+[root@ubuntu2204 ~]$ unset var
+[root@ubuntu2204 ~]$ echo $var
+```
     
 ## 设置永久环境变量  
     
 在 /etc/profile 文件中添加，对所有用户生效。  
     
-![1](https://img-blog.csdnimg.cn/13907b40d87f4b3695e04c68d7f11356.png)  
-![1](https://img-blog.csdnimg.cn/6953532b11f94209a366a90f2378672e.png)  
-<br/>  
-    
 ## 在 PATH 中添加路径  
 > [Linux中如何添加自己的路径到PATH](https://blog.csdn.net/qq_16209077/article/details/50711397)  
 > [关於运行档路径的变量： $PATH](http://cn.linux.vbird.org/linux_basic/0220filemanager_1.php#dir_path)  
-    
     
 # /dev/null  
 > [What is /Dev/Null in Linux?](https://www.geeksforgeeks.org/what-is-dev-null-in-linux/)  
@@ -1473,46 +1641,57 @@ ls: cannot access 'a': No such file or directory
 > [Linux User Administration: A Complete Guide to Managing Multi-User Systems](https://www.linuxfordevices.com/tutorials/linux-user-administration)  
     
 ## 用户类型  
-    
-![1](https://img-blog.csdnimg.cn/3462364620494c36a8a334c4233e5715.png)  
-<br/>  
+![](img/2025-02-04-20-41-32.png)    
     
 - **根据 UID 区分不同的用户类型**  
 在 `/etc/login.defs` 文件中查看 UID 的范围，不同的系统可能不一样，下面是 Ubuntu 22.04.1 查看的范围：  
-![1](https://img-blog.csdnimg.cn/e574f71072e54d3eac3d805628889923.png)  
+![](img/2025-02-04-20-42-09.png)
     
-	- 超级用户  
-	root，UID 为 0  
-	- 系统用户  
-	100 ~ 999  
-	100 是保留给用户设置使用的最小值  
-![1](https://img-blog.csdnimg.cn/ef646ce538944398b987d3640d5b1b49.png)  
-    
-	- 普通用户  
-	1000 ~ 60000  
+**超级用户**：  
+root，UID 为 0  
+
+**系统用户**： 
+100 ~ 999  
+100 是保留给用户设置使用的最小值  
+![](img/2025-02-04-20-43-06.png)
+
+- 普通用户  
+1000 ~ 60000  
     
 ### 新建普通用户 UID 超过 60000 影响  
 - 根据配置文件 `/etc/login.defs`，普通用户的最大 UID 为 60000，但新建 UID 超过 60000 也能新建成功，但有一些影响，见 [Using Large User IDs and Group IDs](https://docs.oracle.com/cd/E19120-01/open.solaris/819-2379/userconcept-35/index.html)  
     
-![1](https://img-blog.csdnimg.cn/415b371e172d4f16a1b0d6f2edbc3b7b.png)  
-    
+![](img/2025-02-04-20-43-32.png)
     
 ## 查看当前全部用户  
 ### 在 `/etc/passwd` 中查看全部账户信息  
 - 查看全部  
-![1](https://img-blog.csdnimg.cn/859a2982188748b3b87e18436454aad9.png)  
+```bash
+cat /etc/passwd
+```
+
 - 查看最后部分  
-![2](https://img-blog.csdnimg.cn/37e4eb45763d4f1f996f7f2925de5712.png)  
+```bash
+tail -n5 /etc/passwd
+```
+
 - 查看前面部分  
-![3](https://img-blog.csdnimg.cn/c0bb2aa264b3468f8990fa71cfbfe85f.png)  
+```bash
+head -n5 /etc/passwd
+```
     
 ### 通过 `getent passwd` 查看  
 - 查看全部用户  
-![4](https://img-blog.csdnimg.cn/1e8e87df525d4b4c9b25cd3de0b66c32.png)  
+```bash
+getnet passwd
+```
     
 - 查看某个特殊用户信息  
 根据用户名或者 UID 查询  
-![5](https://img-blog.csdnimg.cn/251e28e099d34fd2aba360e41a684521.png)  
+```bash
+[root@ubuntu2204 ~]$ getent passwd lx
+lx:x:1000:1000:lx,,,:/home/lx:/bin/bash
+```
     
 ## 用户组分类  
 - 管理员组  
@@ -1521,142 +1700,176 @@ ls: cannot access 'a': No such file or directory
     
 ### GID 范围  
 通过 `/etc/login.def` 文件查看，Ubuntu 22.04.1 查看范围如下：  
-![1](https://img-blog.csdnimg.cn/8315e27a5cc141408b6b79ea06ea4cdf.png)  
-    
+![](img/2025-02-04-20-46-32.png)
+
 ## 私有组、主要组和附加组  
 > [Linux私有组，主要组和附加组 ](https://blog.51cto.com/xinsz08/5022617)  
     
 - 创建新用户时默认会创建一个和该用户同名的组，组ID 为 GID  
 - `id username` 可以查看其全部组  
-![1](https://img-blog.csdnimg.cn/c22580ba940545fc9edae820afa4b826.png)  
     
 ## 用户和组相关配置文件  
 ### /etc/passwd  
 1. 查看该配置文件的说明：  
-![1](https://img-blog.csdnimg.cn/3a4c9c0ded454e7fbc9450c39850684e.png)  
+```bash
+[root@ubuntu2204 ~]$ whatis passwd
+passwd (5)           - the password file
+passwd (1)           - change user password
+passwd (1ssl)        - OpenSSL application commands
+```
+
 该配置文件包含用户账号的信息，每一行一个用户，由 7 部分组成，每个部分由冒号分隔，内容如下：  
-![2](https://img-blog.csdnimg.cn/7a6d08fe51e94cc9a022e745ce1c775b.png)  
-    
+![](img/2025-02-04-20-48-03.png)
     
 2. 配置文件的内容  
-![2](https://img-blog.csdnimg.cn/368d2ee181b64e1fb77975ec79f5b5cd.png)  
+```bash
+[root@ubuntu2204 ~]$ head -n1 /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+```
   
 - 第二字段为密码  
-![1](https://img-blog.csdnimg.cn/8058e0605677489e9fcae702f4758947.png)  
-![2](https://img-blog.csdnimg.cn/d6ea94a978644ba59430163545ccf0e8.png)  
-![3](https://img-blog.csdnimg.cn/9cda11e669c542f9843654772c1d6990.png)  
-    - 如果用户密码为**小写的 `x`**，表示密码实际在 `shadow` 文件中，可以在 `etc/shadow` 文件中查看，如果**该文件中没有则密码无效**  
-    - 如果**用户密码为空**，则不需要密码。但有些应用可能在密码为空时不允许访问。  
-    - 如果密码以感叹号 `!` 开头，表示**密码被锁定**  
-    新创建的用户，还没设置密码时，查看密码为一个 `!`，除了 `root` 可以直接切换到该用户外，其他用户不能切换，需要先设置密码  
-    用 `passwd -l` 锁住密码后 `/etc/shadow` 中加密的密码前也有一个 `!`  
+- 如果用户密码为**小写的 `x`**，表示密码实际在 `shadow` 文件中，可以在 `etc/shadow` 文件中查看，如果**该文件中没有则密码无效**  
+- 如果**用户密码为空**，则不需要密码。但有些应用可能在密码为空时不允许访问。  
+- 如果密码以感叹号 `!` 开头，表示**密码被锁定**  
+新创建的用户，还没设置密码时，查看密码为一个 `!`，除了 `root` 可以直接切换到该用户外，其他用户不能切换，需要先设置密码  
+用 `passwd -l` 锁住密码后 `/etc/shadow` 中加密的密码前也有一个 `!`  
+![](img/2025-02-04-20-49-46.png)
+![](img/2025-02-04-20-50-06.png)
+![](img/2025-02-04-20-50-21.png)
     
 - 第七字段显示 shell 的类型  
     
 ### /etc/shadow 用户密码相关配置  
 > [详细解析/etc/shadow文件尤其是加密密码字段](https://www.cnblogs.com/jason-huawen/p/16300671.html)  
     
-    
 - 查看配置文件的帮助文档  
-![1](https://img-blog.csdnimg.cn/a8f34eee0bd9470f8d636bc292dbe602.png)  
-    
+```bash
+[root@ubuntu2204 ~]$ whatis shadow
+shadow (5)           - shadowed password file
+```
     
 - 查看该配置文件的内容  
-![2](https://img-blog.csdnimg.cn/a3264046efaf42c4a31d5d90d227aa73.png)<br/>  
+```bash
+[root@ubuntu2204 ~]$ head -n1 /etc/shadow
+root:$y$j9T$YrJnvq6yIZEJHcY.C8ET11$anGsi4VIWdBoaFDY/VJ0A373IPSHRLrukXq61uKbKT5:19755:0:99999:7:::
+```
     
+- **第 1 字段 登录用户名 login name**  
+如 root  
     
-	- **第 1 字段 登录用户名 login name**  
-	如 root  
-	    
-	- **第 2 字段 用户密码**  
-	密码以加密的形式显示，没有则为空。  
-	    
-	- **第 3 字段 最近一次修改密码的日期**  
-	显示的数字为从 1970 年 1 月 1 号到最近一次修改密码的天数。  
-	数值 0 表示用户应在下次登录时修改密码。  
-	数值为空表示禁用密码老化功能。  
+- **第 2 字段 用户密码**  
+密码以加密的形式显示，没有则为空。  
     
-	- **第 4 字段 最短密码使用时间**  
-	用户在上次修改密码后，想再次修改密码必须等待的天数。  
-	数值 0 和空表示没有等待时间，即随时可以修改密码。  
-	    
-	- **第 5 字段 最长密码使用时间**  
-	距离上次修改密码后，经过该天数用户必须修改密码。  
-	如果用户超过该时间仍不修改密码，密码仍然有效，在下次登录时用户会被要求修改密码。  
-	数值为空表示没有最长密码使用期限。  
-	如果数值比最短密码使用时间小，表示用户不能修改密码。  
+- **第 3 字段 最近一次修改密码的日期**  
+显示的数字为从 1970 年 1 月 1 号到最近一次修改密码的天数。  
+数值 0 表示用户应在下次登录时修改密码。  
+数值为空表示禁用密码老化功能。  
+
+- **第 4 字段 最短密码使用时间**  
+用户在上次修改密码后，想再次修改密码必须等待的天数。  
+数值 0 和空表示没有等待时间，即随时可以修改密码。  
     
-	- **第 6 字段 密码警告期**  
-	在密码将要过期（即第 5 字段定义的最长密码使用时间）的前几天提示用户修改密码。  
-	数值为 0 和空表示没有警告期。  
-	    
-	- **第 7 字段  密码不活动期**  
-	在密码已经过期（即第 5 字段定义的最长密码使用时间）之后的一段时间，密码仍能使用，但超过该有效期后用户将不能登录。  
-	字段为空表示无不活动期。  
+- **第 5 字段 最长密码使用时间**  
+距离上次修改密码后，经过该天数用户必须修改密码。  
+如果用户超过该时间仍不修改密码，密码仍然有效，在下次登录时用户会被要求修改密码。  
+数值为空表示没有最长密码使用期限。  
+如果数值比最短密码使用时间小，表示用户不能修改密码。  
+
+- **第 6 字段 密码警告期**  
+在密码将要过期（即第 5 字段定义的最长密码使用时间）的前几天提示用户修改密码。  
+数值为 0 和空表示没有警告期。  
     
-	- **第 8 字段 账户到期日**  
-	从 1970 年 1 月 1 号算起，用户账号到期的时间。  
-	账号到期后将不能登录该账号，密码到期后不能使用该密码登录。  
-	字段为空表示账号永远不会过期。  
-	数值 0 不建议使用，可能解释为账户不会到期或者到期时间为 1970年1月1号。  
-    
-	- **第 9 字段 保留字段**  
-	    
+- **第 7 字段  密码不活动期**  
+在密码已经过期（即第 5 字段定义的最长密码使用时间）之后的一段时间，密码仍能使用，但超过该有效期后用户将不能登录。  
+字段为空表示无不活动期。  
+
+- **第 8 字段 账户到期日**  
+从 1970 年 1 月 1 号算起，用户账号到期的时间。  
+账号到期后将不能登录该账号，密码到期后不能使用该密码登录。  
+字段为空表示账号永远不会过期。  
+数值 0 不建议使用，可能解释为账户不会到期或者到期时间为 1970年1月1号。  
+
+- **第 9 字段 保留字段**  
 	    
 ### /etc/group 用户组相关信息  
 - 配置文件帮助文档  
 该配置文件存放用户组相关信息。  
-![1](https://img-blog.csdnimg.cn/aeda50a8882b46cab39e0c7c50e0a303.png)  
+```bash
+[root@ubuntu2204 ~]$ whatis group
+group (5)            - user group file
+```
     
 - 配置文件内容  
-![2](https://img-blog.csdnimg.cn/e1740769beea49f3b64771852ae3a112.png)  
-	- 第 1 字段 组名  
-	- 第 2 字段 组密码  
-	字段为空表示不需要密码。  
-	- 第 3 字段 GID  
-	- 第 4 字段 组中的全部用户  
-	逗号分隔用户，用户为以该组为**附加组**的用户，**不包含主要组**的用户  
-    
+```bash
+[root@ubuntu2204 ~]$ head -n5 /etc/group
+root:x:0:
+daemon:x:1:
+bin:x:2:
+sys:x:3:
+adm:x:4:syslog,lx
+```
+- 第 1 字段 组名  
+- 第 2 字段 组密码  
+字段为空表示不需要密码。  
+- 第 3 字段 GID  
+- 第 4 字段 组中的全部用户  
+逗号分隔用户，用户为以该组为**附加组**的用户，**不包含主要组**的用户  
     
 ### /etc/gshadow 组密码相关配置  
 - 查看帮助文档  
-![1](https://img-blog.csdnimg.cn/2476eeef95c546a9a2f3cf86336560bd.png)  
+```bash
+[root@ubuntu2204 ~]$ whatis gshadow
+gshadow (5)          - shadowed group file
+```
     
 - 查看配置文件内容  
-![2](https://img-blog.csdnimg.cn/70f088dec33b44f89c6136626306ae4c.png)  
-	- 第 1 字段 组名  
-	- 第 2 字段 加密的组密码  
-	- 第 3 字段 组管理者  
-	组管理者以逗号分隔。  
-	管理者（administrators）能修改组密码和组成员。  
-	管理者同时有组成员的权限。  
-	- 第 4 字段 组成员  
-	组成员以逗号分隔  
-	组成员访问组不需要密码  
-	组成员为**以该组为附加组**的用户列表  
-    
+```bash
+[root@ubuntu2204 ~]$ head -n5 /etc/gshadow
+root:*::
+daemon:*::
+bin:*::
+sys:*::
+adm:*::syslog,lx
+```
+- 第 1 字段 组名  
+- 第 2 字段 加密的组密码  
+- 第 3 字段 组管理者  
+组管理者以逗号分隔。  
+管理者（administrators）能修改组密码和组成员。  
+管理者同时有组成员的权限。  
+- 第 4 字段 组成员  
+组成员以逗号分隔  
+组成员访问组不需要密码  
+组成员为**以该组为附加组**的用户列表  
     
 ### /etc/skel/ 用户家目录中配置文件  
 > [/etc/skel/目录](https://blog.csdn.net/codetz/article/details/52541780)  
     
 - 用户如果实际创建家目录，会将该目录中的文件复制到**家目录**中  
-![1](https://img-blog.csdnimg.cn/1e41ef7bb60a41e6a97ef47a7febf9a1.png)  
-![2](https://img-blog.csdnimg.cn/a647c2e64eba474ca63590d587ab88b3.png)  
+```bash
+[root@ubuntu2204 ~]$ ll /etc/skel/
+total 32
+drwxr-xr-x   2 root root  4096  3月 19  2024 ./
+drwxr-xr-x 133 root root 12288  2月  4 19:45 ../
+-rw-r--r--   1 root root   763  2月  2  2024 bash_custom.sh
+-rw-r--r--   1 root root   220  1月  7  2022 .bash_logout
+-rw-r--r--   1 root root  3830  2月  2  2024 .bashrc
+-rw-r--r--   1 root root   807  1月  7  2022 .profile
+[root@ubuntu2204 ~]$
+```
+
 - 该目录在 `/etc/default/useradd` 文件中指定  
-![3](https://img-blog.csdnimg.cn/21aa866434844f6ebe026d7da2b217b1.png)  
-    
     
 ### /etc/login.defs 用户默认设置文件  
 > [Linux /etc/login.defs：创建用户的默认设置文件](http://c.biancheng.net/view/3059.html)  
     
-    
 #### 查看 UID 和 GID 范围  
-![1](https://img-blog.csdnimg.cn/62583e07edb14abf8cd1ef7fbcc4ae0d.png)  
+![](img/2025-02-04-20-58-57.png)
+
 #### 默认加密方法  
 - `/etc/shadow` 中第二个字段加密密码的方法  
-![2](https://img-blog.csdnimg.cn/1d84b7110fe64cbd862b1511ece94416.png)  
-![2](https://img-blog.csdnimg.cn/f9e2d6ae5e5f4cedb7486e069a125f83.png)  
-    
+![](img/2025-02-04-20-59-23.png)    
+![](img/2025-02-04-20-59-40.png)
     
 ### /etc/default/useradd 指定创建新用户时的默认设置  
 > [/etc/default/useradd文件详解](https://blog.csdn.net/qq_41982304/article/details/104953572)  
@@ -1665,11 +1878,11 @@ ls: cannot access 'a': No such file or directory
     
 #### 指定创建用户时的默认 shell 类型  
 - ubuntu 20.04 默认 `/bin/sh`，rocky 8.6 中默认 `/bin/bash`  
-![1](https://img-blog.csdnimg.cn/79fca442c0444e01bd2b36faeb0e955c.png)  
-![2](https://img-blog.csdnimg.cn/6ad39c01101b46578c07c6d1f0d474b9.png)  
-    
+![](img/2025-02-04-21-00-18.png)
+![](img/2025-02-04-21-00-42.png)
+
 #### 指定创建家目录时复制配置文件的路径 SEKL  
-![1](https://img-blog.csdnimg.cn/299791d813d54a778b28a7d1f3506f7d.png)  
+![](img/2025-02-04-21-01-10.png)
     
 #### 指定创建用户时是否创建 mail spool  
 - ubuntu 22.04 默认不创建 mail spool，rocky 8.6 默认创建  
@@ -1720,230 +1933,193 @@ ls: cannot access 'a': No such file or directory
 > [Linux 中useradd命令的使用](https://www.cnblogs.com/Hackerman/p/12535719.html)  
     
 ### 指定家目录  
-1. `-b` 选项指定 basedir，家目录默认由 **basedir** 和**账户名**组合在一起，如：  
-![1](https://img-blog.csdnimg.cn/ea80e41009c5447fb1174c83a752697b.png)  
+1. `-b` 选项指定 basedir，家目录默认由 **basedir** 和**账户名**组合在一起。 
     
-<br/>  
     
-2. 加 `-m` 选项可以实际生成该家目录，并将 `/etc/skel/` 目录中的配置文件拷贝到家目录下：  
-![2](https://img-blog.csdnimg.cn/316f0ec16b9e4cbb99d71f9191e585b3.png)  
-<br/>  
+2. 加 `-m` 选项可以实际生成该家目录，并将 `/etc/skel/` 目录中的配置文件拷贝到家目录下。  
     
-3. `-d` 选项可以直接指定**家目录的完整路径**，如果同时指定 basedir 和 homedir 且两者不一致，不管命令的先后顺序，以 `-d` 指定的路径为主：  
-![3](https://img-blog.csdnimg.cn/b87ea03fa12e4770901177825f46e798.png)  
-<br/>  
+3. `-d` 选项可以直接指定**家目录的完整路径**，如果同时指定 basedir 和 homedir 且两者不一致，不管命令的先后顺序，以 `-d` 指定的路径为主。 
+![](img/2025-02-04-21-03-35.png)
     
-4. `-d` 选项指定的**路径不存在时**可以**创建该路径**，包括**多级子目录都可以创建**，但创建子目录时有提示；`-b` 创建 basedir 规则也相同：  
-![4](https://img-blog.csdnimg.cn/9594ad79cdda471e979debeaeeb3cc7d.png)  
-![5](https://img-blog.csdnimg.cn/81bdcb83954b48cca583c4708ccd6d78.png)  
-![6](https://img-blog.csdnimg.cn/8b9b01a52ade444eb243c9ee89ee5476.png)  
-![7](https://img-blog.csdnimg.cn/71aaaa52cec64601b37563f2af2ae80d.png)  
-    
-<br/>  
+4. `-d` 选项指定的**路径不存在时**可以**创建该路径**，包括**多级子目录都可以创建**，但创建子目录时有提示；`-b` 创建 basedir 规则也相同。
+![](img/2025-02-04-21-03-54.png)
+![](img/2025-02-04-21-04-10.png)
+![](img/2025-02-04-21-04-25.png)
     
 5. 如果不指定 basedir 和 homedir，则使用默认值，默认在 `/etc/login.def ` 文件中  
-	- 默认认 basedir 为/home，家目录为 basedir/用户名/  
-![7](https://img-blog.csdnimg.cn/f22795e9d02d4167931cacf104b950e7.png)  
-	- `ubuntu 22.04`  中没有该设置，`rocky 8.6` 有  
-![6](https://img-blog.csdnimg.cn/9b070855f0d04a078e67f650acfebb40.png)  
-![7](https://img-blog.csdnimg.cn/b591244d0cd14ab08a67ff669ce79574.png)  
-    
-<br/>  
-    
+- 默认认 basedir 为/home，家目录为 basedir/用户名/  
+![](img/2025-02-04-21-05-12.png)
+
+- `ubuntu 22.04`  中没有该设置，`rocky 8.6` 有  
+![](img/2025-02-04-21-05-32.png)    
+![](img/2025-02-04-21-05-55.png)
+
 ### -u 指定 UID  
 #### `-u` 选项指定 UID，默认如果 UID 已存在，则不能创建：  
-![1](https://img-blog.csdnimg.cn/c36b8d4c54874223b4d8a40fae390054.png)  
-<br/>  
+![](img/2025-02-04-21-06-14.png)
     
 #### `-u -o` 两个选项结合可以创建重复的 UID  
-![2](https://img-blog.csdnimg.cn/591f122613cf4b1e92c5d7aeb0ca4f02.png)  
-    
+![](img/2025-02-04-21-06-27.png) 
+
 #### 创建的账户指定 UID 为 0 时  
-![1](https://img-blog.csdnimg.cn/9973b08510e64555aa6077076eb1baf4.png)  
+![](img/2025-02-04-21-06-53.png)
+
 该账户显示为 root，具有 root 权限：  
-![2](https://img-blog.csdnimg.cn/f9bd43ea8be14e5b82a6192b4d80dd3e.png)  
+![](img/2025-02-04-21-07-25.png)
+
 #### 指定 UID 超过 60000  
 - 根据配置文件 `/etc/login.defs`，普通用户的最大 UID 为 60000，但新建 UID 超过 60000 也能新建成功，但有一些影响，见 [Using Large User IDs and Group IDs](https://docs.oracle.com/cd/E19120-01/open.solaris/819-2379/userconcept-35/index.html)  
-![1](https://img-blog.csdnimg.cn/415b371e172d4f16a1b0d6f2edbc3b7b.png)  
+![](img/2025-02-04-21-07-46.png)
+
 ### -g 指定用户 primary group  
 `-g` 选项指定主要组，可以指定组名或者 GID，但**组必须存在**  
 如果不指定，默认创建一个**和用户同名的组**  
-    
-![1](https://img-blog.csdnimg.cn/e3fbcb3ddfcf4bf0bd6a297fa5ea8e25.png)  
-    
+![](img/2025-02-04-21-08-06.png) 
+
 ### -G 指定用户附加组  
 用 `-G` 选项增加附加组，附加组可以多个，用逗号 `,` 间隔，如果不指定主要组，则默认创建一个用户名同名的主要组。  
-    
-![1](https://img-blog.csdnimg.cn/2e39e6b8a7994476b23cdd2bb7a8507d.png)  
+![](img/2025-02-04-21-08-35.png)    
+
 ### -s 指定 shell  
 Ubuntu 22.04.1 默认用 useradd 创建用户的 shell 为 `/bin/sh`，可在 `/etc/default/useradd` 文件中查看，可以修改默认为 `/bin/bash`  
-![1](https://img-blog.csdnimg.cn/aa850680f54148b18f6d1b28f6294457.png)![2](https://img-blog.csdnimg.cn/b34fed8b44d04fcd95e264fac9048072.png)  
+![](img/2025-02-04-21-08-53.png)
     
 ### -r 创建系统用户  
 `-r` 选项创建系统用户，系统用户和普通用户的 UID 范围不同。  
-    
-![1](https://img-blog.csdnimg.cn/b557ca941d0d421f91e354b6c9428ea8.png)![2](https://img-blog.csdnimg.cn/3e8be66ac53e4756b260cfe6c79c1217.png)  
+![](img/2025-02-04-21-09-18.png)    
+
 ### -m 创建家目录  
 用 `-d` 指定加目录后默认不会真的创建该目录，需要用 `-m` 选项创建，而 `-M` 选项则不创建家目录。  
-    
-![1](https://img-blog.csdnimg.cn/d1596edfa74b4bdabb6fbcf8d1e3184b.png)  
+![](img/2025-02-04-21-09-39.png)
     
 ### -e 设置账号过期时间  
 `-e` 选项设置账号过期时间：  
-![1](https://img-blog.csdnimg.cn/9639737365fa41ff8cc51ca12571c04b.png)  
-![2](https://img-blog.csdnimg.cn/4ebbcbe254a1439aa496edbff738d69e.png)  
+![](img/2025-02-04-21-10-11.png)
     
 ### <font color = 'red'>-l 不将新创建的用户添加到 lastlog 和 faillog 数据库中</font>  
-![1](https://img-blog.csdnimg.cn/1b288af44c8e46b7a57ed0f706c6e9a8.png)  
+![](img/2025-02-04-21-10-33.png)
     
 *********************  
 **问题：**  
 - ubuntu22.04 指定 `-l` 选项后新加的用户仍在 `lastlog` 数据库中？？  
-![2](https://img-blog.csdnimg.cn/e98725beb529440db7de3977261d602b.png)  
-    
+![](img/2025-02-04-21-10-52.png) 
+
 ### useradd 和 adduser  
 > [useradd和 adduser的区别](https://blog.csdn.net/cynthrial/article/details/84673357)  
     
-    
 Ubuntu 22.04.1 测试两者区别，adduser 会交互式让输入密码，默认的 shell 为 `/bin/bash`，自动创建主目录且赋值默认文件：  
-    
-![1](https://img-blog.csdnimg.cn/ca88313c2dc3402e8d44fe491c05b022.png)  
-    
-![2](https://img-blog.csdnimg.cn/7e20bea56b2749569368ae0322570e04.png)  
-    
+![](img/2025-02-04-21-11-30.png)    
+![](img/2025-02-04-21-11-44.png)
     
 ### 批量添加用户 newusers  
 > [newusers和chpasswd的用法](https://blog.licess.com/newusers-chpasswd/)  
     
 - 格式按照 `/etc/passwd` 中写  
-![1](https://img-blog.csdnimg.cn/390c8e5a4cf34e44b1f5f2d455caa4ec.png)  
+![](img/2025-02-04-21-12-06.png)
     
 ## 新添加的用户不能执行 ll 命令问题  
 - 测试环境为 Ubuntu 22.04.1  
-![1](https://img-blog.csdnimg.cn/9d16342866d74448a1a67e678b7e8820.png)  
+![](img/2025-02-04-21-12-23.png)
     
 - 解决方案  
 用 `-m` 选项增加家目录（家目录内会有一些配置文件），并用 `-s` 选项修改 shell  为 `/bin/bash`  
-![2](https://img-blog.csdnimg.cn/f284176e41c44b8791cef67a8a4558d0.png)  
-![3](https://img-blog.csdnimg.cn/f55cfc1bc0d84473b2ff6fe7c64b94b7.png)  
-    
+![](img/2025-02-04-21-12-41.png) 
     
 ## 新添加的账户设置登录密码  
 新建账号没有设置密码时，先切换到 root 账户，然后用 `passwd` 命令设置密码，再切换到新账户即可正常使用新账号登录：  
-![1](https://img-blog.csdnimg.cn/b099c0fb857e4e62951c2175c552a21e.png)  
-    
+![](img/2025-02-04-21-13-02.png) 
+
 ## 无法切换到 root 账户  
 新装好 Ubuntu 系统后用 `su` 或 `su -` 无法切换到 root 时，可以修改 root 密码，再切换  
-    
-![1](https://img-blog.csdnimg.cn/be9aed1077b441ddb2537331d4e33457.png)  
-    
-&nbsp;  
+![](img/2025-02-04-21-13-24.png)
     
 ## 新建用户时默认创建家目录  
 - ubuntu 20.04 和 rocky 8.6 的默认设置有差异  
 - rocky 8.6 中新建用户默认创建家目录  
 - ubuntu 20.04 中新建用户不指定 -m 选项，不创建家目录  
 - 在 `/etc/login.defs`  文件中设置  
-    
-![1](https://img-blog.csdnimg.cn/9b178e2d3467464daa2554a607811208.png)  
-![2](https://img-blog.csdnimg.cn/f4b35a74fec945d69e7e34aa385d2822.png)  
-![3](https://img-blog.csdnimg.cn/086ee324c1b048cf822a2af782974541.png)  
-    
-![3](https://img-blog.csdnimg.cn/abe8e8bf46ff453ab749083d88530fd2.png)  
-    
+![](img/2025-02-04-21-13-52.png)    
+![](img/2025-02-04-21-14-05.png)
+![](img/2025-02-04-21-14-21.png)
+![](img/2025-02-04-21-14-33.png)
+
 ****************  
 - `/etc/login.defs` 文件中设置 `CREATE_HOME` 变量  
 - ubuntu 20.04 需要新加设置  
-![1](https://img-blog.csdnimg.cn/8bf7538b0d8b40d1bba8a1b1ce247f57.png)  
-    
+![](img/2025-02-04-21-14-53.png) 
     
 ## 新建用户时为家目录中添加指定文件  
 - 将要默认添加的文件添加到 `/etc/skel` 目录中  
 - `useradd -m` 在创建用户时创建家目录  
-![1](https://img-blog.csdnimg.cn/bb72ca267e8e41dd966cec80e4ee767a.png)  
+![](img/2025-02-04-21-15-46.png)
     
 ## mkhomedir_helper 为已创建的用户创建家目录  
 - `man mkhomedir_helper` 查看该命令的帮助文档  
-![1](https://img-blog.csdnimg.cn/7128e17eb1654805829a7a1e3564281a.png)  
+![](img/2025-02-04-21-16-03.png)
     
 ### 用户已存在家目录：原来家目录文件时间不更新  
-![1](https://img-blog.csdnimg.cn/a1e062257b4b4b659445a6d267c07ec5.png)  
-![2](https://img-blog.csdnimg.cn/4eccf180582f4632ba16a942f06491ad.png)  
+![](img/2025-02-04-21-16-25.png)
+![](img/2025-02-04-21-16-47.png)
     
 ### 用户不存在家目录：创建家目录并拷贝默认文件  
-![1](https://img-blog.csdnimg.cn/5471505d22a94f05a5fb9ea96b821638.png)  
+![](img/2025-02-04-21-17-05.png)
     
 ## 修改用户账户 usermod  
 > [Usermod Command in Linux](https://linuxize.com/post/usermod-command-in-linux/)  
     
-    
 ### -g 修改用户初始组群 GID  
 `-g` 选项修改用户 GID  
-    
-![1](https://img-blog.csdnimg.cn/7a807ba27c4642cdbb10d0ac1bf34cd5.png)  
+![](img/2025-02-04-21-17-30.png)    
     
 ### -G 修改用户附加组  
 `-G` 选项修改附加组。  
-    
-![1](https://img-blog.csdnimg.cn/0dbf2314dc5c444cbafb2c79f9160d08.png)  
-    
-![2](https://img-blog.csdnimg.cn/f1edd5b4198d4e3c873eb69f30f23518.png)  
+![](img/2025-02-04-21-17-50.png)
     
 ### -aG 添加附加组  
 `-G` 修改附加组，会完全替换之前的附加组，如果想在原来基础上添加附加组，加上 `-a` 选项。  
 注意要写 `-aG`，如果写 `-Ga` 失败：  
-    
-![1](https://img-blog.csdnimg.cn/68f5a02015234f80857b9cf1683fb6b8.png)![2](https://img-blog.csdnimg.cn/220a4a94cf124074a8780a86be3c3ba0.png)  
-    
+![](img/2025-02-04-21-18-46.png)
     
 ### -d -m修改家目录  
 `-d` 选项修改家目录，但**不会创建该家目录**，也不会将原来家目录内容移到新目录中。  
-    
-![1](https://img-blog.csdnimg.cn/c8cbb47b12a54370a55448252cef055b.png)  
-<br/>  
+![](img/2025-02-04-21-19-13.png) 
     
 加上 `-m` 选项可**新建家目录并将原来目录改为新目录**。  
-    
-![2](https://img-blog.csdnimg.cn/7fbfc90850cf4a94a1b0a3eb1849e4f6.png)  
-    
+![](img/2025-02-04-21-19-30.png) 
+
 ### -s 修改用户默认 shell  
-![1](https://img-blog.csdnimg.cn/d2c8eec1c01d4ad39369836e0ba7b4e1.png)  
+![](img/2025-02-04-21-19-52.png)
     
 ### -u 修改用户 UID  
 `-u` 选项修改 UID，和添加用户时使用规则相同，注意范围，以及修改的 UID 不能和已存在的相同，如果添加相同的 UID，需要加上 `-o` 选项。  
-    
-![1](https://img-blog.csdnimg.cn/e425dca499f542eb9be0e39a7262120a.png)  
-    
+![](img/2025-02-04-21-20-09.png)
     
 ### -l 修改用户登录名  
 - 家目录的名称不变  
 - GID 对应的组名不变  
 - 文件中 owner 名改变  
-![1](https://img-blog.csdnimg.cn/f549dff0456945a3829fe3067b54cf8e.png)  
+![](img/2025-02-04-21-20-24.png)
     
 ### -e 修改账号过期日期  
 `-e` 选项，和 `useradd` 使用方法相同。  
-    
     
 ## 删除账户 userdel  
 > [How to Delete/Remove Users in Linux (userdel Command)](https://linuxize.com/post/how-to-delete-users-in-linux-using-the-userdel-command/)  
     
 ### userdel -f  
 - `userdel` 删除用户，如果用户正在登录，无法删除，需要 `-f` 选项强制删除。  
-![1](https://img-blog.csdnimg.cn/3ecc9e65bb26470192ba8388c0fdb9f4.png)  
+![](img/2025-02-04-21-20-46.png)
     
 ### userdel -r 删除家目录和 mail spool 文件  
 不加 `-r` 删除用户后其家目录以及里面的文件仍存在。  
-![2](https://img-blog.csdnimg.cn/e64bfc19b88a4c1a98fe3ce7a5de5257.png)  
-![3](https://img-blog.csdnimg.cn/07e232babe154744a3f4da3842cf9abd.png)  
-![4](https://img-blog.csdnimg.cn/f7730ba0f7fa43f298a9abf60ec72866.png)  
-    
+![](img/2025-02-04-21-21-11.png) 
+![](img/2025-02-04-21-21-26.png)
+![](img/2025-02-04-21-21-47.png)
     
 ## 账号信息查询  
 ### id 查询 UID GID  
 `-G` 即 `groups` 里内容，包括主要组和附加组。  
-    
-![1](https://img-blog.csdnimg.cn/517092a51b0f4bb4878843f8d3e7cba6.png)  
+![](img/2025-02-04-21-22-11.png)
     
 ### finger  
     
@@ -1953,41 +2129,33 @@ Ubuntu 22.04.1 测试两者区别，adduser 会交互式让输入密码，默认
 > [Linux su命令：用户间切换（包含su和su -的区别）](http://c.biancheng.net/view/3089.html)  
     
 - 切换普通账号  
-![1](https://img-blog.csdnimg.cn/18a3775899c34a1392e21c53bd06f83e.png)  
+![](img/2025-02-04-21-22-30.png)
     
 - shell 为 /sbin/nologin 的账户登录  
 [What does "sudo su -s /bin/bash - <username>" do?](https://unix.stackexchange.com/questions/277639/what-does-sudo-su-s-bin-bash-username-do)  
 对于shell 为 /sbin/nologin 的账户，无法直接切换  
-![1](https://img-blog.csdnimg.cn/5790232c6695444683e30e2df153ce86.png)  
-![2](https://img-blog.csdnimg.cn/2624a90ae0954d7b83e0dc9651a2a170.png)  
-    
+![](img/2025-02-04-21-22-54.png) 
+
 ### sudo  
 > [第十四章、Linux 账号管理与 ACL 权限配置](http://cn.linux.vbird.org/linux_basic/0410accountmanager_4.php#sudo)  
 > [How to Use the sudo Command in Linux](https://phoenixnap.com/kb/linux-sudo-command)  
 > [su、sudo、sudo su、sudo -i sudo -l的用法和区别](https://blog.csdn.net/mutou990/article/details/107724302)  
     
-    
 使用 sudo 可以执行超级用户权限，且输入的是**自己用户的密码**而非 root 密码，但账号能否使用 sudo 要看 ` /etc/sudoers ` 文件的设置。  
-    
-![1](https://img-blog.csdnimg.cn/cd8b112bb16544cb879778aae9d4c7c3.png)  
+![](img/2025-02-04-21-23-40.png)
     
 - usermod 命令将账户加入 sudo 组使用 sudo 命令  
 从 `/etc/sudoer` 配置文件可以看见 sudo 组的成员可以执行命令：  
-![2](https://img-blog.csdnimg.cn/d1b02eee664449909704ff9c7371f181.png)  
-![3](https://img-blog.csdnimg.cn/66a3ed90223e4312b60e8226914c1e8e.png)  
+![](img/2025-02-04-21-24-05.png)
+
 - 添加附加组也可以  
-![4](https://img-blog.csdnimg.cn/3509498563b245468784e759b31e59e4.png)  
-![5](https://img-blog.csdnimg.cn/68479d19dae24abdb7870491db6649cc.png)  
-    
-    
-    
+![](img/2025-02-04-21-24-20.png)    
+
 - 修改 /etc/sudoers 文件  
+![](img/2025-02-04-21-24-40.png)    
+
 普通用户可以用 `sudo vi /etc/sudoers` 修改该文件，或者用 **visudo** 来修改。  
-![1](https://img-blog.csdnimg.cn/938eb5a96be74d02a71809c18a200433.png)  
-![1](https://img-blog.csdnimg.cn/c01885f953d44d4689cf5d71da8cfdfa.png)  
-    
-    
-    
+
 添加 NOPASSWD 可以不用输入密码，如为用户 `uu` 设置权限  
 ```bash  
 uu  ALL=(ALL:ALL) NOPASSWD: ALL  
@@ -2005,40 +2173,33 @@ daemon:*:19213:0:99999:7:::
 uu@zabbix:/etc/zabbix/zabbix_agentd.d$  
 ```  
     
-    
 ******************************  
     
 visudo 的其他用法见 [第十四章、Linux 账号管理与 ACL 权限配置](http://cn.linux.vbird.org/linux_basic/0410accountmanager_4.php#sudo)。  
-    
     
 ## 用户密码  
 > [How to Handle Account Passwords in Linux With passwd Command](https://linuxhandbook.com/passwd-command/)  
 > [第十四章、Linux 账号管理与 ACL 权限配置](http://cn.linux.vbird.org/linux_basic/0410accountmanager_2.php#passwd)  
     
-    
 ### 密码格式  
-![1](https://img-blog.csdnimg.cn/9a1df016c262461f850bfaa64a419e74.png)  
-    
+![](img/2025-02-04-21-26-05.png) 
+
 ### 普通用户修改自己密码 passwd  
-![1](https://img-blog.csdnimg.cn/8a955746d959419e9c22853b35b29b33.png)  
+![](img/2025-02-04-21-26-21.png)
     
 ### 修改 root 账号密码 sudo passwd root  
-![1](https://img-blog.csdnimg.cn/f14726bbf68a433da4aeee103e96d7ac.png)  
-    
+![](img/2025-02-04-21-26-34.png) 
+
 ### 修改其他用户密码  
 - sudo passwd 用户名  
 如果普通用户可以执行 sudo 则可以修改其他用户密码，不需要知道其原始密码  
-![1](https://img-blog.csdnimg.cn/ed5b1b182d2a4b26b7ef51d99082b439.png)  
-    
+![](img/2025-02-04-21-26-49.png) 
+
 - root 账户修改 passwd 用户名  
-![2](https://img-blog.csdnimg.cn/420f27a11d06447cb13c456d33d32aaa.png)  
+![](img/2025-02-04-21-27-03.png)
     
 ### 检查密码状态 passwd -S  
-![1](https://img-blog.csdnimg.cn/6623a174cc2845109021564e35ef3c99.png)  
-![2](https://img-blog.csdnimg.cn/6017e9ca0bcf4586b80f3a7600d5a931.png)  
-    
-<br/>  
-    
+![](img/2025-02-04-21-27-24.png) 
     
 **7 个字段的含义如下：**  
 - 用户名  
@@ -2060,66 +2221,63 @@ visudo 的其他用法见 [第十四章、Linux 账号管理与 ACL 权限配置
 最后四个字段的解释见 `/etc/shadow` 文件中描述。  
     
 ### 检查全部账户的密码状态 passwd -Sa  
-![1](https://img-blog.csdnimg.cn/24b53b29d8cb41318ec0407584d176d6.png)  
-    
+![](img/2025-02-04-21-27-46.png) 
+
 ### 强制用户在下次登录时修改密码  
 #### passwd -e 用户名  
-![1](https://img-blog.csdnimg.cn/6dd4c6dcfbad4525bf0b77988e6d5841.png)  
+![](img/2025-02-04-21-28-05.png)
     
 #### chage -d 0 用户名  
-![2](https://img-blog.csdnimg.cn/56f20881ada34fe2bd54b578ea8f753f.png)  
-    
+![](img/2025-02-04-21-28-19.png)
     
 ### 锁定账户密码 passwd -l  
 - passwd -l 用户名锁住密码  
-![1](https://img-blog.csdnimg.cn/b2ac543bd35e4e279715f73dea3934e9.png)  
+![](img/2025-02-04-21-28-39.png)
     
 - passwd -u 用户名 解锁密码  
-![2](https://img-blog.csdnimg.cn/76ef246655c04c7ba9aa37bcb1e53a2d.png)  
+![](img/2025-02-04-21-28-54.png)
     
 ### 删除密码 passwd -d  
-![1](https://img-blog.csdnimg.cn/6b5113a5818c47e4a6c15269bc6e243a.png)  
-    
+![](img/2025-02-04-21-29-13.png) 
+
 ### 设置最短密码使用时间  
 距离上次修改密码后，最短需要等待多少天才能修改密码，默认值为 0，即随时可以修改密码，可以通过 `-n` 选项修改。  
     
-![1](https://img-blog.csdnimg.cn/47365da75f1849daa17d378bf0742d7c.png)  
-    
+![](img/2025-02-04-21-29-31.png)
+
 ### 修改密码过期参数 chage  
-![1](https://img-blog.csdnimg.cn/8ae921d5d7b340fca5477558d1ecdda7.png)  
-<br/>  
-    
+![](img/2025-02-04-21-29-47.png) 
+
 1. 初始：  
-![1](https://img-blog.csdnimg.cn/7484fb90675247258b9e7539b38550d2.png)  
+![](img/2025-02-04-21-30-17.png)
     
 2. 修改最近一次修改密码日期  
-![2](https://img-blog.csdnimg.cn/c3244c5ddced4c709e1dd6e29974779a.png)  
+![](img/2025-02-04-21-33-43.png)
+
 如果设置数值为 0 则密码立即过期，下次登录必须修改修改密码：  
-![3](https://img-blog.csdnimg.cn/c63a0eb2551941848a94e2e676ebd776.png)  
-    
+![](img/2025-02-04-21-34-02.png)
     
 3. 修改最短密码使用天数  
-![3](https://img-blog.csdnimg.cn/1207c4a7a0464c5ca84292a348120bf8.png)  
-![4](https://img-blog.csdnimg.cn/6170508e5d5f455ea46ba4e227e973ad.png)  
+![](img/2025-02-04-21-34-31.png)
+![](img/2025-02-04-21-34-49.png)
+
 4. 设置账号过期日期  
-![5](https://img-blog.csdnimg.cn/4197fbebd61e439c8d13761094b496e7.png)  
+![](img/2025-02-04-21-35-03.png)
     
 5. 设置密码最长使用天数  
-![6](https://img-blog.csdnimg.cn/4fe842dd62a541f8afeca35e1c674c23.png)  
+![](img/2025-02-04-21-35-16.png)
     
 6. 设置密码过期后的宽限期  
-![7](https://img-blog.csdnimg.cn/5a46832d47b74473853da696ef99e060.png)  
-![8](https://img-blog.csdnimg.cn/1157ccbeac7f4c0bb14ea41852bdab8d.png)  
+![](img/2025-02-04-21-35-35.png)
+![](img/2025-02-04-21-35-50.png)
     
 ### 批量修改密码 chpasswd  
 > [chpasswd command in Linux with examples](https://www.geeksforgeeks.org/chpasswd-command-in-linux-with-examples/)  
     
-![1](https://img-blog.csdnimg.cn/fa314e531a8440b8bacbdf5177548516.png)  
-    
+![](img/2025-02-04-21-36-04.png) 
+
 ### 无交互形式修改密码  
-    
-![1](https://img-blog.csdnimg.cn/302a18dceb01453194efa57f0f02bb68.png)  
-![2](https://img-blog.csdnimg.cn/f2dd47040c5147879c1990ceb1ad6f69.png)  
+![](img/2025-02-04-21-36-29.png)
     
 # 组  
 ## 用户组分类  
@@ -2129,81 +2287,73 @@ visudo 的其他用法见 [第十四章、Linux 账号管理与 ACL 权限配置
     
 ### GID 范围  
 通过 `/etc/login.def` 文件查看，Ubuntu 22.04.1 查看范围如下：  
-![1](https://img-blog.csdnimg.cn/8315e27a5cc141408b6b79ea06ea4cdf.png)  
-    
-    
+![](img/2025-02-04-21-36-47.png)
     
 ## 私有组、主要组和附加组  
 > [Linux私有组，主要组和附加组 ](https://blog.51cto.com/xinsz08/5022617)  
-    
     
 ## groupadd 添加群组  
 > [The groupadd command in Linux – A complete guide](https://www.linuxfordevices.com/tutorials/linux/groupadd-command)  
 > [groupadd](https://haicoder.net/linux/linux-groupadd.html)  
     
-    
 - 添加普通组 groupadd -g GID 组名  
-![1](https://img-blog.csdnimg.cn/0943533cef424c228e7498e813b5a3fb.png)  
+![](img/2025-02-04-21-37-20.png)
     
 - 添加系统组 groupadd -g GID -r 组名  
-![2](https://img-blog.csdnimg.cn/2d37a36390e344eb86c9bd6c18e1dd78.png)  
+![](img/2025-02-04-21-37-31.png)
+
 ## groupmod 修改组  
 - 修改组的名字  groupmod -n  
 - 修改组的 GID  groupmod -g  
+![](img/2025-02-04-21-37-46.png)
     
-![1](https://img-blog.csdnimg.cn/b1de41e80c104215b5affe825e34ca97.png)  
 ## groupdel 删除组  
 `groupdel 组名`，如果该组是某个用户的主要组（GID 为该组），则无法删除，需要用 `-f` 选项强制删除。  
     
 如果要删除的组是某个用户的附加组，则可以正常删除。  
     
-![1](https://img-blog.csdnimg.cn/46eb396f2e4e4c4d930b2d0b30ec34d8.png)  
+![](img/2025-02-04-21-38-08.png)
     
 ## newgrp 切换用户登录的组  
 > [Linux newgrp command](https://www.computerhope.com/unix/unewgrp.htm)  
 > [Linux newgrp命令用法详解：切换用户的有效组](https://blog.csdn.net/digitalkee/article/details/102616038)  
     
-    
 - 默认新建一个文件时其组为 GID 对应的那个主要组，如果要**新建文件时组为附加组**，用 **newgrp** 命令  
 - 与 `su` 和 `su -` 类似，如果切换组时用 `newgrp`则**当前目录不变**，如果用  `newgrp -`则当**前目录改变**  
     
-    
-![1](https://img-blog.csdnimg.cn/1d9cd547d21d4f2284334435ac9057f4.png)  
-![1](https://img-blog.csdnimg.cn/941cd4f7e7474c01ad0437cd2464bf95.png)  
-![2](https://img-blog.csdnimg.cn/5518e548da5146c5b7360aa218cd84fd.png)  
-    
+![](img/2025-02-04-21-38-35.png)
+![](img/2025-02-04-21-38-51.png)
+![](img/2025-02-04-21-39-04.png)
     
 ## 查看当前全部组  
 ### /etc/group 文件中查看  
-![1](https://img-blog.csdnimg.cn/d50ab2ba706c4080a42f95168762d636.png)  
-![2](https://img-blog.csdnimg.cn/ae4c3f7757134000a3452c3634548f65.png)  
+![](img/2025-02-04-21-39-21.png)
     
 ### getent group 查看  
-![2](https://img-blog.csdnimg.cn/f8121ccc97dc468980ed8234521cd123.png)  
+![](img/2025-02-04-21-39-34.png)
     
 ## 查看某个附加组成员  
 ### getent group 组名  
 `/etc/group` 中最后一个字段为该组成员，但为用户的附加组，不包括主要组，可以通过 `getent group` 查看：  
-![1](https://img-blog.csdnimg.cn/8e5509c1021b421b8836d075ee870304.png)  
+![](img/2025-02-04-21-39-49.png)
     
 ### groupmems 组名  
-![2](https://img-blog.csdnimg.cn/c17bf8f7c73d4dc9af5e12e3f0e2e283.png)  
+![](img/2025-02-04-21-40-06.png)
     
 ## 查看用户所在的全部组  
 - id  
 - groups  
     
-![1](https://img-blog.csdnimg.cn/689d86cd2d1540e1ba2da7aea0eef482.png)  
-    
+![](img/2025-02-04-21-40-23.png) 
     
 # 文件权限  
 > [第六章、Linux 的文件权限与目录配置](http://cn.linux.vbird.org/linux_basic/0210filepermission_2.php)  
 > [Linux 的文件权限与目录配置](http://cn.linux.vbird.org/linux_basic/0210filepermission_2.php#filepermission_ch)  
     
-    
 ## 查看文件权限  
-![1](https://img-blog.csdnimg.cn/d4b55a0d6fbb4acab5032dd955bf6866.png)![2](https://img-blog.csdnimg.cn/b5c37029fb004e7788c9f5c29ca6e739.png)  
-    
+![](img/2025-02-04-21-40-48.png)
+![](img/2025-02-04-21-41-01.png)
+
 ## 文件和目录权限意义  
 - **文件存放数据**，**目录**存放内容为**文件名清单**  
     
@@ -2213,8 +2363,8 @@ visudo 的其他用法见 [第十四章、Linux 账号管理与 ACL 权限配置
     
 - **w（write）**  
 编辑，新增，修改**文件内容**（不包含删除文件）  
-![2](https://img-blog.csdnimg.cn/93e0054b81d947938ced6c7309dad1f4.png)  
-    
+![](img/2025-02-04-21-41-17.png) 
+
 - **x（execute）**  
 	- 该文件可以被系统执行  
 	- **Windows** 中文件**是否可执行**是依据**文件的后缀**  
@@ -2226,39 +2376,36 @@ visudo 的其他用法见 [第十四章、Linux 账号管理与 ACL 权限配置
 ### 目录权限  
 - **r（read）**  
 读取目录结构清单，即查看文件名。  
-![1](https://img-blog.csdnimg.cn/076a98f1086b4a4a8bfcd4c38e28baea.png)  
-![2](https://img-blog.csdnimg.cn/2a18551685c642d3aadbe0a9abb1c74a.png)  
-![3](https://img-blog.csdnimg.cn/da75123b240c43718f42908343b4119d.png)  
+![](img/2025-02-04-21-41-38.png)
+![](img/2025-02-04-21-41-58.png)
+![](img/2025-02-04-21-42-19.png)
     
 - **w（write）**  
 	- 创建新的文件或子目录  
 	- 删除文件或子目录  
 	- 修改文件或子目录名字  
 	- 移动文件或子目录的位置  
-![4](https://img-blog.csdnimg.cn/eb0e33905c02419f933bc2dd38102fa6.png)  
-![5](https://img-blog.csdnimg.cn/e297a22ad35647bfbdda614653e19d7f.png)  
-![6](https://img-blog.csdnimg.cn/2689d6a1ed4a4aa78127f771053d0cc1.png)  
-    
+![](img/2025-02-04-21-42-44.png)
+![](img/2025-02-04-21-43-27.png)
+
 - **x（execute）**  
 使用者能进入目录的权限，如果目录只有 w 权限而没有 x 权限，也不能删除或新增文件等操作。  
-![7](https://img-blog.csdnimg.cn/ef7992d0fa1b41fea790afb89730a67e.png)  
-![8](https://img-blog.csdnimg.cn/0eed7000597c4a70be1781df726e9464.png)  
+![](img/2025-02-04-21-43-49.png)
     
 ## 修改所在组 chgrp  
 新的组必须存在  
 普通用户需要用 sudo 执行该命令：  
-![1](https://img-blog.csdnimg.cn/5b395e7f051846b78ab4f986197e7756.png)  
+![](img/2025-02-04-21-44-06.png)
     
 ### 修改文件的所属组  
-![1](https://img-blog.csdnimg.cn/0ca29108f4be49f1a7604f7373ec1b5d.png)  
+![](img/2025-02-04-21-44-20.png)
     
 ### 修改目录的所属组  
-![2](https://img-blog.csdnimg.cn/10893450ed5c49a49b9244e4b3c6e7c8.png)  
+![](img/2025-02-04-21-44-40.png)
     
 ## 修改所有者 chown  
 普通用户需要用 sudo 执行该命令：  
-    
-![1](https://img-blog.csdnimg.cn/b88b35c015ef44c1bf64c091e93d6913.png)  
+![](img/2025-02-04-21-44-58.png)
     
 ### chown --reference= 参考其他文件修改所有者  
 ```bash  
@@ -2267,98 +2414,94 @@ visudo 的其他用法见 [第十四章、Linux 账号管理与 ACL 权限配置
 ```  
     
 ### 修改文件所有者  
-![1](https://img-blog.csdnimg.cn/53ae2c3c525d47fd800f489e7e58168a.png)  
+![](img/2025-02-04-21-45-13.png)
     
 ### 修改目录的所有者  
 注意仅修改目录的所有者还是修改目录以及其所有子目录和文件的所有者。  
     
 1. 初始：  
-![1](https://img-blog.csdnimg.cn/37052a3940bd4f1ba015d30053ac1376.png)  
-    
+![](img/2025-02-04-21-45-26.png) 
+
 2. 仅修改目录 passwd 的用户和所有组  
-![2](https://img-blog.csdnimg.cn/31917f79fb7048918327de0701aad20f.png)  
+![](img/2025-02-04-21-45-41.png)
     
 3. 修改目录以及其全部子目录和文件的用户和组  
-![3](https://img-blog.csdnimg.cn/9c868fc1f1464bf786eceb09626632ae.png)  
+![](img/2025-02-04-21-45-56.png)
     
 ## 修改权限 chmod  
 > [改变权限, chmod](http://cn.linux.vbird.org/linux_basic/0210filepermission_2.php#chmod)  
 > [Linux chmod命令](https://www.runoob.com/linux/linux-comm-chmod.html)  
     
-|权限|二进制|十进制|  
-|--|--|--|  
-|r--|100|4|  
-|-w-|010|2|  
-|--x|001|1|  
+| 权限 | 二进制 | 十进制 |
+| ---- | ------ | ------ |
+| r--  | 100    | 4      |
+| -w-  | 010    | 2      |
+| --x  | 001    | 1      |
     
 如果是目录，需要递归设置目录中所有子目录以及文件的权限，则加上 `-R` 选项。  
     
 1. chmod 数字 文件名  
-![1](https://img-blog.csdnimg.cn/cef700f9da7f40e693be8be3a56034b4.png)  
-![2](https://img-blog.csdnimg.cn/755532ad023c442cbc87a1f9298fa8a6.png)  
+![](img/2025-02-04-21-46-20.png)
+![](img/2025-02-04-21-46-39.png)
     
 2. 符号类型修改  
     
-|身份|符号|  
-|--|--|  
-|user|u|  
-|group|g|  
-|others|o|  
-|all|a|  
+| 身份   | 符号 |
+| ------ | ---- |
+| user   | u    |
+| group  | g    |
+| others | o    |
+| all    | a    |
     
-|权限设置符号|含义|  
-|--|--|  
-|+|加入|  
-|-|除去|  
-|=|设置为|  
+| 权限设置符号 | 含义   |
+| ------------ | ------ |
+| +            | 加入   |
+| -            | 除去   |
+| =            | 设置为 |
     
-![1](https://img-blog.csdnimg.cn/4aab2996c9b84a918852cb7f47c933a2.png)  
-![2](https://img-blog.csdnimg.cn/e958e0ab2836439ea9f3559620903df8.png)  
-![3](https://img-blog.csdnimg.cn/320d1f773552450984cf7b210ab51a36.png)  
-![4](https://img-blog.csdnimg.cn/392a6421aaad45c9ae28eb95234ea397.png)  
-    
+![](img/2025-02-04-21-47-15.png)
+![](img/2025-02-04-21-47-28.png)
+
 *****************  
 **注意**：  
 - root 账户，即使文件没有 rw 权限，依旧可以读写  
-![5](https://img-blog.csdnimg.cn/e1e9518b7d5045d39112dfa1cf92e4f4.png)  
+![](img/2025-02-04-21-48-14.png)
+
 - root 账户，如果文件全部身份都没有 x 权限，不能执行文件，但仍可以修改文件权限  
-![6](https://img-blog.csdnimg.cn/425eadb82172453e8a468b8f5970275f.png)  
+![](img/2025-02-04-21-48-27.png)
+
 - root 账户，只要 user，group 或者 other 三者之一有 x 权限，则 root 可以执行文件  
-![7](https://img-blog.csdnimg.cn/2c3101f82a3a4025bbe8ee0af0e6d0c6.png)  
-    
+![](img/2025-02-04-21-48-43.png)
+
 - 文件所有者，即使没有任何权限，仍可以修改权限  
-![7](https://img-blog.csdnimg.cn/79f250eda33a438c97272abf6b28df3e.png)  
+![](img/2025-02-04-21-48-58.png)
+
 - 属于文件所属组的成员也不可以修改文件权限  
-![8](https://img-blog.csdnimg.cn/fc418f13c1054f4f908d965611b2e615.png)  
+![](img/2025-02-04-21-49-12.png)
     
 - `chmod -R` 递归修改目录中文件的权限，只针对已存在的文件，新建的文件仍是默认权限  
-![9](https://img-blog.csdnimg.cn/07ff8a7dafad4293888ff10ffbb97208.png)  
-    
+![](img/2025-02-04-21-49-30.png)
     
 ## 默认权限 umask  
 > [文件与目录的默认权限与隐藏权限](http://cn.linux.vbird.org/linux_basic/0220filemanager_4.php)  
 > [Linux umask详解：令新建文件和目录拥有默认权限](http://c.biancheng.net/view/764.html)  
     
-    
 1.  文件的最大默认权限为 666（rw-rw-rw-），目录的最大默认权限为777（rwxrwxrwx）。（这个参数在哪查看？）  
 2. 最大默认权限减去 umask 的值即为新建文件或目录时的权限。  
     
-![1](https://img-blog.csdnimg.cn/2b54f99542344007abe24e13ca50aeca.png)  
-![2](https://img-blog.csdnimg.cn/2b4f397e5e1846f1bd4cd16e89795838.png)  
-    
+![](img/2025-02-04-21-49-55.png)
+
 # 文件的隐藏属性  
 > [文件隐藏属性](http://cn.linux.vbird.org/linux_basic/0220filemanager_4.php#attr)  
 > [Linux chattr命令详解：修改文件系统的权限属性](http://c.biancheng.net/view/874.html)  
 > [Linux lsattr命令：查看文件系统属性](http://c.biancheng.net/view/875.html)  
     
-![1](https://img-blog.csdnimg.cn/c4e055ef1b8847fb89ba5f65987c9933.png)  
-    
+![](img/2025-02-04-21-50-14.png) 
     
 The "e" flag in lsattr command output represents the "extent" attribute of the file.  
     
 The extent attribute is used by certain filesystems, such as ext4, to optimize file storage allocation.  
 It indicates that the file is using extents, which are contiguous blocks of disk space allocated for that file. Extents help improve file access and storage efficiency.  
-    
     
 # 文件特殊权限  
 > [文件特殊权限： SUID, SGID, SBIT](http://cn.linux.vbird.org/linux_basic/0220filemanager_4.php#suid_sgid_sbit)  
@@ -2372,10 +2515,6 @@ It indicates that the file is using extents, which are contiguous blocks of disk
 - 如果文件原来的 owner 位有 `x` 权限，则原来的 `x` 变为 `s`  
 - 如果文件原来的 owner 位没有 `x` 权限，则原来的 `x` 变为 `S`  
     
-    
-![](img/2023-03-29-11-50-52.png)  
-![](img/2023-03-29-11-59-29.png)  
-    
 ## SGID  
 - set GID，s 标志在**所属群组**的 **x** 位置时具有该权限  
 - SGID 可以针对**文件或目录**  
@@ -2387,16 +2526,13 @@ It indicates that the file is using extents, which are contiguous blocks of disk
 	- 使用者在该目录下的群组将变成该目录的群组，但如果使用者没有 w 权限，目录的群组有 w 权限，使用者也不能新建文件  
 	- 若使用者在该目录下有 w 权限，则使用者所创建的新文件的群组和**此目录的群组相同**  
     
-![2](https://img-blog.csdnimg.cn/bde101cac33343afb5948fb043c0af59.png)  
-    
+![](img/2025-02-04-21-50-59.png) 
     
 ## SBIT  
 - sticky bit，仅针对**目录**的权限  
 - 使用者在该目录下创建的文件或目录只有**自己与 root 能删除**  
     
-![3](https://img-blog.csdnimg.cn/1e1a10cb38064fc7871d6ffca5682e98.png)  
-    
-    
+![](img/2025-02-04-21-51-24.png)
     
 ## 添加特殊权限  
 1. 数字方法  
@@ -2407,15 +2543,15 @@ It indicates that the file is using extents, which are contiguous blocks of disk
 将要添加的特殊权限数字写在第一个，如 `chmod 4755`，4 表示特殊权限 SUID，7 为 owner 的权限，第一个 5 为 group 权限，第二个 5 为 other 权限。  
 如果第一个数字为 6，即同时拥有权限 SUID 和 SGID。  
     
-![1](https://img-blog.csdnimg.cn/1e2d1090a73b405f935dd7cf10000398.png)  
+![](img/2025-02-04-21-51-42.png)
     
 2. 符号方法  
 - chmod u+s 添加 SUID 权限  
 - chmod g+s 添加 GUID 权限  
 - chmod o+t 添加 SBIT 权限  
-    
-![2](https://img-blog.csdnimg.cn/156a339c802c4ab88070bbab92c2d512.png)  
-    
+
+![](img/2025-02-04-21-52-01.png)    
+
 ## 权限与指令之间的关系  
 > [ 极重要！权限与命令间的关系](http://cn.linux.vbird.org/linux_basic/0220filemanager_6.php)  
     
@@ -2430,231 +2566,206 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
     
 ## 启动 ACL  
     
-    
 ## getfacl 获取文件 ACL  
-![1](https://img-blog.csdnimg.cn/defdcb810bc948d9a496990083f0f2fa.png)  
+![](img/2025-02-04-21-52-26.png)
     
 ## setfacl 设置文件 ACL  
 ### 为特定用户设置权限  
 `setfacl -m u:账号:权限`  
     
-![1](https://img-blog.csdnimg.cn/029addef04f64f01921325d6eb7f0e28.png)  
+![](img/2025-02-04-21-52-43.png)
     
 ### 为特定组设置权限  
-![1](https://img-blog.csdnimg.cn/6c982c25d7f547dca2dc7a6c79000d8d.png)  
+![](img/2025-02-04-21-52-59.png)
     
 ### 最大有效权限 mask  
 - 对文件设置 mask 只针对设置的 ACL 用户、组和默认的组，不影响文件的 owner 和 root 账户。  
 - 设置 mask 后如果用 setfacl 设置用户或组权限，mask 又恢复为默认值。  
 - mask 用来限制最大的有效权限，设置的 ACL  用户的权限不能超过 mask  的权限，超过的权限无效。  
     
-![1](https://img-blog.csdnimg.cn/6ee41981ea154526953115c1151fbae9.png)  
-![2](https://img-blog.csdnimg.cn/e66c4894887a42e994288a628f707f6b.png)  
-    
+![](img/2025-02-04-21-53-21.png)
+![](img/2025-02-04-21-53-42.png)
+
 ### 设置默认 ACL 权限  
 目录内已有的文件权限不改变，只改变新建的文件权限。  
     
-![1](https://img-blog.csdnimg.cn/def894303d314ddcbd2d16ea63897ed8.png)  
-![2](https://img-blog.csdnimg.cn/b23c85b7c56b48e49da2247ebaf0af51.png)  
-![3](https://img-blog.csdnimg.cn/240b5c02de494094b648e64045e14545.png)  
-![4](https://img-blog.csdnimg.cn/00bd0a3677924eddaad6772c5f448c3d.png)  
-    
+![](img/2025-02-04-21-54-06.png)
+![](img/2025-02-04-21-54-19.png)
+![](img/2025-02-04-21-54-32.png)
+![](img/2025-02-04-21-54-45.png)
+
 ### 设置已有目录及其内容权限  
 - 默认 `setfacl` 设置目录不影响目录内文件的权限  
-![1](https://img-blog.csdnimg.cn/12bde60f564649bb9343af12a0308c66.png)  
+![](img/2025-02-04-21-55-02.png)
     
 - 修改已存在的目录以及其子文件权限，不改变新建子文件权限  
-![1](https://img-blog.csdnimg.cn/63d9ead12c814b868f5722fa75af30f4.png)  
-![2](https://img-blog.csdnimg.cn/986ae44e8e994d39880d5ce973d1df0f.png)  
+![](img/2025-02-04-21-55-24.png)
+![](img/2025-02-04-21-55-42.png)
     
 ## setfacl 删除 ACL 权限  
 - 删除单个文件或目录 ACL 权限  
-![1](https://img-blog.csdnimg.cn/9ecd1329127a41f7a53286570d10bf2f.png)  
-    
-    
+![](img/2025-02-04-21-56-27.png)
     
 - 删除目录内全部文件的单个 ACL 权限  
 	- 初始  
-	![1](https://img-blog.csdnimg.cn/3a1ac23789d24e98853a738a5d671a21.png)  
-![2](https://img-blog.csdnimg.cn/9fcca3b41b3640f1a112bf0886a487ac.png)  
+    ![](img/2025-02-04-21-57-13.png)
+    ![](img/2025-02-04-21-57-39.png)
 	- 递归删除目录的 ACL 权限  
-![3](https://img-blog.csdnimg.cn/b075018a82244e61ac3c888a3ce8743b.png)  
+    ![](img/2025-02-04-21-57-58.png)
     
 - 删除全部的 ACL 权限  
 	- `setfacl -b filename` 删除该文件或目录的全部 ACL 权限，目录不递归删除其子文件 ACL 权限。  
 	- `setfacl -b -R filename` 递归删除目录的全部 ACL 权限。  
     
-    
 # 文件结构  
 > [Linux File Structure](https://www.linux.com/training-tutorials/linux-file-structure/)  
-    
-    
-    
     
 # 文件种类  
 > [Linux文件种类与扩展名](http://cn.linux.vbird.org/linux_basic/0210filepermission_2.php#filepermission_type)  
     
-    
 # 查看文件类型 file  
 > [Linux file命令](https://www.runoob.com/linux/linux-comm-file.html)  
     
-![1](https://img-blog.csdnimg.cn/9135fcb7ca8a4a99813f5d5c9a911fe6.png)  
-![2](https://img-blog.csdnimg.cn/f40c44c4dc3148c693c383fb29f0a512.png)  
-    
+![](img/2025-02-04-21-58-41.png)
     
 # stat 查看文件状态 四种时间信息  
     
 > [Stat Command in Linux](https://linuxize.com/post/stat-command-in-linux/)  
     
-    
-![1](https://img-blog.csdnimg.cn/69f6b1842acc416bb1f08ee84221bf6a.png)  
-    
+![](img/2025-02-04-21-58-59.png)    
+
 ## stat -L 查看符号链接对应的源文件的文件信息  
 - 默认查看符号链接时查看的信息是链接文件而非源文件的文件信息  
 - 加上 `-L` 选项后查看的是源文件的信息  
     
-![1](https://img-blog.csdnimg.cn/607fac6619174e449b62f01c233eee4e.png)  
+![](img/2025-02-04-21-59-19.png)
     
 ## stat -f 查看文件系统的信息  
-![1](https://img-blog.csdnimg.cn/4a9eb750a9ac4c02a41300c6eecdb4e7.png)  
+![](img/2025-02-04-21-59-36.png)
     
 ## stat --format="format" 指定输出格式  
 - `man stat` 查看帮助文档可查看格式介绍  
-![1](https://img-blog.csdnimg.cn/6f3945db1e5e46c2993519b3cf0ea682.png)  
-![2](https://img-blog.csdnimg.cn/1205f86ca2694d3998989f3616a510a4.png)  
-    
+![](img/2025-02-04-21-59-56.png)
     
 # 文件的三种时间 mtime ctime atime  
 > [ Useful Examples of Touch Command in Linux](https://phoenixnap.com/kb/touch-command-in-linux)  
     
 # 查看文件时间  
 ## stat 一次查看全部时间  
-![1](https://img-blog.csdnimg.cn/87a7d2c850f24c1b96959a4ef4ca3b94.png)  
+![](img/2025-02-04-22-00-17.png)
     
 ## ll 查看文件时间  
 ### ll 查看 mtime  
 - `ll` 命令看到的时间默认是修改时间（modification time）。  
 - **文件内容** 改变时更新该时间。  
 - 加上 `--full-time` 选项查看完整时间。  
-![1](https://img-blog.csdnimg.cn/77c155214b9d4d22bce7671c4219d210.png)  
+![](img/2025-02-04-22-00-45.png)
     
 ### ll -c 查看 ctime  
 - ll -c 命令看到的时间为 change time。  
 - 文件的 **属性和权限** 改变时，修改文件名，移动文件等会更该时间。  
-![2](https://img-blog.csdnimg.cn/e2d7f2fbf79947a6a4cb7c87ccb1a0e8.png)  
+![](img/2025-02-04-22-01-00.png)
     
 ### ll -u 查看 atime  
 > [3.8. Configuring atime Updates](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/global_file_system_2/s1-manage-atimeconf)  
 > [Linux File Timestamps Explained: atime, mtime, and ctime](https://www.howtogeek.com/517098/linux-file-timestamps-explained-atime-mtime-and-ctime/)  
     
-    
 - ll -u 查看 access time  
 - **查看文件内容**时更新该时间，如 `cat` 查看，但不一定每次读取都会更新，可能延迟  
 - 更新的有规则  
-![1](https://img-blog.csdnimg.cn/637268ca844f4a9ba102ee6aaab40fea.png)  
+![](img/2025-02-04-22-01-30.png)
     
 ### ll --time= 查看特定时间  
-![4](https://img-blog.csdnimg.cn/aa73af50723a4c289455801811e61fe4.png)  
+![](img/2025-02-04-22-01-58.png)
     
 ### ll --full-time 查看完整时间  
 - 可以直接用 `stat` 查看所有时间的完整显示  
-![1](https://img-blog.csdnimg.cn/6ffb94033c1345ffa54cf42c6c701d83.png)  
+![](img/2025-02-04-22-02-12.png)
     
 # touch 修改文件时间  
 > [How To Use the touch Command in Linux](https://phoenixnap.com/kb/touch-command-in-linux#set-timestamp-using-a-reference-file)  
 > [Touch Command in Ubuntu 22.04](https://linuxhint.com/touch-command-linux/)  
     
-    
-![1](https://img-blog.csdnimg.cn/81897b1c06fc4bf4a9a4a379b28e202d.png)  
-    
+![](img/2025-02-04-22-02-30.png)
+
 ## touch 已存在的文件后更新全部时间  
-![在这里插入图片描述](https://img-blog.csdnimg.cn/a5e696c1066c4947abd060a330800390.png)  
+![](img/2025-02-04-22-02-57.png)
     
 ##  touch -c：更新文件的全部时间为当前时间  
 - `-c` 选项可以避免创建文件，默认文件不存在则创建  
 - 如果文件存在，则更新文件的全部时间为当前时间  
     
-![1](https://img-blog.csdnimg.cn/38b68a28633b4646a5ce95943738e201.png)  
-![2](https://img-blog.csdnimg.cn/e8835e927e2b46efbcd14e58b455028d.png)  
-![3](https://img-blog.csdnimg.cn/26575601867c42efb00da88de0abcf5a.png)  
-    
-&nbsp;  
+![](img/2025-02-04-22-03-20.png)
+![](img/2025-02-04-22-03-35.png)
+![](img/2025-02-04-22-03-48.png)
     
 ## touch -d：更新文件的 mtime 和 atime  
 - `touch --date=STRING`  
 - `touch -d` 可以同时修改 mtime 和 atime 的时间，后面参数为日期，以当前日期为参考；修改后 ctime 会变成当前日期和时间  
     
-![1](https://img-blog.csdnimg.cn/544d05726b52488b87e5426956bce8d7.png)  
-![2](https://img-blog.csdnimg.cn/a708e6ab7632465db2fa664bdb2da1e5.png)  
-![1](https://img-blog.csdnimg.cn/65cdae35362a4b8687d858dfc8af1c3d.png)  
-![2](https://img-blog.csdnimg.cn/f8cd2fa19e124713ab88f9bc6606358e.png)  
+![](img/2025-02-04-22-04-06.png)
+![](img/2025-02-04-22-04-30.png)
+![](img/2025-02-04-22-04-49.png)
+![](img/2025-02-04-22-05-04.png)
     
 ## touch -t：更新文件的 mtime 和 atime  
 - 和 `touch -d` 一样，不修改 ctime，但 ctime 的时间还是会变成当前时间  
     
-    
-![0](https://img-blog.csdnimg.cn/a4ec7357fbe141439c41c6e6b9ed7ab6.png)  
-![1](https://img-blog.csdnimg.cn/e2cf71313d61460ca7129e980008c327.png)  
-![2](https://img-blog.csdnimg.cn/70939eb1aa8143e194bbe318cb988dea.png)  
-![3](https://img-blog.csdnimg.cn/5be08991666e46f6a3585faf541c7353.png)  
+![](img/2025-02-04-22-06-24.png)
+![](img/2025-02-04-22-05-50.png)
+![](img/2025-02-04-22-07-03.png)
+![](img/2025-02-04-22-07-28.png)
     
 ## touch -mt：仅修改 mtime  
 - 修改后 ctime 的时间变为当前时间。  
     
 - **touch -m 修改 mtime 为当前时间**  
-![1](https://img-blog.csdnimg.cn/8e261a16e8184c7ab052c43ab16d7d5d.png)  
-    
+![](img/2025-02-04-22-07-48.png)
+
 - **修改 mtime 为指定时间**  
-![1](https://img-blog.csdnimg.cn/919dc41bf8b44479bbb8a798bd6f71b6.png)  
-    
+![](img/2025-02-04-22-08-05.png) 
+
 ## touch -at：仅修改 atime  
 - mtime 的日期和时间都不变，但 ctime 的时间变为当前时间。  
     
 - **修改 atime 为当前时间**  
-![1](https://img-blog.csdnimg.cn/38e0eb6a1b2c4ff980d7704c6b971bef.png)  
+![](img/2025-02-04-22-08-25.png)
     
 - **修改 atime 为指定时间**  
-![2](https://img-blog.csdnimg.cn/a47ba39ff3814a918322f910d75eb87b.png)  
-    
+![](img/2025-02-04-22-08-46.png)
     
 ## touch -amt 修改 mtime 和 atime 为指定时间  
 - 修改后 ctime 会变成当前时间。  
-    
-![1](https://img-blog.csdnimg.cn/96fe2d8260954d68955540652a520edc.png)  
-    
+![](img/2025-02-04-22-09-14.png)
     
 ## touch -r 将文件的时间改为另一个文件的时间  
 - 第一个文件为参考文件，第二个文件为要修改的文件  
 - atime 和 mtime 修改为参考文件的对应时间，ctime 修改为当前时间  
     
-![1](https://img-blog.csdnimg.cn/e08c1f6a045c4029af753da75c4fc3fb.png)  
-![2](https://img-blog.csdnimg.cn/09e2b57340ef42118e09b7cbcbbbbfe8.png)  
-    
+![](img/2025-02-04-22-09-32.png)
+
 ## touch -h：修改符号链接文件时间  
 - 硬链接和源文件是同一个文件，inode 相同，因此修改其中一个时间，另一个同步改变  
 - 修改符号链接时间，默认会修改到源文件而非符号链接文件  
     
-![1](https://img-blog.csdnimg.cn/35c2695bb2994c1d824ede4df0d75309.png)  
-![2](https://img-blog.csdnimg.cn/99b2a91aa75d49ac83f11b207ba0cc6d.png)  
-![3](https://img-blog.csdnimg.cn/1280c69c1d4b48d091663aa368f4ce81.png)  
-    
+![](img/2025-02-04-22-10-54.png)
+![](img/2025-02-04-22-11-25.png)
+![](img/2025-02-04-22-11-43.png)
     
 # touch 创建新文件  
 > [Useful Examples of Touch Command in Linux](https://linuxhandbook.com/touch-command/)  
 > [How To Use the touch Command in Linux](https://phoenixnap.com/kb/touch-command-in-linux)  
 > [修改文件时间或建置新档： touch](http://cn.linux.vbird.org/linux_basic/0220filemanager_3.php#touch)  
     
-    
 ## 创建的文件已存在  
 - 创建的文件已存在，会修改文件的时间，三个时间均更新为当前时间  
     
-![1](https://img-blog.csdnimg.cn/971f957524cf468ea711be304b8c3789.png)  
-    
-    
+![](img/2025-02-04-22-12-02.png)
+
 ## 创建多个文件  
     
-![1](https://img-blog.csdnimg.cn/ba5d4942a01c4adb983faad92f21d62e.png)  
-    
+![](img/2025-02-04-22-12-16.png) 
+
 ## touch 创建文件数据过多不成功  
 ![](img/2023-03-13-15-35-32.png)  
     
@@ -2675,12 +2786,11 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ## which  
 > [Which Command in Linux ](https://linuxhandbook.com/which-command/)  
     
-    
 - 查找可执行文件  
 - 在环境变量 `$PATH` 的路径中搜索  
 - `-a` 显示全部匹配结果  
     
-![1](https://img-blog.csdnimg.cn/898cf91feab74c0792e482d92ddd48bc.png)  
+![](img/2025-02-04-22-12-48.png)
     
 ## whereis  
 > [Linux whereis命令](https://www.runoob.com/linux/linux-comm-whereis.html)  
@@ -2688,8 +2798,6 @@ ACL（Access Control List），可以针对特定使用者，文件或目录来�
 ![1](https://img-blog.csdnimg.cn/3377f8eb8c5c446e98aeb448795f0a79.png)  
 ![2](https://img-blog.csdnimg.cn/a0df71ce0acc4b88b526c87a7ef14c10.png)  
 ![3](https://img-blog.csdnimg.cn/25daaba010fd4ccfaffdab97d595cf78.png)  
-    
-    
     
 ## locate  
 > [Linux locate命令](https://www.runoob.com/linux/linux-comm-locate.html)  
