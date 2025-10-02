@@ -2,6 +2,15 @@ ubuntu 22.04 初始化操作
         
 # 环境准备  
 vmware 中安装 ubuntu22.04   
+
+ubuntu22.04 不同版本有区别，文档中是针对下面版本方法，其他版本需要修改：
+```bash
+[lx@Ubuntu2204 apt]$ cat /etc/lsb-release
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=22.04
+DISTRIB_CODENAME=jammy
+DISTRIB_DESCRIPTION="Ubuntu 22.04.3 LTS"
+```
         
 # bug  
 ## `/etc/bash_completion` 配置文件调用问题  
@@ -228,9 +237,82 @@ en_US.UTF-8
 - 修改完后重启  
         
 ## 修改软件源  
+针对的 ubuntu 版本：
+```bash
+[lx@Ubuntu2204 apt]$ cat /etc/lsb-release
+DISTRIB_ID=Ubuntu
+DISTRIB_RELEASE=22.04
+DISTRIB_CODENAME=jammy
+DISTRIB_DESCRIPTION="Ubuntu 22.04.3 LTS"
+```
 ```bash  
 sed -i.orig 's/cn.archive.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list  
 ```  
+
+兼容 jammy 和 noble 的脚本：
+```bash
+# Function to handle jammy configuration
+configure_jammy() {
+    # Backup original sources.list
+    sudo cp /etc/apt/sources.list /etc/apt/sources.list.bak
+
+    # Configure mirror for jammy
+    #MIRROR="mirrors.tuna.tsinghua.edu.cn"
+    MIRROR="http://mirrors.aliyun.com/ubuntu/"
+    sudo sed -i "s|http://.*archive.ubuntu.com|$MIRROR|g" /etc/apt/sources.list
+    sudo sed -i "s|http://.*security.ubuntu.com|$MIRROR|g" /etc/apt/sources.list
+}
+
+# Function to handle noble configuration
+configure_noble() {
+    # Backup original ubuntu.sources
+    sudo cp /etc/apt/sources.list.d/ubuntu.sources /etc/apt/sources.list.d/ubuntu.sources.bak
+
+    # Configure mirror for noble (using Aliyun as example)
+    #MIRROR="mirrors.tuna.tsinghua.edu.cn"
+    MIRROR="https://mirrors.aliyun.com/ubuntu/"
+
+    # Use sed to replace the URIs in the DEB822 format file
+    sudo sed -i "s|http://cn.archive.ubuntu.com/ubuntu/|$MIRROR|g" /etc/apt/sources.list.d/ubuntu.sources
+    sudo sed -i "s|http://security.ubuntu.com/ubuntu/|$MIRROR|g" /etc/apt/sources.list.d/ubuntu.sources
+
+    # Optionally, you can also update to use HTTPS for all sources
+    sudo sed -i 's|http://|https://|g' /etc/apt/sources.list.d/ubuntu.sources
+}
+
+# Function to handle unknown codename
+configure_unknown() {
+    echo "Warning: Unknown Ubuntu codename: $1"
+}
+
+# Get system version information
+if [ -f /etc/lsb-release ]; then
+    . /etc/lsb-release
+    CODENAME=$DISTRIB_CODENAME
+    RELEASE=$DISTRIB_RELEASE
+else
+    echo "Warning: Cannot detect system version." >&2
+    CODENAME="unknown"
+fi
+
+# Execute configuration based on codename
+case "$CODENAME" in
+    "jammy")
+        configure_jammy
+        ;;
+    "noble")
+        configure_noble
+        ;;
+    *)
+        configure_unknown "$CODENAME"
+        ;;
+esac
+
+# Update package list (always do this)
+echo "Updating package list..."
+sudo apt update
+```
+
 ## 修改系统时区  
         
 ### 利用 timedatectl 修改时区  
