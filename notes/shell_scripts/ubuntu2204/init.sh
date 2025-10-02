@@ -31,7 +31,25 @@
 . git_config.sh
 
 # 配置 vim
-. vim_config.sh
+
+# 检查 Vim 版本
+vim_version=$(vim --version | head -n 1 | awk '{print $5}')
+
+# 根据版本号选择配置脚本
+case "$VIM_VERSION" in
+    8.2*)
+        . vim_config_8.2.sh
+        ;;
+    9.1*)
+        . vim_config_9.1.sh
+        ;;
+    *)
+        echo "Unsupported Vim version: $VIM_VERSION"
+        ;;
+esac
 
 # 配置 ssh
 . ssh_config.sh
+
+# 配置 vmware tool 支持复制内容到系统剪贴版
+. setup_vmware_tools.sh

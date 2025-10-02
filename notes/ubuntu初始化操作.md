@@ -1140,11 +1140,13 @@ unset host_ip
 unset proxy_port  
 ```  
     
+# 支持复制内容到系统剪贴版        
         
-        
-        
-        
-        
+```bash
+sudo apt-get update
+sudo apt-get install -y open-vm-tools open-vm-tools-desktop
+```
+
 # ubuntu server 最小化安装  
 - ubuntu22.04 最小化安装  
         
@@ -1157,20 +1159,48 @@ unset proxy_port
   
 # ubuntu22.04 桌面版初始化  
 vmware 中安装 ubuntu22.04 桌面版  
+
+## 添加 root 账号
+```cpp
+sudo passwd root
+```
+
+可以删除安装时建立的用户的密码，如：
+```cpp
+su
+passwd -d lx
+```
   
-## 初始化脚本  
-先安装 openssh-server 将初始化脚本拷贝到本机执行  
+## 安装 openssh-server  
 ```bash  
 sudo apt install openssh-server -y  
 ```  
 openssh-server 配置见前面说明  
-  
+如果有其他虚拟机已经配置好 ssh 配置的，可以拷贝过去覆盖 `/etc/ssh/sshd_config` 文件。
+这样可以使用 root 远程登录。
+
+如：
+```cpp
+scp root@10.0.0.172:/etc/ssh/sshd_config /etc/ssh/
+```
+重启 ssh 服务
+```cpp
+sudo systemctl restart ssh.service  
+```
+
+在 mobaxterm 中登录。
+
+## 拷贝初始化脚本
+可以用 mobaxterm 的 sftp 工具将 windows 中的脚本和配置文件文件夹拖到虚拟机的对应目录中。
+或者 windows 中装了 WSL，则可以用 scp 拷贝。
+
+执行 ubuntu2204 子目录中的 init.sh，执行前先修改 env.sh 的宿主机的 ip 地址。
+
 ## 分辨率设置  
 自适应分辨率  
 ```bash  
 sudo apt install -y open-vm-tools  
 ```  
-安装后感觉没什么变化？  
   
 ## 字体大小设置  
 > [ubuntu系统字体太小调整方法，亲测有效，2分钟解决！](https://blog.csdn.net/Time_Memory_cici/article/details/131615107)  
@@ -1179,7 +1209,6 @@ sudo apt install -y open-vm-tools
 sudo apt install gnome-tweaks -y  
 gnome-tweaks  
 ```  
-设置很方便  
   
 ## 中文输入法  
 > [Ubuntu22.04-添加中文输入法](https://blog.csdn.net/qq_19331985/article/details/125998219)  
