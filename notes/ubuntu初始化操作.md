@@ -1,9 +1,8 @@
-ubuntu 22.04 初始化操作  
+ubuntu 22.04 以及 24.04 初始化操作  
         
 # 环境准备  
 vmware 中安装 ubuntu22.04   
 
-ubuntu22.04 不同版本有区别，文档中是针对下面版本方法，其他版本需要修改：
 ```bash
 [lx@Ubuntu2204 apt]$ cat /etc/lsb-release
 DISTRIB_ID=Ubuntu
@@ -237,7 +236,7 @@ en_US.UTF-8
 - 修改完后重启  
         
 ## 修改软件源  
-针对的 ubuntu 版本：
+ubuntu 版本：
 ```bash
 [lx@Ubuntu2204 apt]$ cat /etc/lsb-release
 DISTRIB_ID=Ubuntu
