@@ -236,7 +236,7 @@ en_US.UTF-8
 - 修改完后重启  
         
 ## 修改软件源  
-ubuntu 版本：
+查看 ubuntu 版本：
 ```bash
 [lx@Ubuntu2204 apt]$ cat /etc/lsb-release
 DISTRIB_ID=Ubuntu
@@ -244,8 +244,13 @@ DISTRIB_RELEASE=22.04
 DISTRIB_CODENAME=jammy
 DISTRIB_DESCRIPTION="Ubuntu 22.04.3 LTS"
 ```
+
+对于 ubuntu22.04：
 ```bash  
-sed -i.orig 's/cn.archive.ubuntu.com/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list  
+MIRROR="mirrors.tuna.tsinghua.edu.cn"
+sudo sed -i.orig "s#archive.ubuntu.com#${MIRROR}#g" /etc/apt/sources.list
+sed -i.orig.security "s#security.ubuntu.com#${MIRROR}#g" /etc/apt/sources.list
+sudo apt update && sudo apt upgrade -y
 ```  
 
 兼容 jammy 和 noble 的脚本：
@@ -399,6 +404,9 @@ Functions:
     - `~/.bash_aliases`  
         
 因此两种方式最后都会执行 `~/.bashrc`，在用户家目录的 `.bashrc` 和 `/etc/skel/.bashrc` 中追加对自定义脚本 `bash_custom.sh` 的调用，如下：  
+
+### 每个用户的自定义脚本独立
+初始时将 root 目录下的 bash_custom.sh 脚本复制到其他用户目录下，并修改权限，后续如果要修改，则每个用户目录都要改。
 ```bash  
 #!/bin/bash  
 #  
@@ -456,6 +464,74 @@ fi
 . ~/${custom_script}  
 ```  
         
+### 所有用户共用一个自定义脚本
+在 root 目录下创建脚本 bash_custom.sh，然后通过脚本为普通用户创建这个脚本的软链接，后续如果需要修改脚本内容，只用通过 root 修改即可。
+
+这个脚本的调用也需要通过其他脚本在执行每个用户的  .bashrc 文件时调用。
+
+```bash
+#!/bin/bash
+#
+#********************************************************************
+#Author:            lx
+#Date:              2024-02-01
+#URL:               http://github.com/lxwcd
+#Description:       创建自定义脚本的软链接，便于统一管理。
+#                   源脚本为 /root/bash_custom.sh
+#                   在 ~/.bashrc 中添加对软链接的调用
+# Copyright (C):     2024 All rights reserved
+#********************************************************************
+
+# 定义源脚本（中心脚本）的绝对路径
+source_script="/root/bash_custom.sh"
+# 定义在所有用户目录下创建的软链接的名称
+link_name="bash_custom.sh"
+
+# ~/.bashrc 中添加自定义脚本的调用
+modify_bashrc() {
+    if grep -q "${link_name}" "$1"; then
+        return
+    fi
+
+    cat <<EOF >> "$1"
+if [ -f ~/${link_name} ]; then
+    . ~/${link_name}
+fi
+EOF
+}
+
+# 1. 确保源脚本存在
+if [ ! -f "${source_script}" ]; then
+    echo "错误：源脚本 ${source_script} 不存在！"
+    return 1
+fi
+
+# 2. 修改 /etc/skel/.bashrc (用于新创建的用户)
+modify_bashrc "/etc/skel/.bashrc"
+
+# 3. 为已有的普通用户家目录创建软链接
+for user_home in /home/*; do
+    if [ -d "${user_home}" ]; then
+        user_name=$(basename "${user_home}")
+        user_link="${user_home}/${link_name}"
+
+        modify_bashrc "${user_home}/.bashrc"
+
+        # --- 关键修改：删除可能存在的旧文件（无论是普通文件还是旧链接），然后创建新的软链接 ---
+        rm -f "${user_link}"
+        ln -s "${source_script}" "${user_link}"
+        chown -h "${user_name}:${user_name}" "${user_link}" # 使用 -h 修改链接本身的所有者
+        echo "软链接已创建/更新: ${user_link} -> ${source_script}"
+    fi
+done
+
+# 4. 让当前环境生效 (如果当前是root用户)
+if [ -f ~/.bashrc ]; then
+    source ~/.bashrc
+    echo "当前环境的 .bashrc 已重新加载。"
+fi
+```
+
 ## 创建自定义 vim 配置文件  
 - vim 版本为 `version 8.2.4919`  
         
